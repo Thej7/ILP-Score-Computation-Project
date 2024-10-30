@@ -1,0 +1,127 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    
+}
+
+body {
+    display: flex; /* Use flexbox for layout */
+}
+
+.layout-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+    position: fixed;
+    width: 100%;
+}
+
+.sidebar {
+    width: 20%; /* Sidebar takes 20% of the screen width */
+    background-color: #8061C3; /* Light background color */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 20px 0; /* Top and bottom padding */
+}
+
+.logo {
+    max-width: 80%; /* Make logo fit within button size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space below the logo */
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    justify-content:center; /* Even spacing between buttons */
+    flex-grow: 1; /* Allow nav-menu to grow */
+    width: 80%; /* Full width of the sidebar */
+    border-radius: 8px;
+    
+}
+
+.nav-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    padding: 15px; /* Space around the items */
+    text-decoration: none; /* Remove underline */
+    color: white; /* White text color */
+    background-color: #967CCF; /* Button background color */
+    border-radius: 4px; /* Rounded corners */
+    margin: 20px 0; /* Space between buttons */
+    height: 50px; /* Fixed height for equal button size */
+    width: 100%; /* Full width for buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.nav-item:hover {
+    background-color: #7a5f9e; /* Darker shade on hover */
+}
+
+.nav-icon {
+    max-width: 25px; /* Limit icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.footer-logo {
+    max-width: 80%; /* Responsive footer logo */
+    margin-top: auto; /* Push footer logo to the bottom */
+}
+
+.Config-Page-Right {
+    width: 80%;
+    height: auto;
+    padding: 20px;
+}
+
+.Config-Page-Right-Criteria-Group {
+    border: 1px solid black;
+    background-color: rgba(128, 97, 195, 0.2);
+}
+
+.Config-Page-Right-Criteria-Group-Head {
+    display: flex;
+    justify-content: space-between;
+    background-color: #8061C3;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.Config-Page-Right-Criteria-Group-Body {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.Config-Page-Right-Criteria-Group-Body-Table {
+    border: 2px solid red;
+    box-sizing: border-box;
+}
+
+.Config-Page-Right-Criteria-Group-Body-Options {
+    border: 2px solid red;
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+}
+
+.Config-Page-Right-Criteria-Group-Body-Table input{
+    border: none;
+    outline: none;
+    padding: 0;
+}
+
+.Config-Page-Right-Criteria-Group-Body-Table td, th{
+    border: 2px solid black;
+    margin: 0;
+}
+
+.Config-Page-Right-Criteria-Group-Body-Table table{
+    border-collapse: collapse;
+    background-color: white;
+    margin-top: 20px;
+}

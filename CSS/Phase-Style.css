@@ -1,0 +1,81 @@
+body {
+    width: 100%;
+    height: auto;
+    background-color: rgb(244, 245, 247);
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.Phase-Page {
+    width: 100%;
+    height: 50em;
+    display: flex;
+    flex-direction: row;
+    /* border: 1px solid rgb(243, 238, 238); */
+}
+
+.Phase-Page-Left {
+    width: 16%;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    background-color: #8061c3;
+    /* border: 1px solid rgb(4, 0, 255); */
+    padding-left: 2em;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+.Phase-Page-Left-Logo {
+    padding-top: 2em;
+}
+
+.Phase-Page-Left-Menu {
+    padding-top: 3em;
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    height: 22em;
+    /* border: 1px solid rgb(243, 238, 238); */
+    color: white;
+    gap: 2em;
+}
+
+.Phase-Page-Left-Menu-Element {
+    background-color: #967ccf;
+    width: 90%;
+    height: 2.5em;
+    display: flex;
+    border-radius: 4px;
+    flex-direction: row;
+    gap: 2em;
+    padding-top: 0.5em;
+    justify-content: center;
+}
+
+.Phase-Page-Right {
+    width: 80%;
+    height: auto;
+    padding: 20px;
+}
+
+.Phase-Page-Right-Group {
+    border: 2px solid black;
+}
+
+.Phase-Page-Right-Group-Head {
+    border: 2px solid pink;
+}
+
+.Phase-Page-Right-Group-Body {
+    border: 2px solid yellow;
+}
+
+.Phase-Page-Right-Group-Body-Form {
+    border: 2px solid red;
+}
+
+.Phase-Page-Right-Group-Body-Options {
+    border: 2px solid green;
+}
+
