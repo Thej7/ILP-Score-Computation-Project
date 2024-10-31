@@ -1,56 +1,74 @@
-body {
-    width: 100%;
-    height: auto;
-    background-color: rgb(244, 245, 247);
-    overflow-x: hidden;
+* {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    
 }
 
-.Phase-Page {
+body {
+    display: flex; /* Use flexbox for layout */
+}
+
+.layout-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+    position: fixed;
     width: 100%;
-    height: 50em;
-    display: flex;
-    flex-direction: row;
-    /* border: 1px solid rgb(243, 238, 238); */
 }
 
-.Phase-Page-Left {
-    width: 16%;
-    height: 600px;
+.sidebar {
+    width: 20%; /* Sidebar takes 20% of the screen width */
+    background-color: #8061C3; /* Light background color */
     display: flex;
-    flex-direction: column;
-    background-color: #8061c3;
-    /* border: 1px solid rgb(4, 0, 255); */
-    padding-left: 2em;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 20px 0; /* Top and bottom padding */
 }
 
-.Phase-Page-Left-Logo {
-    padding-top: 2em;
+.logo {
+    max-width: 80%; /* Make logo fit within button size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space below the logo */
 }
 
-.Phase-Page-Left-Menu {
-    padding-top: 3em;
+.nav-menu {
     display: flex;
-    flex-direction: column;
-    width: 90%;
-    height: 22em;
-    /* border: 1px solid rgb(243, 238, 238); */
-    color: white;
-    gap: 2em;
+    flex-direction: column; /* Stack links vertically */
+    justify-content:center; /* Even spacing between buttons */
+    flex-grow: 1; /* Allow nav-menu to grow */
+    width: 80%; /* Full width of the sidebar */
+    border-radius: 8px;
+    
 }
 
-.Phase-Page-Left-Menu-Element {
-    background-color: #967ccf;
-    width: 90%;
-    height: 2.5em;
-    display: flex;
-    border-radius: 4px;
-    flex-direction: row;
-    gap: 2em;
-    padding-top: 0.5em;
-    justify-content: center;
+.nav-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    padding: 15px; /* Space around the items */
+    text-decoration: none; /* Remove underline */
+    color: white; /* White text color */
+    background-color: #967CCF; /* Button background color */
+    border-radius: 4px; /* Rounded corners */
+    margin: 20px 0; /* Space between buttons */
+    height: 50px; /* Fixed height for equal button size */
+    width: 100%; /* Full width for buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.nav-item:hover {
+    background-color: #7a5f9e; /* Darker shade on hover */
+}
+
+.nav-icon {
+    max-width: 25px; /* Limit icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.footer-logo {
+    max-width: 80%; /* Responsive footer logo */
+    margin-top: auto; /* Push footer logo to the bottom */
 }
 
 .Phase-Page-Right {
@@ -59,23 +77,40 @@ body {
     padding: 20px;
 }
 
-.Phase-Page-Right-Group {
-    border: 2px solid black;
+.Phase-Page-Right-Phase {
+    border: 1px solid black;
+    background-color: rgba(128, 97, 195, 0.2);
 }
 
-.Phase-Page-Right-Group-Head {
-    border: 2px solid pink;
+.Phase-Page-Right-Phase-Head {
+    display: flex;
+    justify-content: space-between;
+    background-color: #8061C3;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
 }
 
-.Phase-Page-Right-Group-Body {
-    border: 2px solid yellow;
+.Phase-Page-Right-Phase-Body {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
 }
 
-.Phase-Page-Right-Group-Body-Form {
+.Phase-Page-Right-Phase-Body-Detail {
     border: 2px solid red;
+    box-sizing: border-box;
 }
 
-.Phase-Page-Right-Group-Body-Options {
-    border: 2px solid green;
+.Phase-Page-Right-Phase-Body-Options {
+    border: 2px solid red;
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
 }
 
+.Phase-Page-Right-Phase-Body-Detail input{
+    border: none;
+    outline: none;
+    padding: 0;
+}

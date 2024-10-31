@@ -341,6 +341,8 @@ function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteria
         submittedDataHeaderRow.appendChild(submittedDataHead3);
         submittedDataTable.appendChild(submittedDataHeaderRow);
 
+        console.log(rows)
+
         rows.forEach((row, index) => {
             if (index === 0) return;
             const inputs = row.querySelectorAll('input');
@@ -353,7 +355,7 @@ function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteria
             `;
 
             submittedDataTable.appendChild(submittedDataRow);
-            writeFirebaseData(oldHeadName, inputs, groupName, rows);
+            writeFirebaseData(oldHeadName, inputs, groupName);
         });
 
         criteriaBodyTable.innerHTML = '';
@@ -372,112 +374,111 @@ function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteria
 async function loadFirebaseData() {
     const loadedData = await readFirebaseData();
 
-    const workspace = document.getElementsByClassName('Config-Page-Right')[0];
+    if (loadedData != null) {
 
-    loadedData.forEach((group) => {
+        const workspace = document.getElementsByClassName('Config-Page-Right')[0];
 
-        const criteriaGroup = document.createElement('div');
-        criteriaGroup.classList.add('Config-Page-Right-Criteria-Group');
+        loadedData.forEach((group) => {
 
-        const criteriaHead = document.createElement('div');
-        criteriaHead.classList.add('Config-Page-Right-Criteria-Group-Head');
+            const criteriaGroup = document.createElement('div');
+            criteriaGroup.classList.add('Config-Page-Right-Criteria-Group');
 
-        const criteriaHeadName = document.createElement('div');
-        criteriaHeadName.classList.add('Config-Page-Right-Criteria-Group-Head-Name');
-        criteriaHeadName.innerText = group.groupName;
+            const criteriaHead = document.createElement('div');
+            criteriaHead.classList.add('Config-Page-Right-Criteria-Group-Head');
 
-        const criteriaHeadButton = document.createElement('button');
-        criteriaHeadButton.classList.add('Config-Page-Right-Criteria-Group-Head-Button');
-        criteriaHeadButton.innerText = "+";
+            const criteriaHeadName = document.createElement('div');
+            criteriaHeadName.classList.add('Config-Page-Right-Criteria-Group-Head-Name');
+            criteriaHeadName.innerText = group.groupName;
 
-        criteriaHead.appendChild(criteriaHeadName);
-        criteriaHead.appendChild(criteriaHeadButton);
+            const criteriaHeadButton = document.createElement('button');
+            criteriaHeadButton.classList.add('Config-Page-Right-Criteria-Group-Head-Button');
+            criteriaHeadButton.innerText = "+";
 
-        criteriaGroup.appendChild(criteriaHead);
+            criteriaHead.appendChild(criteriaHeadName);
+            criteriaHead.appendChild(criteriaHeadButton);
 
-        const criteriaBody = document.createElement('div');
-        criteriaBody.classList.add('Config-Page-Right-Criteria-Group-Body');
+            criteriaGroup.appendChild(criteriaHead);
 
-        const criteriaBodyTable = document.createElement('div');
-        criteriaBodyTable.classList.add('Config-Page-Right-Criteria-Group-Body-Table');
+            const criteriaBody = document.createElement('div');
+            criteriaBody.classList.add('Config-Page-Right-Criteria-Group-Body');
 
-        const criteriaTable = document.createElement('table');
+            const criteriaBodyTable = document.createElement('div');
+            criteriaBodyTable.classList.add('Config-Page-Right-Criteria-Group-Body-Table');
 
-        const headerRow = document.createElement('tr');
-        const headerCells = ['SL. No', 'Evaluation Criteria', 'Points', 'Actions'];
-        headerCells.forEach(headerText => {
-            const headerCell = document.createElement('th');
-            headerCell.innerText = headerText;
-            headerRow.appendChild(headerCell);
-        });
-        criteriaTable.appendChild(headerRow);
+            const criteriaTable = document.createElement('table');
 
-        const newTableRow = document.createElement('tr');
-
-        group.criteria.forEach((criteria) => {
-            const newTableId = document.createElement('td');
-            newTableId.innerText = criteria.id;
-            const newTableName = document.createElement('td');
-            newTableName.innerText = criteria.name;
-            const newTablePoint = document.createElement('td');
-            newTablePoint.innerText = criteria.points;
-            const newTableButton = document.createElement('button');
-            newTableButton.innerHTML = 'Remove';
-            newTableButton.addEventListener('click', function () {
-                newTableRow.remove();
+            const headerRow = document.createElement('tr');
+            const headerCells = ['SL. No', 'Evaluation Criteria', 'Points'];
+            headerCells.forEach(headerText => {
+                const headerCell = document.createElement('th');
+                headerCell.innerText = headerText;
+                headerRow.appendChild(headerCell);
             });
-            newTableRow.appendChild(newTableId);
-            newTableRow.appendChild(newTableName);
-            newTableRow.appendChild(newTablePoint);
-            newTableRow.appendChild(newTableButton);
+            criteriaTable.appendChild(headerRow);
+
+            let newTableRow;
+
+            group.criteria.forEach((criteria) => {
+
+                newTableRow = document.createElement('tr');
+                const newTableId = document.createElement('td');
+                newTableId.innerText = criteria.id;
+                const newTableName = document.createElement('td');
+                newTableName.innerText = criteria.name;
+                const newTablePoint = document.createElement('td');
+                newTablePoint.innerText = criteria.points;
+                newTableRow.appendChild(newTableId);
+                newTableRow.appendChild(newTableName);
+                newTableRow.appendChild(newTablePoint);
+                criteriaTable.appendChild(newTableRow)
+            })
+            criteriaBodyTable.appendChild(criteriaTable);
+
+
+            const criteriaBodyOption = document.createElement('div');
+            criteriaBodyOption.classList.add('Config-Page-Right-Criteria-Group-Body-Options');
+
+            const criteriaOptionEdit = document.createElement('button');
+            criteriaOptionEdit.classList.add('Config-Page-Right-Criteria-Group-Body-Options-Edit');
+            criteriaOptionEdit.innerText = "Edit";
+
+            const criteriaOptionDelete = document.createElement('button');
+            criteriaOptionDelete.classList.add('Config-Page-Right-Criteria-Group-Body-Options-Delete');
+            criteriaOptionDelete.innerText = "Delete";
+
+            const criteriaOptionSubmit = document.createElement('button');
+            criteriaOptionSubmit.classList.add('Config-Page-Right-Criteria-Group-Body-Options-Submit');
+            criteriaOptionSubmit.innerText = "Submit";
+
+            criteriaBodyOption.appendChild(criteriaOptionEdit);
+            criteriaBodyOption.appendChild(criteriaOptionDelete);
+            criteriaBodyOption.appendChild(criteriaOptionSubmit);
+
+            criteriaBody.appendChild(criteriaBodyTable);
+            criteriaBody.appendChild(criteriaBodyOption);
+            criteriaBody.style.display = 'none';
+            criteriaGroup.appendChild(criteriaBody);
+
+            criteriaHeadButton.addEventListener('click', async function () {
+                if (criteriaBody.style.display === 'none') {
+                    criteriaBody.style.display = 'flex';
+                } else {
+                    criteriaBody.style.display = 'none';
+                }
+            });
+
+
+            workspace.appendChild(criteriaGroup);
+
+            criteriaOptionDelete.addEventListener('click', function () {
+                criteriaGroup.remove();
+            });
+
+            criteriaOptionEdit.addEventListener('click', function () {
+                editCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBodyTable, criteriaOptionSubmit, criteriaHeadName, criteriaTable, criteriaTable);
+            });
         })
-        criteriaTable.appendChild(newTableRow)
-        criteriaBodyTable.appendChild(criteriaTable);
-
-
-        const criteriaBodyOption = document.createElement('div');
-        criteriaBodyOption.classList.add('Config-Page-Right-Criteria-Group-Body-Options');
-
-        const criteriaOptionEdit = document.createElement('button');
-        criteriaOptionEdit.classList.add('Config-Page-Right-Criteria-Group-Body-Options-Edit');
-        criteriaOptionEdit.innerText = "Edit";
-
-        const criteriaOptionDelete = document.createElement('button');
-        criteriaOptionDelete.classList.add('Config-Page-Right-Criteria-Group-Body-Options-Delete');
-        criteriaOptionDelete.innerText = "Delete";
-
-        const criteriaOptionSubmit = document.createElement('button');
-        criteriaOptionSubmit.classList.add('Config-Page-Right-Criteria-Group-Body-Options-Submit');
-        criteriaOptionSubmit.innerText = "Submit";
-
-        criteriaBodyOption.appendChild(criteriaOptionEdit);
-        criteriaBodyOption.appendChild(criteriaOptionDelete);
-        criteriaBodyOption.appendChild(criteriaOptionSubmit);
-
-        criteriaBody.appendChild(criteriaBodyTable);
-        criteriaBody.appendChild(criteriaBodyOption);
-        criteriaBody.style.display = 'none';
-        criteriaGroup.appendChild(criteriaBody);
-
-        criteriaHeadButton.addEventListener('click', async function () {
-            if (criteriaBody.style.display === 'none') {
-                criteriaBody.style.display = 'flex';
-            } else {
-                criteriaBody.style.display = 'none';
-            }
-        });
-
-
-        workspace.appendChild(criteriaGroup);
-
-        criteriaOptionDelete.addEventListener('click', function () {
-            criteriaGroup.remove();
-        });
-
-        criteriaOptionEdit.addEventListener('click', function () {
-            editCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBodyTable, criteriaOptionSubmit, criteriaHeadName, criteriaTable, criteriaTable);
-        });
-    })
+    }
 }
 
 async function readFirebaseData() {
@@ -513,6 +514,7 @@ async function readFirebaseData() {
 
         } else {
             console.log("No groups found under 'Evaluation Criteria'");
+            return null;
         }
     } catch (error) {
         console.error("Error reading data: ", error);
@@ -521,37 +523,22 @@ async function readFirebaseData() {
 
 
 
-async function writeFirebaseData(oldHeadName, inputs, groupName, rows) {
+async function writeFirebaseData(oldHeadName, inputs, groupName) {
     const headingText = oldHeadName;
     console.log(headingText);
 
     try {
-        const groupRef = ref(db, `Evaluation Criteria/${groupName}`);
+        const groupRef = ref(db, `Evaluation Criteria/${groupName}/${inputs[0].value}`); // Reference with unique criteria ID
 
-        const criteriaArray = [];
+        const criteriaObject = {
+            id: inputs[0].value,
+            name: inputs[1].value,
+            points: inputs[2].value,
+        };
 
-        for (let index = 1; index < rows.length; index++) {
-            const row = rows[index];
-            const criteriaId = `id${index}`;
-            const criteriaName = inputs[1].value;
-            const criteriaPoints = inputs[2].value;
-
-            if (criteriaName === undefined || criteriaPoints === undefined) {
-                console.error("One or more input values are undefined.");
-                continue;
-            }
-
-            const criteriaObject = {
-                id: criteriaId,
-                name: criteriaName,
-                points: criteriaPoints,
-            };
-
-            criteriaArray.push(criteriaObject);
-        }
-
-        await set(groupRef, criteriaArray);
-        console.log(`Criteria for group '${groupName}' created successfully`);
+        // Save each row's data individually as a unique entry
+        await set(groupRef, criteriaObject);
+        console.log(`Criteria '${criteriaObject.name}' for group '${groupName}' created successfully`);
 
     } catch (error) {
         console.error("Error creating document: ", error);
