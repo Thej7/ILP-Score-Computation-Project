@@ -73,11 +73,9 @@ function createCriteriaGroup() {
             if (criteriaHeadName.innerText === "Add a new Evaluation Criteria") {
                 criteriaHead.style.display = "none";
 
-                // Await the showCriteriaForm function
                 try {
                     div = await showCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBodyTable, criteriaOptionSubmit, criteriaHeadName);
-                    console.log(div); // This will log the returned value from showCriteriaForm
-                    // You can also use div here to do something with the returned value
+                    console.log(div);
                 } catch (error) {
                     console.error('Error during criteria form submission:', error);
                 }
@@ -104,7 +102,7 @@ function createCriteriaGroup() {
 }
 
 function showCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBodyTable, criteriaOptionSubmit, criteriaHeadName, criteriaTable) {
-    return new Promise((resolve) => { // Wrap in a Promise
+    return new Promise((resolve) => {
         criteriaBodyTable.innerHTML = '';
 
         const criteriaTitle = document.createElement('input');
@@ -176,6 +174,7 @@ function editCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBod
     let criteriaTitle;
 
     const existingTitleInput = criteriaBody.querySelector('input[type="text"]');
+    console.log(existingTitleInput);
     if (existingTitleInput) {
         existingTitleInput.value = criteriaHeadName.textContent;
         criteriaTitle = existingTitleInput;

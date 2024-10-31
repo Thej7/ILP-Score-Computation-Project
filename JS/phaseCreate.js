@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { collection, doc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import { db } from './firebaseConfig.mjs';
 
 function createPhase() {
@@ -53,15 +53,23 @@ function createPhase() {
 
     phaseBody.style.display = 'none';
     phaseSection.appendChild(phaseBody);
-    
+
+    let phaseBodyText = null;
+
     phaseHeadButton.addEventListener('click', function () {
         if (phaseBody.style.display === 'none') {
             phaseBody.style.display = 'block';
             if (phaseHeadName.innerText === "add a new Phase") {
                 phaseHead.style.display = "none";
-                showPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName);
+                try {
+                    phaseBodyText = showPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName);
+                } catch (error) {
+                    console.error('Error', error)
+                }
+            } else {
+                console.log(phaseBodyText);
             }
-        } 
+        }
         else {
             phaseBody.style.display = 'none';
         }
@@ -74,38 +82,75 @@ function createPhase() {
     });
 
     phaseOptionEdit.addEventListener('click', function () {
-        editPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName);
+        editPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseBodyText);
     });
 }
 
-function showPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName){
-    const phaseTitle = document.createElement('input');
-    phaseTitle.type = 'text';
-    phaseTitle.placeholder = 'Enter the Phase name';
-    phaseBody.appendChild(phaseTitle);
+function showPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName) {
+    return new Promise((resolve) => {
 
+        phaseBodyDetail.innerHTML = '';
+        const phaseTitle = document.createElement('input');
+        phaseTitle.type = 'text';
+        phaseTitle.placeholder = 'Enter the Phase name';
+        phaseBody.appendChild(phaseTitle);
+
+        phaseBodyDetail.innerHTML = '';
+
+        const phaseBodyDesc = document.createElement('textarea');
+        phaseBodyDesc.placeholder = 'Enter a phase Description';
+
+        phaseBodyDetail.appendChild(phaseBodyDesc);
+
+        phaseOptionSubmit.addEventListener('click', async () => {
+            try {
+                const phaseBodyText = await submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc);
+                await createPhase();
+                resolve(phaseBodyText);
+            } catch (error) {
+                console.error(error);
+                resolve(null);
+            }
+        });
+    });
+}
+
+function editPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseBodyText) {
     phaseBodyDetail.innerHTML = '';
 
+    let phaseTitle;
+
+    const existingTitleInput = phaseBody.querySelector('input[type="text"]');
+    if (existingTitleInput) {
+        existingTitleInput.value = phaseHeadName.textContent;
+        phaseTitle = existingTitleInput;
+    } else {
+        phaseTitle = document.createElement('input');
+        phaseTitle.type = 'text';
+        phaseTitle.value = phaseHeadName.textContent;
+        phaseBodyDetail.appendChild(phaseTitle);
+    }
+
     const phaseBodyDesc = document.createElement('textarea');
-    phaseBodyDesc.placeholder = 'Enter a phase Description';
-    
+    phaseBodyDesc.value = phaseBodyText.innerText;
+
     phaseBodyDetail.appendChild(phaseBodyDesc);
+
+    phaseBody.appendChild(phaseBodyDetail);
+
+    phaseOptionSubmit.replaceWith(phaseOptionSubmit.cloneNode(true));
+    phaseOptionSubmit = phaseBody.querySelector('.Phase-Page-Right-Phase-Body-Options-Submit');
 
     phaseOptionSubmit.addEventListener('click', async () => {
         try {
-            await submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc);
-            await createPhase();
+            phaseBodyText = await submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc);
         } catch (error) {
             console.error(error);
         }
-    }); 
+    });
+
+
 }
-
-// function editCriteriaForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName) {
-//     phaseBodyDetail.innerHTML = '';
-
-
-// }
 
 function submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc) {
     return new Promise((resolve, reject) => {
