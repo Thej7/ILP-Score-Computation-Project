@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import { getDatabase, ref, set, get, child, remove} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -19,4 +19,4 @@ const analytics = getAnalytics(app);
 const db = getDatabase(app); 
 const auth = getAuth(app);
 
-export { app, db, analytics, auth, ref, set, get, child };
+export { app, db, analytics, auth, ref, set, get, child, remove };
