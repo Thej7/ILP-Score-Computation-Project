@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./CSS/Trainer-Home.css" />
+    <title>Trainer Dash based on latest batch added in database</title>
+  </head>
+  <body>
+    <div class="layout-container">
+      <nav class="sidebar" aria-label="Main navigation">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/be6e480a4e97c35c3433043d9521312efd752316dd543b35245d5abbb337723d?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+          alt="Company Logo"
+          class="logo"
+        />
+        <div class="nav-menu">
+          <a href="#" class="nav-item" aria-current="page">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/8e411e340ae2bb31d4785684e7c8a26030841429d5bd85ec8c34ea6c44f68272?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+              alt=""
+              class="nav-icon"
+              aria-hidden="true"
+            />
+            <span>Home</span>
+          </a>
+          <a href="#" class="nav-item">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/f645272289d417d5bba4e10b87511f91ea76b1cf63a5840e07da35d192bb15e0?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+              alt=""
+              class="nav-icon"
+              aria-hidden="true"
+            />
+            <span>Batches</span>
+          </a>
+          <a href="studyproject.html" class="nav-item">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/74b6ec9e8ccb39913fa4417e35fc22f6e12f61fd0099b4db533a77968606d525?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+              alt=""
+              class="nav-icon"
+            />
+            <span>Assessments</span>
+          </a>
+          <a href="TrainerProfile.html" class="nav-item">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/d884f34b2fd4a979af3412cf204c834013d2a65016b5215c45500fadb2c318dd?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+              alt=""
+              class="nav-icon"
+              aria-hidden="true"
+            />
+            <span>Profile</span>
+          </a>
+          <a href="./loginmain.html" class="nav-item">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets/TEMP/3c53a8954b172c5d5bd2aadff171e5ba6d15deec26252800847d825ebeb702e3?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+              alt=""
+              class="nav-icon"
+              aria-hidden="true"
+            />
+            <span>Log Out</span>
+          </a>
+        </div>
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/76b0a4e3509e937479c25bf98a22dee240a4cb9c4d333572149329aab7e91e04?placeholderIfAbsent=true&apiKey=c7865e64d5d04ad3844ba91ef78dbf86"
+          alt=""
+          class="footer-logo"
+          aria-hidden="true"
+        />
+      </nav>
+    </div>
+
+    <div class="right-container">
+      <h1 id="batchName"></h1>
+      <div class="phase-viewreport">
+        <h5 id="phaseName"></h5>
+        <button id="view-report">View Report</button>
+      </div>
+    </div>
+
+    <div class="right-last-container">
+      <div class="card-background">
+        <h2>Current Batch Details</h2>
+      </div>
+      <div class="card-background" id="criteria">
+        <h2>Evaluation Parameter Criteria</h2>
+      </div>
+      <div class="card-background">
+        <h2>Overall Performance</h2>
+      </div>
+    </div>
+
+    <script type="module" src="./JS/firebaseConfig.mjs"></script>
+    <script type="module" src="./JS/homepage.js"></script>
+  </body>
+</html>
