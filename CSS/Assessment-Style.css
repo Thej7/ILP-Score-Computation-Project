@@ -1,0 +1,122 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    
+}
+
+body {
+    display: flex; /* Use flexbox for layout */
+}
+
+.layout-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+}
+
+.sidebar {
+    width: 60%; /* Sidebar takes 20% of the screen width */
+    background-color: #3F69BA; /* Light background color */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 20px 0; /* Top and bottom padding */
+}
+
+.logo {
+    max-width: 80%; /* Make logo fit within button size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space below the logo */
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    justify-content:center; /* Even spacing between buttons */
+    flex-grow: 1; /* Allow nav-menu to grow */
+    width: 80%; /* Full width of the sidebar */
+    border-radius: 8px;
+    
+}
+
+.nav-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    padding: 15px; /* Space around the items */
+    text-decoration: none; /* Remove underline */
+    color: white; /* White text color */
+    background-color: #6B92DE; /* Button background color */
+    border-radius: 4px; /* Rounded corners */
+    margin: 20px 0; /* Space between buttons */
+    height: 50px; /* Fixed height for equal button size */
+    width: 100%; /* Full width for buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.nav-item:hover {
+    background-color: #5e89df; /* Darker shade on hover */
+}
+
+.nav-icon {
+    max-width: 25px; /* Limit icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.footer-logo {
+    max-width: 80%; /* Responsive footer logo */
+    margin-top: auto; /* Push footer logo to the bottom */
+}
+.right-container{
+    width:60%;
+    margin-left: -188px;
+}
+#batchName{
+    margin-top: 20px;
+    margin-left: 20px;
+}
+.card{
+    width:120px;
+    height:fit-content;
+    border:1px solid #8061C3;
+    border-radius: 50%;
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+   
+}
+.module-container
+{
+    margin-top: 20px;
+    margin-left: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid #ffff;
+    border-radius: 15px 15px;
+    padding: 20px 20px;
+    gap:20px;
+    width:80%;
+}
+.phase{
+    margin-left: 60px;
+    margin-top: 50px;
+}
+
+.right-last-container{
+
+    width:25%;
+   
+    
+
+}
+.card-background{
+    width:340px;
+    height:200px;
+    margin-left: 25px;
+    margin-top: 35px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid #ffff;
+    padding:10px 10px;
+}
