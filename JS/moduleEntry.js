@@ -1,4 +1,3 @@
-
 // batch entry okay
 // module entry and alert of exceeding 100 is okay and module store in local store until full submision
 //submiting mkodules and view modules at middle and submitall modules make the fullmodules save in firebase
@@ -8,7 +7,7 @@
 //but editing works but when entering phase and criteria and submit in the view module only the first option is showing also got corrected everything in modules fine
 // active field in module is given
 //startdateand end were added
-import { db, ref, set, get } from './firebaseConfig.js';
+import { db, ref, set, get } from './firebaseConfig.mjs';
 import { fetchPhase, fetchCriteria } from './getDropdown.js';  // Import the fetch function
 
 export let currentBatchName = '';
@@ -20,7 +19,6 @@ let modules = [];
 async function addBatch(year) {
     try {
         const name = document.getElementById('batch-name').value;
-        currentBatchName = name;
         if (!name) {
             alert("Please enter a batch name.");
             return;
@@ -105,7 +103,6 @@ function addModule(moduleName, totalWeightage, criteria, phase) {
 document.getElementById('Config-Page-Right-bottom-submit').addEventListener('click', async function (event) {
     event.preventDefault();
     const year = document.getElementById('batch-year').value;
-    currentBatchYear = year;
 
     if (year) {
         await addBatch(year);
@@ -376,4 +373,3 @@ document.getElementById('viewmodules-button').addEventListener('click', function
     event.preventDefault();
     viewAllModules();
 });
-

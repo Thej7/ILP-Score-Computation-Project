@@ -1,5 +1,5 @@
 // fetchOptions.js
-import { db, ref, get } from './firebaseConfig.js';
+import { db, ref, get } from './firebaseConfig.mjs';
 
 // Function to fetch document names from the 'Evaluation Criteria' and populate dropdown
 async function fetchCriteria(dropdown) {
