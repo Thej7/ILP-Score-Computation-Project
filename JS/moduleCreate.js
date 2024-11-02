@@ -1,11 +1,11 @@
-import { db, ref, set, get, remove} from './firebaseConfig.mjs';
+import { db, ref, set, get, remove } from './firebaseConfig.mjs';
 
 function createModule() {
     const workspace = document.getElementsByClassName('Module-Page-Right')[0];
 
     const moduleSection = document.createElement('div');
     moduleSection.classList.add('Module-Page-Right-Module');
-    
+
     const moduleHead = document.createElement('div');
     moduleHead.classList.add('Module-Page-Right-Module-Head');
 
@@ -56,7 +56,7 @@ function createModule() {
     let moduleBodyText = null;
 
     moduleHeadButton.addEventListener('click', async function () {
-        if(moduleBody.style.display === 'none') {
+        if (moduleBody.style.display === 'none') {
             moduleBody.style.display = 'block'
             if (moduleHeadName.innerText === "Add a new Module") {
                 moduleHead.style.display = "none";
@@ -105,6 +105,40 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
         const moduleBodyDesc = document.createElement('textarea');
         moduleBodyDesc.placeholder = 'Enter a module Description';
 
+        getEvaluationNames()
+            .then(assessments => {
+                console.log(assessments); // Log the retrieved assessments
+
+                const moduleDropdown = document.createElement('select');
+
+                // Check if assessments is an array before iterating
+                if (Array.isArray(assessments)) {
+                    assessments.forEach(assessment => {
+                        const moduleDropOption = document.createElement('option'); // Create an <option> element
+                        moduleDropOption.value = assessment; // Set the value of the option
+                        moduleDropOption.textContent = assessment; // Set the display text for the option
+                        moduleDropdown.appendChild(moduleDropOption); // Append the option to the dropdown
+                    });
+                } else {
+                    console.error("Expected an array but got:", assessments);
+                }
+
+                // Append the dropdown to the DOM
+                document.getElementById('dropdown-container').appendChild(moduleDropdown);
+
+                // Variable to hold the selected option
+                let selectedCriteria;
+
+                // Add an event listener to capture the selected option
+                moduleDropdown.addEventListener('change', (event) => {
+                    selectedCriteria = event.target.value; // Get the selected value
+                    console.log("Selected option:", selectedCriteria); // Log the selected value
+                });
+            })
+            .catch(error => {
+                console.error("Error retrieving assessment names:", error);
+            });
+
         moduleBodyDetail.appendChild(moduleBodyDesc);
 
         moduleOptionSubmit.addEventListener('click', async () => {
@@ -140,14 +174,13 @@ function editModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
         moduleBodyDetail.appendChild(moduleTitle);
     }
 
-    const moduleBodyDiv = document.createElement('div');    
+    const moduleBodyDiv = document.createElement('div');
 
     const moduleBodyDesc = document.createElement('textarea');
     moduleBodyDesc.value = moduleBodyText;
 
     moduleBodyDiv.appendChild(moduleBodyDesc);
     moduleBodyDetail.appendChild(moduleBodyDiv);
-
 
     moduleBody.appendChild(moduleBodyDetail);
 
@@ -322,6 +355,29 @@ async function readFirebaseData() {
     }
 }
 
+function getEvaluationNames() {
+    const dbRef = ref(db, 'Evaluation Criteria');
+
+    // Return a promise
+    return get(dbRef)
+        .then((snapshot) => {
+            if (snapshot.exists()) {
+                const criteriaData = snapshot.val(); // Get the data under "Evaluation Criteria"
+                const assessmentNames = Object.keys(criteriaData); // Get the keys (names)
+
+                console.log(assessmentNames); // Log the names or use them as needed
+                return assessmentNames; // Return the array of names
+            } else {
+                console.log("No data available");
+                return []; // Return an empty array if no data exists
+            }
+        })
+        .catch((error) => {
+            console.error("Error getting data: ", error);
+            return []; // Return an empty array in case of error
+        });
+}
+
 async function deleteModule(moduleName) {
     try {
         const moduleRef = ref(db, `Module/${moduleName}`);
@@ -337,4 +393,3 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadFirebaseData();
     await createModule();
 });
-
