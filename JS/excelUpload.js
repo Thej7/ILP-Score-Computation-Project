@@ -2,7 +2,7 @@
 let jsonData;
 
 import { db, ref, get, set } from './firebaseConfig.js';
-import { currentBatchYear, currentBatchName } from './ModuleEntry.js';
+import { currentBatchYear, currentBatchName } from './moduleEntry.js';
 
 async function handleFileUpload(event) {
     const file = event.target.files[0];

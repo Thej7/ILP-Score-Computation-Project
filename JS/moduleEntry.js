@@ -9,7 +9,7 @@
 // active field in module is given
 //startdateand end were added
 import { db, ref, set, get } from './firebaseConfig.js';
-import { fetchPhase, fetchCriteria } from './CriteriaAndPhaseOption.js';  // Import the fetch function
+import { fetchPhase, fetchCriteria } from './getDropdown.js';  // Import the fetch function
 
 export let currentBatchName = '';
 export let currentBatchYear = '';
