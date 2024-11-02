@@ -1,4 +1,4 @@
-import { db, ref, set, get, child, remove} from './firebaseConfig.mjs';
+import { db, ref, set, get, child, remove } from './firebaseConfig.mjs';
 
 let groupCounter = 1;
 
@@ -90,7 +90,9 @@ function createCriteriaGroup() {
 
     workspace.appendChild(criteriaGroup);
 
-    criteriaOptionDelete.addEventListener('click', function () {
+    criteriaOptionDelete.addEventListener('click', async function () {
+        console.log(criteriaHeadName.innerText);
+        await deleteFirebaseData(criteriaHeadName.innerText);
         criteriaGroup.remove();
         if (criteriaHeadName.innerText === "Add a new Evaluation Criteria") {
             createCriteriaGroup();
@@ -325,6 +327,7 @@ function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteria
             return;
         }
         const oldHeadName = criteriaHeadName.innerText;
+        console.log("headname: " + oldHeadName);
         criteriaHeadName.innerText = groupName;
 
         const submittedDataTable = document.createElement('table');
@@ -346,21 +349,21 @@ function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteria
 
         console.log(rows)
 
-        await deleteFirebaseData(groupName);
+        await deleteFirebaseData(oldHeadName);
 
         for (const [index, row] of rows.entries()) {
             if (index === 0) continue;
             const inputs = row.querySelectorAll('input');
-        
+
             const submittedDataRow = document.createElement('tr');
             submittedDataRow.innerHTML = `
                 <td>${inputs[0].value}</td>
                 <td>${inputs[1].value}</td>
                 <td>${inputs[2].value}</td>
             `;
-        
+
             submittedDataTable.appendChild(submittedDataRow);
-        
+
             // Await deletion before writing new data
             await writeFirebaseData(oldHeadName, inputs, groupName);
         }
@@ -481,6 +484,8 @@ async function loadFirebaseData() {
             workspace.appendChild(criteriaGroup);
 
             criteriaOptionDelete.addEventListener('click', async function () {
+                console.log(criteriaHeadName.innerText);
+                await deleteFirebaseData(criteriaHeadName.innerText);
                 criteriaGroup.remove();
             });
 
@@ -495,13 +500,13 @@ async function readFirebaseData() {
     const groupsRef = ref(db, `Evaluation Criteria`);
     try {
         const snapshot = await get(groupsRef);
-        
+
         if (snapshot.exists()) {
             const allGroupsArray = [];
             snapshot.forEach((groupSnapshot) => {
                 const groupName = groupSnapshot.key; // Get the name of the group
                 const criteriaArray = []; // Create an array for the criteria within this group
-                
+
                 groupSnapshot.forEach((childSnapshot) => {
                     const criteriaData = childSnapshot.val();
                     criteriaArray.push(criteriaData); // Add each criteria object to the array
@@ -525,7 +530,7 @@ async function readFirebaseData() {
 function getCriteriaByGroupName(allGroupsArray, groupName) {
     // Find the group in the array
     const group = allGroupsArray.find(group => group.groupName === groupName);
-    
+
     if (group) {
         return group.criteria; // Return the criteria array for the found group
     } else {
