@@ -1,4 +1,4 @@
-import { db, ref, set, get, child } from './firebaseConfig.mjs';
+import { db, ref, set, get, child, remove} from './firebaseConfig.mjs';
 
 let groupCounter = 1;
 
@@ -92,6 +92,9 @@ function createCriteriaGroup() {
 
     criteriaOptionDelete.addEventListener('click', function () {
         criteriaGroup.remove();
+        if (criteriaHeadName.innerText === "Add a new Evaluation Criteria") {
+            createCriteriaGroup();
+        }
     });
 
     criteriaOptionEdit.addEventListener('click', function () {
@@ -290,7 +293,7 @@ function createCriteriaTableRow(criteriaTable) {
 }
 
 function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteriaBody, criteriaBodyTable, criteriaHead) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
         const divId = criteriaBodyTable.id;
         const divClass = criteriaBodyTable.className;
@@ -343,20 +346,24 @@ function submitFunction(criteriaTitle, criteriaTable, criteriaHeadName, criteria
 
         console.log(rows)
 
-        rows.forEach((row, index) => {
-            if (index === 0) return;
-            const inputs = row.querySelectorAll('input');
+        await deleteFirebaseData(groupName);
 
+        for (const [index, row] of rows.entries()) {
+            if (index === 0) continue;
+            const inputs = row.querySelectorAll('input');
+        
             const submittedDataRow = document.createElement('tr');
             submittedDataRow.innerHTML = `
                 <td>${inputs[0].value}</td>
                 <td>${inputs[1].value}</td>
                 <td>${inputs[2].value}</td>
             `;
-
+        
             submittedDataTable.appendChild(submittedDataRow);
-            writeFirebaseData(oldHeadName, inputs, groupName);
-        });
+        
+            // Await deletion before writing new data
+            await writeFirebaseData(oldHeadName, inputs, groupName);
+        }
 
         criteriaBodyTable.innerHTML = '';
         criteriaBodyTable.appendChild(submittedDataTable);
@@ -379,6 +386,9 @@ async function loadFirebaseData() {
         const workspace = document.getElementsByClassName('Config-Page-Right')[0];
 
         loadedData.forEach((group) => {
+            const criteria = getCriteriaByGroupName(loadedData, group.groupName)
+            console.log('well');
+            console.log(criteria);
 
             const criteriaGroup = document.createElement('div');
             criteriaGroup.classList.add('Config-Page-Right-Criteria-Group');
@@ -418,7 +428,7 @@ async function loadFirebaseData() {
 
             let newTableRow;
 
-            group.criteria.forEach((criteria) => {
+            criteria.forEach((criteria) => {
 
                 newTableRow = document.createElement('tr');
                 const newTableId = document.createElement('td');
@@ -470,7 +480,7 @@ async function loadFirebaseData() {
 
             workspace.appendChild(criteriaGroup);
 
-            criteriaOptionDelete.addEventListener('click', function () {
+            criteriaOptionDelete.addEventListener('click', async function () {
                 criteriaGroup.remove();
             });
 
@@ -482,45 +492,47 @@ async function loadFirebaseData() {
 }
 
 async function readFirebaseData() {
-    const evalCriteriaRef = ref(db, "Evaluation Criteria");
-
+    const groupsRef = ref(db, `Evaluation Criteria`);
     try {
-        // Fetch all groups under 'Evaluation Criteria'
-        const snapshot = await get(evalCriteriaRef);
-
+        const snapshot = await get(groupsRef);
+        
         if (snapshot.exists()) {
-            const allGroups = snapshot.val(); // Get the entire 'Evaluation Criteria' data
-            const groupNames = Object.keys(allGroups); // Get all group names
-            console.log("All group names:", groupNames);
-
-            // To store data for all groups and their criteria
-            const allData = [];
-
-            // Iterate through each group and fetch its criteria
-            groupNames.forEach((groupName) => {
-                const groupCriteria = allGroups[groupName]; // Access criteria for this group
-                console.log(`Criteria for group '${groupName}':`, groupCriteria);
-
-                // You can store this data in your program as needed
-                allData.push({
-                    groupName: groupName,
-                    criteria: groupCriteria
+            const allGroupsArray = [];
+            snapshot.forEach((groupSnapshot) => {
+                const groupName = groupSnapshot.key; // Get the name of the group
+                const criteriaArray = []; // Create an array for the criteria within this group
+                
+                groupSnapshot.forEach((childSnapshot) => {
+                    const criteriaData = childSnapshot.val();
+                    criteriaArray.push(criteriaData); // Add each criteria object to the array
                 });
+
+                allGroupsArray.push({ groupName, criteria: criteriaArray }); // Add group name and its criteria array to the allGroupsArray
             });
 
-            // Output all the data
-            console.log("All data saved in program:", allData);
-            return allData;
-
+            console.log("All groups data retrieved successfully:", allGroupsArray);
+            return allGroupsArray; // Return the array containing all groups and their criteria
         } else {
-            console.log("No groups found under 'Evaluation Criteria'");
-            return null;
+            console.log("No groups available.");
+            return []; // Return an empty array if no data
         }
     } catch (error) {
         console.error("Error reading data: ", error);
+        return []; // Return an empty array on error
     }
 }
 
+function getCriteriaByGroupName(allGroupsArray, groupName) {
+    // Find the group in the array
+    const group = allGroupsArray.find(group => group.groupName === groupName);
+    
+    if (group) {
+        return group.criteria; // Return the criteria array for the found group
+    } else {
+        console.log(`Group '${groupName}' not found.`);
+        return []; // Return an empty array if the group does not exist
+    }
+}
 
 
 async function writeFirebaseData(oldHeadName, inputs, groupName) {
@@ -545,16 +557,16 @@ async function writeFirebaseData(oldHeadName, inputs, groupName) {
     }
 }
 
-async function deleteFirebaseData(criteriaHeadName) {
-    const criteriaRef = doc(db, "Evaluation Criteria", criteriaHeadName.innerText);
-
+async function deleteFirebaseData(groupName) {
     try {
-        await deleteDoc(criteriaRef);
-        console.log(`Document with title "${criteriaHeadName.innerText}" has been deleted.`);
+        const groupRef = ref(db, `Evaluation Criteria/${groupName}`);
+        await remove(groupRef);
+        console.log(`Group '${groupName}' deleted successfully from the database.`);
     } catch (error) {
-        console.error("Error deleting document: ", error);
+        console.error("Error deleting group:", error);
     }
 }
+
 
 
 document.addEventListener('DOMContentLoaded', async function () {
