@@ -1,4 +1,4 @@
-import { db, ref, set, get } from './firebaseConfig.mjs';
+import { db, ref, set, get, remove} from './firebaseConfig.mjs';
 
 function createPhase() {
     const workspace = document.getElementsByClassName('Phase-Page-Right')[0];
@@ -78,8 +78,12 @@ function createPhase() {
 
     workspace.appendChild(phaseSection);
 
-    phaseOptionDelete.addEventListener('click', function () {
+    phaseOptionDelete.addEventListener('click', async function () {
         phaseSection.remove();
+        await deletePhase(phaseHeadName.innerText)
+        if (phaseHeadName.innerText === "add a new Phase") {
+            createPhase();
+        }
     });
 
     phaseOptionEdit.addEventListener('click', function () {
@@ -123,6 +127,8 @@ function editPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phas
 
     let phaseTitle;
 
+    const oldHeadName = phaseHeadName.textContent;
+
     const existingTitleInput = phaseBody.querySelector('input[type="text"]');
     if (existingTitleInput) {
         existingTitleInput.value = phaseHeadName.textContent;
@@ -152,8 +158,7 @@ function editPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phas
 
     phaseOptionSubmit.addEventListener('click', async () => {
         try {
-            phaseBodyText = await submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc);
-            await writeFirebaseData(phaseTitle.value, phaseBodyDesc.value)
+            phaseBodyText = await submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc, oldHeadName);
         } catch (error) {
             console.error(error);
         }
@@ -162,8 +167,8 @@ function editPhaseForm(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phas
 
 }
 
-function submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc) {
-    return new Promise((resolve, reject) => {
+function submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, phaseOptionSubmit, phaseHeadName, phaseTitle, phaseBodyDesc, oldHeadName) {
+    return new Promise(async (resolve, reject) => {
 
         const phaseName = phaseTitle.value;
 
@@ -185,6 +190,9 @@ function submitFunction(phaseSection, phaseHead, phaseBody, phaseBodyDetail, pha
         phaseTitle.remove();
         phaseBody.style.display = 'none';
         phaseHead.style.display = 'flex';
+
+        await deletePhase(oldHeadName);
+        await writeFirebaseData(phaseName, phaseDesc)
 
         resolve(phaseDesc);
     });
@@ -266,8 +274,9 @@ async function loadFirebaseData() {
 
             workspace.appendChild(phaseSection);
 
-            phaseOptionDelete.addEventListener('click', function () {
+            phaseOptionDelete.addEventListener('click', async function () {
                 phaseSection.remove();
+                await deletePhase(phaseHeadName.innerText)
             });
 
             phaseOptionEdit.addEventListener('click', function () {
@@ -314,6 +323,16 @@ async function readFirebaseData() {
     } catch (error) {
         console.error("Error reading all phases data:", error);
         return [];
+    }
+}
+
+async function deletePhase(phaseName) {
+    try {
+        const phaseRef = ref(db, `Phases/${phaseName}`);
+        await remove(phaseRef); // Delete the specified phase
+        console.log(`Phase '${phaseName}' deleted successfully.`);
+    } catch (error) {
+        console.error(`Error deleting phase '${phaseName}':`, error);
     }
 }
 
