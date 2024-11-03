@@ -25,6 +25,7 @@ async function getLastAddedBatch() {
 
                         lastBatchKey = batchKey;
                         localStorage.setItem("lastBatchKey", lastBatchKey);
+                        localStorage.setItem("lastBatchYear", lastBatchYear)
                         console.log(lastBatchKey);
                         lastBatchData = currentBatchData;
 
@@ -97,5 +98,9 @@ async function getLastAddedBatch() {
         console.error("Error fetching data:", error);
     }
 }
+
+document.getElementById("view-report").addEventListener("click", () => {
+    window.location.href = "Report.html";
+});
 
 getLastAddedBatch();
