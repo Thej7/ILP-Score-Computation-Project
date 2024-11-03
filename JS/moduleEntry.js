@@ -1,4 +1,3 @@
-
 // batch entry okay
 // module entry and alert of exceeding 100 is okay and module store in local store until full submision
 //submiting mkodules and view modules at middle and submitall modules make the fullmodules save in firebase
@@ -8,8 +7,8 @@
 //but editing works but when entering phase and criteria and submit in the view module only the first option is showing also got corrected everything in modules fine
 // active field in module is given
 //startdateand end were added
-import { db, ref, set, get } from './firebaseConfig.js';
-import { fetchPhase, fetchCriteria } from './CriteriaAndPhaseOption.js';  // Import the fetch function
+import { db, ref, set, get } from './firebaseConfig.mjs';
+import { fetchPhase, fetchCriteria } from './getDropdown.js';  // Import the fetch function
 
 export let currentBatchName = '';
 export let currentBatchYear = '';
@@ -71,6 +70,22 @@ async function addBatch(year) {
         alert("There was an error adding the batch.");
     }
 }
+
+const batchNameInput = document.getElementById('batch-name');
+
+// Add an event listener to update the variable on every input
+batchNameInput.addEventListener('input', (event) => {
+    currentBatchName = event.target.value;
+    console.log(currentBatchName); // Optional: for debugging to see the current value
+});
+
+const batchYearInput = document.getElementById('batch-year');
+
+// Add an event listener to update the variable on every input
+batchYearInput.addEventListener('input', (event) => {
+    currentBatchYear = event.target.value;
+    console.log(currentBatchYear); // Optional: for debugging to see the current value
+});
 
 
 // Function to add a module to the local array
@@ -376,4 +391,3 @@ document.getElementById('viewmodules-button').addEventListener('click', function
     event.preventDefault();
     viewAllModules();
 });
-

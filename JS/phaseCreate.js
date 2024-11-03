@@ -341,4 +341,3 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadFirebaseData();
     await createPhase();
 });
-

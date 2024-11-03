@@ -69,7 +69,7 @@ async function getLastAddedBatch() {
                            // Store whole last batch data
                             localStorage.setItem("lastBatchYear", lastBatchYear); // Store the year of the batch
 
-                            window.location.href = "TrainerAssessment.html";
+                            window.location.href = "Mark-Entry.html";
                         };
                         moduleContainer.appendChild(card);
                     });
