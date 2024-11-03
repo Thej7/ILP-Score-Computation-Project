@@ -56,9 +56,15 @@ async function getLastAddedBatch() {
                     moduleContainer.classList.add("module-container");
 
                     phaseGroups[phase].forEach(moduleData => {
+
+                        const containerphasecard = document.createElement("div");
+                        containerphasecard.classList.add("containerphasecard");
                         const card = document.createElement("div");
                         card.classList.add("card");
-                        card.innerHTML = `<h1>${moduleData.moduleName}</h1><img src="Graph.png">`;
+                        // card.innerHTML="55%";
+                        const phasename = document.createElement("div");
+                        phasename.classList.add("phasename");
+                        phasename.innerHTML = `<h1>${moduleData.moduleName}</h1>`;
                         card.onclick = () => {
                             // Store selected phase and module, along with last active batch data
                             localStorage.setItem("selectedPhase", phase);
@@ -71,10 +77,17 @@ async function getLastAddedBatch() {
 
                             window.location.href = "TrainerAssessment.html";
                         };
-                        moduleContainer.appendChild(card);
+
+                        containerphasecard.appendChild(card);
+                        containerphasecard.appendChild(phasename);
+                        moduleContainer.appendChild(containerphasecard);
                     });
 
                     container.appendChild(moduleContainer);
+
+
+
+
                 });
             }
         } else {

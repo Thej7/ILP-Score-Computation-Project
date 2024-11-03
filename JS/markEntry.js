@@ -2,8 +2,6 @@ import { db, ref, get, set} from './firebaseConfig.mjs'; // Import necessary Fir
 
 let studentsList;
 let evalCriterias;
-
-
 const selectedPhase = localStorage.getItem("selectedPhase"); // Get selected phase from localStorage
 const selectedModule = localStorage.getItem("selectedModule"); // Get selected module from localStorage
 const lastBatchData = JSON.parse(localStorage.getItem("lastBatchData")); // Get last active batch data
@@ -14,9 +12,7 @@ async function populateDropdownWithPhaseModules() {
     console.log(lastBatchKey);
     console.log(lastBatchYear);
     console.log(lastBatchData);
-
     let criteria = null;
-
     // Check if lastBatchData and modules are defined
     if (lastBatchData && lastBatchData.modules) {
         const modules = lastBatchData.modules;
@@ -27,11 +23,6 @@ async function populateDropdownWithPhaseModules() {
             console.log(`Criteria for ${selectedModule}: ${criteria}`);
         }
     }
-
-
-
-
-
 
 
 
@@ -107,31 +98,6 @@ async function populateDropdownWithPhaseModules() {
     evalCriterias = await fetchEvaluationCriteria();
     console.log(studentsList);
     console.log(evalCriterias);
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if (!selectedPhase || !lastBatchData) {
         console.error("No phase or batch data available");
         return;
@@ -139,7 +105,6 @@ async function populateDropdownWithPhaseModules() {
 
     // Only get modules from the last active batch data
     const modulesInPhase = [];
-
     if (lastBatchData.modules) {
         // Iterate over modules in the last active batch to find those in the selected phase
         Object.keys(lastBatchData.modules).forEach(moduleKey => {
@@ -243,41 +208,35 @@ function showCard(index) {
         cardContainer.appendChild(currentCard);
 
         // Create next card (hidden initially)
+         // Create next card if it exists
+        if (index + 1 < validCards.length) {
         const nextCard = createCardElement(validCards[index + 1]);
         nextCard.classList.add('next-card');
         cardContainer.appendChild(nextCard);
+        }
 
         // Create previous card (hidden initially)
+        // Create previous card if it exists
+        if (index - 1 >= 0) {
         const previousCard = createCardElement(validCards[index - 1]);
+        console.log("previous"+previousCard);
         previousCard.classList.add('next-next-card');
         cardContainer.appendChild(previousCard);
+        }
     } else {
         alert("No more cards available!");
     }
 }
 
 // Function to create card element
-function createCardElement(cardData) {
+function createCardElement(cardData)
+ {
     const card = document.createElement('div');
     card.className = 'card';
-
+    console.log("card"+cardData);
     // Display validation errors from Excel import
-    if (cardData.validationErrors && cardData.validationErrors.length > 0) {
-        const errorContainer = document.createElement('div');
-        errorContainer.className = 'error-container';
-
-        cardData.validationErrors.forEach(error => {
-            const errorMessage = document.createElement('p');
-            errorMessage.className = 'error-message';
-            errorMessage.textContent = error;
-            errorContainer.appendChild(errorMessage);
-        });
-
-        card.appendChild(errorContainer); // Attach error container to the card
-    }
-
-    // Populate card with data
-    for (const [key, value] of Object.entries(cardData)) {
+    for (const [key, value] of Object.entries(cardData))
+     {
         const inputContainer = document.createElement('div');
         inputContainer.className = 'input-container';
 
@@ -324,7 +283,8 @@ function createCardElement(cardData) {
 
 
 // Function to create a button with text and click handler
-function createButton(text, onClick) {
+function createButton(text, onClick)
+ {
     const button = document.createElement('button');
     button.textContent = text;
     button.className = text.toLowerCase(); // e.g., "edit" or "save"
@@ -339,50 +299,51 @@ function toggleEditMode() {
 }
 
 
-async function saveChanges() 
-{
+// Helper function to sanitize keys by replacing invalid characters
+function sanitizeKey(key) {
+    return key.replace(/[.#$/\[\]]/g, '_');
+}
+
+async function saveChanges() {
     const inputs = document.querySelectorAll('.input-field');
     const keys = Object.keys(cards[currentCardIndex]);
-    let hasError = false; // Flag to track validation errors
+    let hasError = false;
 
-    // Collect criteria data from the inputs
     const updatedCriteria = {};
     let total = 0;
 
     inputs.forEach((input, index) => {
         const key = keys[index];
-        if (key && key !== 'name') { // Skip the name field
-            const value = parseFloat(input.value) || 0; // Convert input value to a number, defaulting to 0 if empty or invalid
+        if (key && key !== 'name') {
+            const value = parseFloat(input.value) || 0;
 
-            // Find the corresponding criterion to validate points
+            // Find and validate the criterion points
             const criterion = evalCriterias.find(c => c.name === key);
-
             if (criterion && value > criterion.points) {
                 input.setCustomValidity(`Value must be less than or equal to ${criterion.points}`);
                 input.reportValidity();
-                hasError = true; // Set error flag
+                hasError = true;
             } else {
-                input.setCustomValidity(''); // Clear the error if valid
-                updatedCriteria[key] = value;
-                total += value; // Accumulate total points as a number
+                input.setCustomValidity('');
+                
+                // Use sanitized key to prevent errors
+                const sanitizedKey = sanitizeKey(key);
+                updatedCriteria[sanitizedKey] = value;
+                total += value;
             }
         }
     });
 
-    // Prevent saving if there were any validation errors
     if (hasError) {
         console.log("Validation failed. Data will not be saved.");
         return;
     }
 
-    // Prepare data for saving
     const studentName = cards[currentCardIndex].name;
-    const studentId = `id${currentCardIndex + 1}`; // Generate a unique ID for each student
+    const studentId = `id${currentCardIndex + 1}`;
 
-    // Define the database reference path for this student
+    // Define sanitized data to save
     const studentRef = ref(db, `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students/${studentId}`);
-
-    // Data to be saved
     const studentData = {
         studentName: studentName,
         criteria: updatedCriteria,
@@ -390,18 +351,16 @@ async function saveChanges()
     };
 
     try {
-        // Save to Realtime Database
         await set(studentRef, studentData);
         console.log("Data saved successfully:", studentData);
     } catch (error) {
         console.error("Error saving data:", error);
     }
 
-    // Update UI and localStorage as before
-    isEditing = false; // Exit edit mode
-    localStorage.setItem('cards', JSON.stringify(cards)); // Save to localStorage
+    isEditing = false;
+    localStorage.setItem('cards', JSON.stringify(cards));
     await fetchCardsFromDatabase();
-    updateDisplay(); // Refresh display
+    updateDisplay();
 }
 
 
@@ -448,17 +407,6 @@ async function fetchCardsFromDatabase() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 // Button event listeners for navigation
 document.getElementById('nextButton').addEventListener('click', () => {
     if (currentCardIndex < cards.length - 1) {
@@ -499,7 +447,7 @@ function handleFile(event) {
     reader.readAsArrayBuffer(file);
 }
 
-function createCards(data) {
+async function createCards(data) {
     cards = [];
     const headers = data[0].map(header => header.trim().toLowerCase()); // Normalize headers
     const validHeaders = evalCriterias.map(criterion => criterion.name.toLowerCase()); // Get valid headers from criteria
@@ -518,6 +466,7 @@ function createCards(data) {
     if (unmatchedHeaders.length > 0) {
         unmatchedHeaders.forEach(header => {
             validationErrors.add(`The header "${header}" does not match any expected criteria.`);
+            
         });
     }
 
@@ -529,12 +478,14 @@ function createCards(data) {
         headers.forEach((header, index) => {
             const cellValue = row[index] !== undefined ? row[index].toString().trim() : ''; // Ensure cellValue is a string
             card[header] = cellValue;
+            console.log("CELL VALUE"+cellValue);
 
             // Perform validation based on criteria (skip the "name" field)
             if (header !== 'name') {
                 const criterion = evalCriterias.find(crit => crit.name.toLowerCase() === header);
                 if (criterion) {
                     const cellNumberValue = parseFloat(cellValue);
+                       console.log(cellNumberValue);
 
                     // Check if cell is a number and exceeds allowed points
                     if (!isNaN(cellNumberValue) && cellNumberValue > criterion.points) {
@@ -567,20 +518,50 @@ function createCards(data) {
 
     currentCardIndex = 0; // Reset index to the first card
     updateDisplay(); // Display cards on the UI
+
+     // Save each valid card to Firebase
+     for (const card of cards) {
+        await saveCardToFirebase(card);
+    }
+    
+}
+// Function to save each card to Firebase
+async function saveCardToFirebase(card) {
+    const studentName = card.name;
+    const studentId = `id${currentCardIndex + 1}`;
+
+    const studentRef = ref(db, `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students/${studentId}`);
+
+    const studentData = {
+        studentName: studentName,
+        criteria: Object.fromEntries(
+            Object.entries(card).filter(([key]) => key !== 'name') // Filter out 'name' from criteria
+        )
+    };
+
+    try {
+        await set(studentRef, studentData);
+        console.log("Data saved to Firebase:", studentData);
+    } catch (error) {
+        console.error("Error saving data to Firebase:", error);
+    }
 }
 
 
 function updateDisplay() {
     // Call showCard with the current card index
     showCard(currentCardIndex);
+
 }
 
-// Call the API function to load data on page load
-// document.addEventListener('DOMContentLoaded', () => {
-//     cards = sampleCards; // Use the sample cards for demonstration
-//     updateDisplay(); // Show the cards immediately after fetching
-// });
-//search box
+
+
+
+
+
+
+
+
 // Create the search container
 const searchContainer = document.createElement('div');
 searchContainer.className = 'search-container';
@@ -613,6 +594,7 @@ function searchCards() {
         updateDisplay(); // Update the display to show the matching card
     } else {
         alert("No matching card found!"); // Alert if no match is found
+        
     }
 }
 
@@ -632,11 +614,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Wait for the dropdown to populate first
     await populateDropdownWithPhaseModules();
 
-    
     // Then initialize the sample cards
     initializeCards();
-
-
     // Use the initialized cards and display them
     cards = sampleCards; // Assign the initialized sample cards to `cards`
     await fetchCardsFromDatabase(); // Fetch data after populating dropdown
