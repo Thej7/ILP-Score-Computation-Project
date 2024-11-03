@@ -1,0 +1,132 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #fff; 
+    overflow: hidden;
+    
+}
+
+/* Container for the whole login page */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    background: linear-gradient(524.5deg, #3F69BA 60%, white 25%);
+    background-size: cover;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Login box container */
+
+
+.login-box {
+    background-color: #1e1e1e82; 
+    width: 100%;
+    max-width: 500px; /* Ensures the box doesn't get too wide */
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    height: 400px;
+    margin-top: -50px;
+    
+}
+/* Logo styling */
+.logo {
+    margin-bottom: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+}
+.logo a {
+ 
+    text-decoration:none ;
+    }
+
+.logo img {
+    width: 50px; /* Adjust logo size */
+    vertical-align: middle;
+}
+
+.logo span {
+    color: white;
+    font-size: 50px;
+    font-weight: bolder;
+}
+
+.tagline {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.login-as {
+    color: white;
+    font-size: 20px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+/* Login options styling */
+.login-trainer input {
+    margin-top: 10px;
+    width: 300px;
+    height: 30px;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: none;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.login-trainer button {
+    margin-top: 10px;
+   border: solid;
+    height: 40px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: black;
+    text-align: center;
+    
+   
+}
+.forget {
+    width: auto;
+    background-color: #2C2C2C;
+    color: white;
+}
+ 
+.loginbtn{
+    width: 100px;
+    color:white;
+    background-color: #3F69BA;
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    margin-bottom: -18px;
+    display: flex;
+   margin-left: 200px;
+}
+
+.loginbtn img {
+    margin-right: 10px; /* Add space between icon and text */
+}
+
+
+/* Footer styling */
+.footer {
+   
+    
+    text-align: center;
+    margin-top: -120px;
+}
+
+.footer img {
+    width: 25%;  
+  
+}

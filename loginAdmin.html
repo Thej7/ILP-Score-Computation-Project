@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="./CSS/loginAdmin.css">
+    <title>AdminLogin</title>
+</head>
+<body>
+    <body>
+        <div clas="body">
+        <div class="container">
+            <div class="login-box">
+                <div class="logo">
+                    <a href="loginmain.html">
+                    <img src="./Assets/output-onlinepngtools.png" alt="growthXP Logo">
+                    <span>growth<span style="color:#f00909;">XP</span></span></a>
+                </div>
+                <div class="tagline">
+                    If you can't measure it, you can't improve it.
+                </div>
+                <div class="login-as">
+                    Login as Admin
+                </div>
+                <div class="login-admin">
+                    <!-- Admin Option -->
+                    <div id="error-message" style="color: red;"></div>
+                     <input id="email" type="text" placeholder="Username"><br>
+                    <input id="password" type="password" placeholder="Password" autocomplete="off"><br>
+                    <div id="error-message" style="color: red; margin-top: 10px;"></div>
+
+                    <button type="submit" id="loginbtn" class="loginbtn" > <img src="./Assets/output-onlinepngtools (1).png" alt="login" width="25%">Login</button> <br>
+                    <button id="forget" class="forget">Forget Password</button>
+                    </div>
+                </div>
+               
+            </div>
+            <div class="footer">
+                <img src="./Assets/logo-dark.png" alt="Experion Technologies Logo">
+            </div> 
+        </div>
+        </div>
+    </body>
+    <script type="module" src="./JS/firebaseConfig.mjs"></script>
+    <script type="module" src="./JS/loginAdmin.mjs"></script>
+</body>
+</html>
