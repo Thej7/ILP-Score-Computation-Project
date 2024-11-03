@@ -1,0 +1,205 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex; 
+}
+
+.layout-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+}
+
+.sidebar {
+    width: 60%; /* Sidebar takes 40% of the screen width */
+    background-color: #3F69BA; /* Sidebar background color */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 20px 0; /* Top and bottom padding */
+}
+
+.logo {
+    max-width: 80%; /* Make logo fit within button size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space below the logo */
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    justify-content: center; /* Even spacing between buttons */
+    flex-grow: 1; /* Allow nav-menu to grow */
+    width: 80%; /* Full width of the sidebar */
+    border-radius: 8px;
+}
+
+.nav-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    padding: 15px; /* Space around the items */
+    text-decoration: none; /* Remove underline */
+    color: white; /* White text color */
+    background-color: #6B92DE; /* Button background color */
+    border-radius: 4px; /* Rounded corners */
+    margin: 20px 0; /* Space between buttons */
+    height: 50px; /* Fixed height for equal button size */
+    width: 100%; /* Full width for buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.nav-item:hover {
+    background-color: #5e89df; /* Darker shade on hover */
+}
+
+.nav-icon {
+    max-width: 25px; /* Limit icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.footer-logo {
+    max-width: 80%; /* Responsive footer logo */
+    margin-top: auto; /* Push footer logo to the bottom */
+}
+
+.profile-container {
+    margin-left: -50px;
+    padding: 20px; /* Internal padding */
+    background-color: #3F69BA; /* White background for the card */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    transition: transform 0.3s, box-shadow 0.3s; /* Smooth transition for hover effect */
+    width: 500px; /* Fixed width */
+    height: 420px; /* Height will be based on content */
+    margin-top: 100px; /* Space above the profile card */
+    color: white;
+}
+
+.profile-container:hover {
+    transform: translateY(-5px); /* Slightly lift on hover */
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3); /* Enhance shadow on hover */
+}
+
+.profile-container h2 {
+    text-align: center; /* Centered heading */
+    color: #ffffff; /* Updated heading color */
+    margin-bottom: 20px; /* Space below heading */
+    font-size: 25px; /* Increased font size for heading */
+    font-weight: bolder;
+}
+
+.profile-detail {
+    margin-bottom: 15px; /* Space between profile details */
+    display: flex; /* Flexbox for alignment */
+    justify-content: space-between; /* Space between label and value */
+    font-size: 20px; /* Font size for details */
+    padding: 10px 0; /* Padding for vertical spacing */
+    border-bottom: 1px solid #E0E0E0; /* Divider line between details */
+}
+
+.profile-detail span {
+    font-weight: bold; /* Bold label */
+    color: #ffffff; /* Darker color for the label */
+}
+
+
+
+
+
+
+
+
+
+/* Style for the reset password container */
+.reset-container {
+    background-color: #ffffff; /* White background for the card */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 30px; /* Internal padding */
+    width: 300px; /* Responsive width */
+    height: 200px;
+    margin-top: 60px;
+    margin-left: 350px;
+    
+    text-align: center; /* Center text */
+    
+}
+
+/* Style for the heading */
+.reset-container h2 {
+    margin-bottom: 20px; /* Space below the heading */
+    color: #3F69BA; /* Heading color */
+    font-size: 24px; /* Font size for the heading */
+}
+
+/* Style for the input field */
+#resetEmail {
+    width: 100%; /* Full width */
+    padding: 12px; /* Internal padding */
+    margin-bottom: 15px; /* Space below input */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    transition: border-color 0.3s; /* Smooth transition */
+}
+
+/* Change border color on focus */
+#resetEmail:focus {
+    border-color: #3F69BA; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Style for the submit button */
+#submit {
+    width: 100%; /* Full width */
+    padding: 12px; /* Internal padding */
+    background-color: #5e89df; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+/* Change button color on hover */
+#submit:hover {
+    background-color: #3F69BA; /* Darker shade on hover */
+}
+
+/* Style for the message display area */
+.message {
+    margin-top: 15px; /* Space above message */
+    font-size: 14px; /* Font size for message */
+}
+
+/* Optional: Success message color */
+.message.success {
+    color: green; /* Success message color */
+}
+
+/* Optional: Error message color */
+.message.error {
+    color: red; /* Error message color */
+}
+.resetbtn{
+    display: flex;
+    flex-direction: column;
+}
+.reset-button{
+    margin-top: 30px;
+    margin-left: 70%;
+
+}
+
+
+
+
+
+
+

@@ -116,6 +116,37 @@ function addModule(moduleName, totalWeightage, criteria, phase) {
     alert("Module added successfully!");
 }
 
+async function saveToDatabase(data) {
+    // Destructure year, batch, and students from data
+    const { year, batch, students } = data;
+
+    // Check if students array is valid
+    if (!students || !Array.isArray(students) || students.length === 0) {
+        console.error("No valid students found to save.");
+        return; // Exit if there's no valid student data
+    }
+
+    // Loop through each student to save their data
+    for (let i = 0; i < students.length; i++) {
+        const student = students[i];
+        const studentId = `id${i + 1}`; // Create a unique student ID
+
+        // Create a reference in the database for the current student
+        const studentRef = ref(db, `studentList/${year}/${batch}/${studentId}`);
+
+        try {
+            // Attempt to save the student data to the database
+            await set(studentRef, student);
+
+            // Log the successful save
+            console.log(`Saved ${student.Name} to ${studentRef.path}`);
+        } catch (error) {
+            // Log an error if saving fails
+            console.error(`Error saving student ${student.Name}:`, error);
+        }
+    }
+}
+
 // Function to handle batch form submission
 document.getElementById('Config-Page-Right-bottom-submit').addEventListener('click', async function (event) {
     event.preventDefault();
@@ -123,7 +154,21 @@ document.getElementById('Config-Page-Right-bottom-submit').addEventListener('cli
     currentBatchYear = year;
 
     if (year) {
-        await addBatch(year);
+        const savedDataJson = localStorage.getItem("savedData");
+        const savedData = savedDataJson ? JSON.parse(savedDataJson) : null; // Parse the JSON string
+
+        if (savedData && savedData.students) { // Ensure students is defined
+            await Promise.all([
+                addBatch(year),
+                saveToDatabase(savedData) // Pass the parsed data
+            ]);
+
+            // Clear localStorage after successfully saving the data
+            localStorage.removeItem("savedData"); // Remove the savedData item
+            // or use localStorage.clear(); // to clear all localStorage items if needed
+        } else {
+            alert("No valid student data found in localStorage.");
+        }
     } else {
         alert("Please enter a year.");
     }

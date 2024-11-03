@@ -1,0 +1,112 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #fff; /* Default background white */
+    overflow: hidden; /* Prevent scrolling */
+}
+
+/* Container for the whole login page */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center content vertically */
+    height: 100vh; /* Full viewport height */
+    background: linear-gradient(524.5deg, #dc143c 60%, white 25%);
+    background-size: cover;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+/* Login box container */
+.login-box {
+    background-color: rgb(30 30 30 / 38%); /* Slightly transparent background */
+    width: 90%; /* Use a percentage for responsive width */
+    max-width: 500px; /* Max width to maintain size on larger screens */
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    margin: 0; /* No margin for better alignment */
+    height: auto; /* Automatic height to fit content */
+    margin-top: 90px;
+}
+
+/* Logo styling */
+.logo {
+    margin-bottom: 10px;
+    font-size: 36px; /* Adjusted font size */
+    font-weight: bold;
+    color: white;
+}
+
+.logo img {
+    width: 50px; /* Logo size */
+    vertical-align: middle;
+}
+
+.logo span {
+    color: white;
+    font-size: 40px; /* Adjusted font size */
+    font-weight: bolder;
+}
+
+.tagline {
+    color: white;
+    font-size: 18px; /* Adjusted font size */
+    margin-bottom: 10px; /* Reduced margin */
+}
+
+.login-as {
+    color: white;
+    font-size: 18px; /* Adjusted font size */
+    margin-bottom: 20px; /* Reduced margin */
+}
+
+/* Login options styling */
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Reduced margin */
+    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+}
+
+.login-option {
+    background-color: #1e1e1e;
+    padding: 10px; /* Increased padding for better touch targets */
+    width: 45%; /* Use a percentage for flexible width */
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px; /* Spacing between options */
+}
+
+.login-option:hover {
+    background-color: #3d3d3d;
+    transform: scale(1.05);
+}
+
+.login-option img {
+    width: 100%; /* Make icons responsive */
+    max-width: 180px; /* Limit max width */
+}
+
+.login-option p {
+    font-size: 16px; /* Slightly reduced font size */
+    color: #4c73c3; /* Contrast color */
+    margin: 0;
+}
+
+/* Footer styling */
+.footer {
+    margin-top: 50px; /* Push footer to the bottom */
+    text-align: center;
+}
+
+.footer img {
+    width: 70%; /* Adjust footer image size */
+}
