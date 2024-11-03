@@ -19,6 +19,7 @@ let modules = [];
 async function addBatch(year) {
     try {
         const name = document.getElementById('batch-name').value;
+        currentBatchName = name;
         if (!name) {
             alert("Please enter a batch name.");
             return;
@@ -70,6 +71,22 @@ async function addBatch(year) {
     }
 }
 
+const batchNameInput = document.getElementById('batch-name');
+
+// Add an event listener to update the variable on every input
+batchNameInput.addEventListener('input', (event) => {
+    currentBatchName = event.target.value;
+    console.log(currentBatchName); // Optional: for debugging to see the current value
+});
+
+const batchYearInput = document.getElementById('batch-year');
+
+// Add an event listener to update the variable on every input
+batchYearInput.addEventListener('input', (event) => {
+    currentBatchYear = event.target.value;
+    console.log(currentBatchYear); // Optional: for debugging to see the current value
+});
+
 
 // Function to add a module to the local array
 function addModule(moduleName, totalWeightage, criteria, phase) {
@@ -103,6 +120,7 @@ function addModule(moduleName, totalWeightage, criteria, phase) {
 document.getElementById('Config-Page-Right-bottom-submit').addEventListener('click', async function (event) {
     event.preventDefault();
     const year = document.getElementById('batch-year').value;
+    currentBatchYear = year;
 
     if (year) {
         await addBatch(year);

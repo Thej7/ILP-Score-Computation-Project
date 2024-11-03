@@ -1,5 +1,5 @@
 //final ecxel but students get enetred to last current year
-let jsonData;
+export let savedData;
 
 import { currentBatchYear, currentBatchName } from '../JS/moduleEntry.js';
 
@@ -83,20 +83,22 @@ function saveStudentsLocally(studentData, year, batch) {
     };
 
     const json = JSON.stringify(dataToSave, null, 2); // Convert data to JSON string
-
-    // Create a Blob with the JSON data
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    // Create a temporary link to trigger the download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `students_${batch}_${year}.json`; // Name of the file
-    document.body.appendChild(a);
-    a.click(); // Programmatically click the link to trigger the download
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url); // Free up memory
+    
+    // Save the JSON string in a variable and log it to the console
+    savedData = json;
+    console.log(savedData);
+    
+    // Optionally, if you want to work with it as an object again, you can parse it back
+    const parsedData = JSON.parse(savedData);
+    console.log(parsedData); // This will show it in object format in the console
 }
 
+
 // HTML input listener for file upload
-document.getElementById("Config-Page-Right-top-buttonpart-AddFile").addEventListener("change", handleFileUpload);
+const fileInput = document.getElementById("Config-Page-Right-top-buttonpart-AddFile");
+
+fileInput.addEventListener("change", (event) => {
+    handleFileUpload(event);
+    // Clear the input to allow the same file to be uploaded again
+    fileInput.value = '';
+});
