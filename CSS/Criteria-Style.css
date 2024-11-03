@@ -71,7 +71,35 @@ body {
     margin-top: auto; /* Push footer logo to the bottom */
 }
 
+.Config-Page-Workspace {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.Config-Page-Bar {
+    display: flex;
+    justify-content: space-around;
+    background-color: #f3f3f3; /* Customize as needed */
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc; /* Adds a separator line */
+}
+
+.Config-Page-Link {
+    text-decoration: none;
+    color: #333; /* Customize link color */
+    font-weight: bold;
+    padding: 5px 15px;
+    transition: color 0.2s;
+}
+
+.Config-Page-Link:hover {
+    color: #4f46e5; /* Customize hover color */
+}
+
 .Config-Page-Right {
+    margin-top: 10px;
     width: 80%;
     height: auto;
     padding: 20px;

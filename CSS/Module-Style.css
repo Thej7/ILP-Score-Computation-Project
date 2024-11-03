@@ -2,7 +2,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    
 }
 
 body {
@@ -34,11 +33,10 @@ body {
 .nav-menu {
     display: flex;
     flex-direction: column; /* Stack links vertically */
-    justify-content:center; /* Even spacing between buttons */
+    justify-content: center; /* Even spacing between buttons */
     flex-grow: 1; /* Allow nav-menu to grow */
     width: 80%; /* Full width of the sidebar */
     border-radius: 8px;
-    
 }
 
 .nav-item {
@@ -71,14 +69,14 @@ body {
     margin-top: auto; /* Push footer logo to the bottom */
 }
 
-.Phase-Page-Workspace {
+.Module-Page-Workspace {
     margin-top: 10px;
     width: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.Phase-Page-Bar {
+.Module-Page-Bar {
     display: flex;
     justify-content: space-around;
     background-color: #f3f3f3; /* Customize as needed */
@@ -86,7 +84,7 @@ body {
     border-bottom: 1px solid #ccc; /* Adds a separator line */
 }
 
-.Phase-Page-Link {
+.Module-Page-Link {
     text-decoration: none;
     color: #333; /* Customize link color */
     font-weight: bold;
@@ -94,23 +92,23 @@ body {
     transition: color 0.2s;
 }
 
-.Phase-Page-Link:hover {
+.Module-Page-Link:hover {
     color: #4f46e5; /* Customize hover color */
 }
 
-.Phase-Page-Right {
+.Module-Page-Right {
     margin-top: 10px;
     width: 80%;
     height: auto;
     padding: 20px;
 }
 
-.Phase-Page-Right-Phase {
+.Module-Page-Right-Module {
     border: 1px solid black;
     background-color: rgba(128, 97, 195, 0.2);
 }
 
-.Phase-Page-Right-Phase-Head {
+.Module-Page-Right-Module-Head {
     display: flex;
     justify-content: space-between;
     background-color: #8061C3;
@@ -119,25 +117,25 @@ body {
     padding: 10px;
 }
 
-.Phase-Page-Right-Phase-Body {
+.Module-Page-Right-Module-Body {
     display: flex;
     flex-direction: row;
     width: 100%;
 }
 
-.Phase-Page-Right-Phase-Body-Detail {
+.Module-Page-Right-Module-Body-Detail {
     border: 2px solid red;
     box-sizing: border-box;
 }
 
-.Phase-Page-Right-Phase-Body-Options {
+.Module-Page-Right-Module-Body-Options {
     border: 2px solid red;
     display: flex;
     flex-direction: column;
     padding-left: 20px;
 }
 
-.Phase-Page-Right-Phase-Body-Detail input{
+.Module-Page-Right-Module-Body-Detail input {
     border: none;
     outline: none;
     padding: 0;
