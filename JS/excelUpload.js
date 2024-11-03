@@ -1,5 +1,5 @@
 //final ecxel but students get enetred to last current year
-export let savedData;
+let savedData;
 
 import { currentBatchYear, currentBatchName } from '../JS/moduleEntry.js';
 
@@ -85,9 +85,10 @@ function saveStudentsLocally(studentData, year, batch) {
     const json = JSON.stringify(dataToSave, null, 2); // Convert data to JSON string
     
     // Save the JSON string in a variable and log it to the console
+    localStorage.setItem("savedData", json);
     savedData = json;
     console.log(savedData);
-    
+
     // Optionally, if you want to work with it as an object again, you can parse it back
     const parsedData = JSON.parse(savedData);
     console.log(parsedData); // This will show it in object format in the console
