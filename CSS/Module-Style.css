@@ -2,194 +2,77 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
- 
+    
 }
- 
+
 body {
-    display: flex;
-    /* Use flexbox for layout */
+    display: flex; /* Use flexbox for layout */
 }
 
-button {
-    background-color: #8061C3; /* Updated background color */
-    color: #e0e7ff; /* Text color */
-    padding: 5px 10px; /* Smaller padding for a smaller button */
-    margin: 10px;
-    border: none; /* Remove default border */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 14px; /* Smaller font size */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
-}
-
-button:hover {
-    background-color: #6849A1; /* Darker background on hover */
-    transform: scale(1.05); /* Slightly enlarge on hover */
-}
-
-button:disabled {
-    background-color: #ccc; /* Disabled button background */
-    color: #666; /* Disabled text color */
-    cursor: not-allowed; /* Not-allowed cursor */
-}
-
-/* General Reset for Input Elements */
-input,
-textarea,
-select {
-    border: 1px solid #ccc; /* Light border for inputs */
-    border-radius: 8px; /* Rounded corners */
-    padding: 10px; /* Padding inside input */
-    font-size: 16px; /* Font size */
-    font-family: 'Arial', sans-serif; /* Modern font */
-    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for effects */
-    width: 100%; /* Full width */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-}
-
-/* Focus State for Inputs */
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: #8061C3; /* Change border color on focus */
-    box-shadow: 0 0 5px rgba(128, 97, 195, 0.5); /* Subtle shadow on focus */
-    outline: none; /* Remove default outline */
-}
-
-/* Textarea Specific Styles */
-textarea {
-    resize: vertical; /* Allow vertical resizing only */
-}
-
-/* Placeholder Styling */
-input::placeholder,
-textarea::placeholder {
-    color: #aaa; /* Placeholder color */
-    opacity: 1; /* Make sure it is fully opaque */
-}
-
-/* Input Types */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-select {
-    background-color: #f9f9f9; /* Light background for inputs */
-}
-
-input[type="submit"],
-input[type="button"] {
-    background-color: #8061C3; /* Button background color */
-    color: #fff; /* Button text color */
-    cursor: pointer; /* Pointer cursor on hover */
-    border: none; /* No border */
-    border-radius: 8px; /* Rounded corners */
-    padding: 10px 15px; /* Padding for buttons */
-    transition: background-color 0.3s, transform 0.3s; /* Transition for hover effects */
-}
-
-input[type="submit"]:hover,
-input[type="button"]:hover {
-    background-color: #674f9f; /* Darker shade on hover */
-    transform: translateY(-2px); /* Lift effect on hover */
-}
-
- 
 .layout-container {
     display: flex;
-    height: 100vh;
-    /* Full height of the viewport */
+    height: 100vh; /* Full height of the viewport */
 }
- 
+
 .sidebar {
-    width: 60%;
-    /* Sidebar takes 20% of the screen width */
-    background-color: #8061C3;
-    /* Light background color */
+    width: 282.5px; /* Sidebar takes 20% of the screen width */
+    background-color: #8061C3; /* Light background color */
     display: flex;
-    flex-direction: column;
-    /* Stack items vertically */
-    align-items: center;
-    /* Center items horizontally */
-    padding: 20px 0;
-    /* Top and bottom padding */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 20px 0; /* Top and bottom padding */
 }
- 
+
 .logo {
-    max-width: 80%;
-    /* Make logo fit within button size */
-    height: auto;
-    /* Maintain aspect ratio */
-    margin-bottom: 20px;
-    /* Space below the logo */
+    max-width: 80%; /* Make logo fit within button size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space below the logo */
 }
- 
+
 .nav-menu {
     display: flex;
-    flex-direction: column;
-    /* Stack links vertically */
-    justify-content: center;
-    /* Even spacing between buttons */
-    flex-grow: 1;
-    /* Allow nav-menu to grow */
-    width: 80%;
-    /* Full width of the sidebar */
+    flex-direction: column; /* Stack links vertically */
+    justify-content:center; /* Even spacing between buttons */
+    flex-grow: 1; /* Allow nav-menu to grow */
+    width: 80%; /* Full width of the sidebar */
     border-radius: 8px;
- 
+    
 }
- 
+
 .nav-item {
-    display: flex;
-    /* Flexbox for alignment */
-    align-items: center;
-    /* Center items vertically */
-    justify-content: center;
-    /* Center items horizontally */
-    padding: 15px;
-    /* Space around the items */
-    text-decoration: none;
-    /* Remove underline */
-    color: white;
-    /* White text color */
-    background-color: #967CCF;
-    /* Button background color */
-    border-radius: 4px;
-    /* Rounded corners */
-    margin: 20px 0;
-    /* Space between buttons */
-    height: 50px;
-    /* Fixed height for equal button size */
-    width: 100%;
-    /* Full width for buttons */
-    transition: background-color 0.3s;
-    /* Smooth background transition */
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    padding: 15px; /* Space around the items */
+    text-decoration: none; /* Remove underline */
+    color: white; /* White text color */
+    background-color: #967CCF; /* Button background color */
+    border-radius: 4px; /* Rounded corners */
+    margin: 20px 0; /* Space between buttons */
+    height: 50px; /* Fixed height for equal button size */
+    width: 100%; /* Full width for buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
 }
- 
+
 .nav-item:hover {
-    background-color: #5e89df;
-    /* Darker shade on hover */
+    background-color: #5e89df; /* Darker shade on hover */
 }
- 
+
 .nav-icon {
-    max-width: 25px;
-    /* Limit icon size */
-    height: auto;
-    /* Maintain aspect ratio */
-    margin-right: 10px;
-    /* Space between icon and text */
+    max-width: 25px; /* Limit icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between icon and text */
 }
- 
+
 .footer-logo {
-    max-width: 80%;
-    /* Responsive footer logo */
-    margin-top: auto;
-    /* Push footer logo to the bottom */
+    max-width: 80%; /* Responsive footer logo */
+    margin-top: auto; /* Push footer logo to the bottom */
 }
  
 .Module-Page-Workspace {
     margin-top: 10px;
     width: 100%;
-    margin-left: -188px;
+    margin-left: -18px;
     display: flex;
     flex-direction: column;
 }
@@ -284,5 +167,89 @@ input[type="button"]:hover {
     border-radius: 4px; /* Slight rounding for consistency with other elements */
     width: 80%; /* Ensures input fields take full width */
     box-sizing: border-box; /* Ensures padding does not affect width */
+}
+
+button {
+    background-color: #8061C3; /* Updated background color */
+    color: #e0e7ff; /* Text color */
+    padding: 5px 10px; /* Smaller padding for a smaller button */
+    margin: 10px;
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Smaller font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #6849A1; /* Darker background on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+button:disabled {
+    background-color: #ccc; /* Disabled button background */
+    color: #666; /* Disabled text color */
+    cursor: not-allowed; /* Not-allowed cursor */
+}
+
+/* General Reset for Input Elements */
+input,
+textarea,
+select {
+    border: 1px solid #ccc; /* Light border for inputs */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px; /* Padding inside input */
+    font-size: 16px; /* Font size */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for effects */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Focus State for Inputs */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #8061C3; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(128, 97, 195, 0.5); /* Subtle shadow on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Textarea Specific Styles */
+textarea {
+    resize: vertical; /* Allow vertical resizing only */
+}
+
+/* Placeholder Styling */
+input::placeholder,
+textarea::placeholder {
+    color: #aaa; /* Placeholder color */
+    opacity: 1; /* Make sure it is fully opaque */
+}
+
+/* Input Types */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+    background-color: #f9f9f9; /* Light background for inputs */
+}
+
+input[type="submit"],
+input[type="button"] {
+    background-color: #8061C3; /* Button background color */
+    color: #fff; /* Button text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    border: none; /* No border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for buttons */
+    transition: background-color 0.3s, transform 0.3s; /* Transition for hover effects */
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background-color: #674f9f; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
 }
  

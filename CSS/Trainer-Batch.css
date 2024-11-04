@@ -5,19 +5,17 @@
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+    display: flex; 
 }
 
 .layout-container {
     display: flex;
     height: 100vh; /* Full height of the viewport */
-    position: fixed;
 }
 
 .sidebar {
-    width: 300px; /* Fixed width for sidebar */
-    background-color: #3F69BA; /* Light background color */
+    width: 60%; /* Sidebar takes 40% of the screen width */
+    background-color: #3F69BA; /* Sidebar background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
@@ -36,17 +34,21 @@ body {
     justify-content: center; /* Even spacing between buttons */
     flex-grow: 1; /* Allow nav-menu to grow */
     width: 80%; /* Full width of the sidebar */
+    border-radius: 8px;
 }
 
 .nav-item {
     display: flex; /* Flexbox for alignment */
     align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
     padding: 15px; /* Space around the items */
     text-decoration: none; /* Remove underline */
     color: white; /* White text color */
     background-color: #6B92DE; /* Button background color */
     border-radius: 4px; /* Rounded corners */
-    margin: 10px 0; /* Space between buttons */
+    margin: 20px 0; /* Space between buttons */
+    height: 50px; /* Fixed height for equal button size */
+    width: 100%; /* Full width for buttons */
     transition: background-color 0.3s; /* Smooth background transition */
 }
 
@@ -67,7 +69,7 @@ body {
 
 /******************************************    Right side    ******************************************/
 .Config-Page-Right {
-    margin-left: 300px; /* Adjusted to match sidebar width */
+    margin-left: -200px; /* Adjusted to match sidebar width */
     padding: 20px; /* Add padding for better spacing */
     flex-grow: 1; /* Allow it to take remaining space */
     background-color: #f0f0f0; /* Light background for contrast */
