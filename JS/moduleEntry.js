@@ -15,6 +15,8 @@ export let currentBatchYear = '';
 let phaseWeightage = {};
 let modules = [];
 
+console.log(localStorage.getItem("savedData"))
+
 // Function to add a batch
 async function addBatch(year) {
     try {
@@ -158,21 +160,26 @@ document.getElementById('Config-Page-Right-bottom-submit').addEventListener('cli
         const savedData = savedDataJson ? JSON.parse(savedDataJson) : null; // Parse the JSON string
 
         if (savedData && savedData.students) { // Ensure students is defined
-            await Promise.all([
-                addBatch(year),
-                saveToDatabase(savedData) // Pass the parsed data
-            ]);
-
-            // Clear localStorage after successfully saving the data
-            localStorage.removeItem("savedData"); // Remove the savedData item
-            // or use localStorage.clear(); // to clear all localStorage items if needed
+            try {
+                await Promise.all([
+                    addBatch(year),
+                    saveToDatabase(savedData) // Pass the parsed data
+                ]);
+            } catch (error) {
+                console.error("Error saving data:", error);
+            }
         } else {
             alert("No valid student data found in localStorage.");
         }
     } else {
         alert("Please enter a year.");
     }
+
+    // Clear localStorage after attempting to save data, regardless of outcome
+    localStorage.removeItem("savedData");
+    // Or use localStorage.clear(); to clear all localStorage items if needed
 });
+
 
 // Function to handle module form submission
 document.addEventListener('submit', async function (event) {

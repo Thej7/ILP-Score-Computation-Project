@@ -1,18 +1,85 @@
-import { db, ref, get, set } from './firebaseConfig.mjs'; // Import necessary Firebase functions
+import { db, ref, get, set} from './firebaseConfig.mjs'; // Import necessary Firebase functions
 let studentsList;
 let evalCriterias;
+let selectedCriteria;
 const selectedPhase = localStorage.getItem("selectedPhase"); // Get selected phase from localStorage
 const selectedModule = localStorage.getItem("selectedModule"); // Get selected module from localStorage
-console.log("selectedmodule" + selectedModule);
+console.log("selectedmodule"+selectedModule);
 const lastBatchData = JSON.parse(localStorage.getItem("lastBatchData")); // Get last active batch data
 const lastBatchYear = localStorage.getItem("lastBatchYear");
 const lastBatchKey = localStorage.getItem("lastBatchKey");
 
+// Function to fetch evaluation criteria and log name and points
+async function fetchEvaluationCriteria(criteria) {
+    const criteriaRef = ref(db, `Evaluation Criteria/${criteria}`); // Adjust the path as needed
+    const evaluationCriteria = []; // Array to store fetched criteria
+
+    try {
+        const snapshot = await get(criteriaRef);
+        if (snapshot.exists()) {
+            const criteriaData = snapshot.val();
+
+            // Iterate over the criteria entries
+            Object.keys(criteriaData).forEach((criterionKey) => {
+                const criterion = criteriaData[criterionKey]; // This will be 1, 2, etc.
+
+                // Log the details
+                console.log(`Criterion ID: ${criterion.id}`); // Log the ID
+                console.log(`Criterion Name: ${criterion.name}`); // Log the name
+                console.log(`Criterion Points: ${criterion.points}`); // Log the points
+
+                // Store the criterion in the evaluationCriteria array
+                evaluationCriteria.push({
+                    id: criterion.id,
+                    name: criterion.name,
+                    points: criterion.points
+                });
+            });
+        } else {
+            console.log("No evaluation criteria data available.");
+        }
+    } catch (error) {
+        console.error("Error fetching evaluation criteria:", error);
+    }
+
+    return evaluationCriteria; // Return the collected criteria
+}
+
+// Function to fetch the student list
+async function fetchStudentList(lastBatchYear, lastBatchKey) {
+    const studentListRef = ref(db, `studentList/${lastBatchYear}/${lastBatchKey}`);
+    console.log(`Fetching data from: ${studentListRef.toString()}`); // Log the path
+    const studentNames = []; // Array to store student names
+
+    try {
+        const snapshot = await get(studentListRef);
+        if (snapshot.exists()) {
+            const students = snapshot.val();
+
+            // Collect each student's name in the studentNames array
+            Object.keys(students).forEach((studentId) => {
+                const student = students[studentId];
+                console.log("studentLIST" + student.Name); // Log each student's name
+                studentNames.push(student.Name); // Add the name to the array
+            });
+        } else {
+            console.log("No data available for the specified path.");
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+
+    return studentNames; // Return the list of student names
+}
+
+// Main function to populate dropdown with phase modules
 async function populateDropdownWithPhaseModules() {
     console.log(lastBatchKey);
     console.log(lastBatchYear);
     console.log(lastBatchData);
+
     let criteria = null;
+
     // Check if lastBatchData and modules are defined
     if (lastBatchData && lastBatchData.modules) {
         const modules = lastBatchData.modules;
@@ -21,80 +88,17 @@ async function populateDropdownWithPhaseModules() {
         if (modules[selectedModule]) {
             criteria = modules[selectedModule].criteria; // Access the criteria of the selected module
             console.log(`Criteria for ${selectedModule}: ${criteria}`);
+            selectedCriteria = criteria;
         }
     }
 
-    // // Function to fetch evaluation criteria and log name and points
-    async function fetchEvaluationCriteria() {
-        const criteriaRef = ref(db, `Evaluation Criteria/${criteria}`); // Adjust the path as needed
-        const evaluationCriteria = []; // Array to store fetched criteria
+    // Call the functions to fetch data
+    studentsList = await fetchStudentList(lastBatchYear, lastBatchKey);
+    evalCriterias = await fetchEvaluationCriteria(criteria);
 
-        try {
-            const snapshot = await get(criteriaRef);
-            if (snapshot.exists()) {
-                const criteriaData = snapshot.val();
-
-                // Iterate over the criteria entries
-                Object.keys(criteriaData).forEach((criterionKey) => {
-                    const criterion = criteriaData[criterionKey]; // This will be 1, 2, etc.
-
-                    // Log the details
-                    console.log(`Criterion ID: ${criterion.id}`); // Log the ID
-                    console.log(`Criterion Name: ${criterion.name}`); // Log the name
-                    console.log(`Criterion Points: ${criterion.points}`); // Log the points
-
-                    // Store the criterion in the evaluationCriteria array
-                    evaluationCriteria.push({
-                        id: criterion.id,
-                        name: criterion.name,
-                        points: criterion.points
-                    });
-                });
-            } else {
-                console.log("No evaluation criteria data available.");
-            }
-        } catch (error) {
-            console.error("Error fetching evaluation criteria:", error);
-        }
-
-        return evaluationCriteria; // Return the collected criteria
-    }
-
-
-
-
-    async function fetchStudentList() {
-        const studentListRef = ref(db, `studentList/${lastBatchYear}/${lastBatchKey}`);
-        console.log(`Fetching data from: ${studentListRef.toString()}`); // Log the path
-        const studentNames = []; // Array to store student names
-
-        try {
-            const snapshot = await get(studentListRef);
-            if (snapshot.exists()) {
-                const students = snapshot.val();
-
-                // Collect each student's name in the studentNames array
-                Object.keys(students).forEach((studentId) => {
-                    const student = students[studentId];
-                    console.log(student.Name); // Log each student's name
-                    studentNames.push(student.Name); // Add the name to the array
-                });
-            } else {
-                console.log("No data available for the specified path.");
-            }
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
-
-        return studentNames; // Return the list of student names
-    }
-
-    studentsList = await fetchStudentList()
-    console.log("student List", studentsList)
-    // Call the function to fetch and log the criteria
-    evalCriterias = await fetchEvaluationCriteria();
     console.log("student list" + studentsList);
-    console.log(evalCriterias);
+    console.log("evaluation" + evalCriterias);
+
     if (!selectedPhase || !lastBatchData) {
         console.error("No phase or batch data available");
         return;
@@ -135,42 +139,35 @@ async function populateDropdownWithPhaseModules() {
     });
 }
 
-async function downloadTemplate() {
-    // Fetch the evaluation criteria
-    const evaluationCriteria = await fetchEvaluationCriteria();
+document.querySelector('.download-template').addEventListener('click', async () => {
 
-    // Prepare the data for the Excel file
-    const headers = ['Name']; // First heading should be 'Name'
-    const dataRows = []; // This will hold the rows of data
+    // Fetch student list and evaluation criteria
+    studentsList = await fetchStudentList(lastBatchYear, lastBatchKey);
+    evalCriterias = await fetchEvaluationCriteria(selectedCriteria);
 
-    // Add each criterion name to the headers
-    for (const criterion of evaluationCriteria) {
-        headers.push(criterion.name); // Add criterion name to headers
-    }
+    // Prepare Excel data structure
+    const excelData = [];
+ 
+    // Add header row with "Name" and each criterion's name
+    const headerRow = ["Name", ...evalCriterias.map(criteria => criteria.name)];
+    excelData.push(headerRow);
 
-    // Here you can populate dataRows with sample data; for example:
-    const sampleData = [
-        { name: 'John Doe', scores: evaluationCriteria.map(criterion => Math.random() * criterion.points) },
-        { name: 'Jane Smith', scores: evaluationCriteria.map(criterion => Math.random() * criterion.points) },
-        // Add more sample data as needed
-    ];
-
-    // Populate dataRows with names and corresponding scores
-    sampleData.forEach(item => {
-        const row = [item.name, ...item.scores]; // Create row array
-        dataRows.push(row);
+    // Add student rows, each with the student's name and blank cells for criteria columns
+    studentsList.forEach(studentName => {
+        const row = [studentName, ...new Array(evalCriterias.length).fill("")];
+        excelData.push(row);
     });
 
-    // Create a workbook and a worksheet
+    // Create Excel file
+    const worksheet = XLSX.utils.aoa_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows]); // Convert array of arrays to a worksheet
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Evaluation Report');
 
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    // Export to Excel
+    XLSX.writeFile(workbook, 'Evaluation_Report.xlsx');
+});
 
-    // Create an Excel file and trigger download
-    XLSX.writeFile(workbook, 'Template.xlsx');
-}
+
 
 // Declare variables in the broader scope
 let currentCardIndex = 0;
@@ -283,7 +280,7 @@ function createCardElement(cardData) {
         input.value = value;
         input.className = 'input-field';
         input.readOnly = !isEditing; // Make input editable only in edit mode
-
+     
         // Find the points for the corresponding criterion
         console.log("evalCriterias array:", JSON.stringify(evalCriterias, null, 2));
         console.log(`Checking value for ${key}:`, value);
@@ -371,7 +368,7 @@ async function saveChanges() {
                 hasError = true;
             } else {
                 input.setCustomValidity('');
-
+                
                 // Use sanitized key to prevent errors
                 const sanitizedKey = sanitizeKey(key);
                 updatedCriteria[sanitizedKey] = value;
@@ -399,13 +396,6 @@ async function saveChanges() {
     try {
         await set(studentRef, studentData);
         console.log("Data saved successfully:", studentData);
-        cards[currentCardIndex] = { ...cards[currentCardIndex], ...updatedCriteria };
-
-        // Save the updated `cards` array to localStorage
-        localStorage.setItem('cards', JSON.stringify(cards));
-
-        // Re-render the cards to reflect the changes
-        updateDisplay();
     } catch (error) {
         console.error("Error saving data:", error);
     }
@@ -483,7 +473,6 @@ document.getElementById('previousButton').addEventListener('click', () => {
 //Function to handle file upload
 // Function to handle file upload
 document.getElementById('excelFile').addEventListener('change', handleFile);
-document.getElementById('template').addEventListener('click', downloadTemplate);
 
 function handleFile(event) {
     const file = event.target.files[0];
@@ -504,8 +493,12 @@ function handleFile(event) {
 function createCards(data) {
     cards = [];
     const headers = data[0].map(header => header.trim().toLowerCase()); // Normalize headers
-    const validHeaders = evalCriterias.map(criterion => criterion.name.toLowerCase()); // Get valid headers from criteria
+    const validHeaders = evalCriterias.map(criterion => criterion.name.trim().toLowerCase()); // Normalize criteria names
     const validationErrors = new Set(); // Use a Set to store unique validation error messages
+
+    // Debugging: Log headers and valid headers to compare them side-by-side
+    console.log("Excel Headers:", headers);
+    console.log("Valid Headers from Criteria:", validHeaders);
 
     // Step 1: Check if the first header is "name"
     if (headers[0] !== 'name') {
@@ -514,14 +507,15 @@ function createCards(data) {
     }
 
     // Step 2: Create a Set of valid student names for faster lookup
-    const validStudentNames = new Set(studentsList.map(name => name.toLowerCase()));
+    const validStudentNames = new Set(studentsList.map(name => name.trim().toLowerCase())); // Normalize student names
 
     // Step 3: Check for unmatched headers
     const unmatchedHeaders = headers.filter(header => header !== 'name' && !validHeaders.includes(header));
 
-    // If there are unmatched headers (excluding "name"), add to validation errors
+    // Debugging: Log unmatched headers to diagnose any mismatches
     if (unmatchedHeaders.length > 0) {
         unmatchedHeaders.forEach(header => {
+            console.log(`Unmatched header: "${header}"`);
             validationErrors.add(`The header "${header}" does not match any expected criteria.`);
         });
     }
@@ -544,24 +538,30 @@ function createCards(data) {
             // Perform validation based on criteria (skip the "name" field)
             if (header !== 'name') {
                 const criterion = evalCriterias.find(crit => crit.name.trim().toLowerCase() === header);
+
+                // Debugging: Log criterion matching process
+                if (criterion) {
+                    console.log(`Matched Criterion: "${criterion.name}" for header "${header}"`);
+                } else {
+                    console.log(`No matching criterion found for header "${header}".`);
+                }
+
                 if (criterion) {
                     const cellNumberValue = parseFloat(cellValue);
-                    console.log("cell number value" + cellNumberValue);
-                    console.log("points" + criterion.points);
+                    
                     // Check if cell is a number and exceeds allowed points
                     if (cellNumberValue > criterion.points) {
-                        validationErrors.add(`Error in ${header}: Value ${cellNumberValue} exceeds maximum of ${criterion.points}`); // Use Set to avoid duplicates
-                        isValid = false; // Mark card as invalid
-                        alert("dsfdjfjd");
+                        validationErrors.add(`Error in ${header}: Value ${cellNumberValue} exceeds maximum of ${criterion.points}.`);
+                        isValid = false;
                     } else if (isNaN(cellNumberValue) && cellValue !== '') {
-                        // Optional: Add error if non-numeric value provided for a numeric criterion
+                        // Error if non-numeric value provided for a numeric criterion
                         validationErrors.add(`Error in ${header}: Value "${cellValue}" is not a valid number.`);
                         isValid = false;
                     }
                 } else if (cellValue !== '') {
                     // If no matching criterion was found for this header and it's not empty
-                    validationErrors.add(`Warning: No matching criterion for header "${header}".`); // Use Set to avoid duplicates
-                    isValid = false; // Optional: Mark card as invalid
+                    validationErrors.add(`Warning: No matching criterion for header "${header}".`);
+                    isValid = false;
                 }
             }
         });
@@ -579,15 +579,9 @@ function createCards(data) {
         return; // Exit function after showing errors
     }
 
-    // // Check if we have any valid cards and set the currentCardIndex
-    // if (cards.length > 0) {
-    //     currentCardIndex = 0; // Reset index to the first card only if we have valid cards
-    // } else {
-    //     currentCardIndex = -1; // No valid cards means there are none to display
-    // }
-
     updateDisplay(); // Display cards on the UI
 }
+
 
 
 
@@ -662,5 +656,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     cards = sampleCards; // Assign the initialized sample cards to `cards`
     await fetchCardsFromDatabase(); // Fetch data after populating dropdown
     updateDisplay(); // Run updateDisplay last to ensure everything is set up
-
+   
 });
