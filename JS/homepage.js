@@ -47,25 +47,70 @@ async function getLastAddedBatch() {
                     phaseGroups[moduleData.phase].push(moduleData);
                 });
 
-                Object.keys(phaseGroups).forEach(phase => {
+                for (const phase of Object.keys(phaseGroups)) {
                     const phaseHeading = document.createElement("h2");
                     phaseHeading.classList.add("phase");
                     phaseHeading.textContent = phase;
                     container.appendChild(phaseHeading);
-
+                
                     const moduleContainer = document.createElement("div");
                     moduleContainer.classList.add("module-container");
-
-                    phaseGroups[phase].forEach(moduleData => {
-
+                
+                    for (const moduleData of phaseGroups[phase]) {
                         const containerphasecard = document.createElement("div");
                         containerphasecard.classList.add("containerphasecard");
                         const card = document.createElement("div");
                         card.classList.add("card");
-                        // card.innerHTML="55%";
+                
+                        const criteriaRef = ref(db, `Batches/${lastBatchYear}/${lastBatchKey}/modules/${moduleData.moduleName}/criteria`);
+                
+                        // Fetch criteriaName
+                        const criteriaSnapshot = await get(criteriaRef);
+                        const criteriaName = criteriaSnapshot.val();
+                
+                        // Reference to the Evaluation Criteria based on the criteriaName
+                        const evalCriteriaRef = ref(db, `Evaluation Criteria/${criteriaName}`);
+                
+                        // Fetch all keys within criteriaName and sum up the points
+                        const evalCriteriaSnapshot = await get(evalCriteriaRef);
+                        let maxScore = 0;
+                
+                        // Summing the points in the Evaluation Criteria
+                        evalCriteriaSnapshot.forEach((childSnapshot) => {
+                            const points = parseFloat(childSnapshot.child('points').val()) || 0;
+                            maxScore += points;
+                        });
+                        console.log('max score', maxScore);
+                
+                        const studentListRef = ref(db, `marks/${lastBatchYear}/${lastBatchKey}/${moduleData.moduleName}/students`);
+                        const studentListSnapshot = await get(studentListRef);
+                
+                        let totalScore = 0;
+                        let studentCount = 0;
+                
+                        if (studentListSnapshot.exists()) {
+                            const students = studentListSnapshot.val();
+                
+                            // Calculate total scores and count of students for the module
+                            for (const id in students) {
+                                const studentData = students[id];
+                                totalScore += studentData.total || 0; // Add student score to the total
+                                studentCount++; // Count the student
+                            }
+                        }
+                
+                        // Calculate average score for the module if there are students
+                        const averageScore = studentCount > 0 ? totalScore / studentCount : 0;
+                
+                        // Convert average score to a percentage based on maxScore
+                        const percentage = (averageScore / maxScore) * 100;
+                
+                        card.innerHTML = percentage + "%";
                         const phasename = document.createElement("div");
                         phasename.classList.add("phasename");
                         phasename.innerHTML = `<h1>${moduleData.moduleName}</h1>`;
+                        console.log("moduleData", moduleData.moduleName);
+                        
                         card.onclick = () => {
                             // Store selected phase and module, along with last active batch data
                             localStorage.setItem("selectedPhase", phase);
@@ -75,21 +120,18 @@ async function getLastAddedBatch() {
                             console.log(lastBatchKey);
                             // Store whole last batch data
                             localStorage.setItem("lastBatchYear", lastBatchYear); // Store the year of the batch
-
+                
                             window.location.href = "TrainerAssessment.html";
                         };
-
+                
                         containerphasecard.appendChild(card);
                         containerphasecard.appendChild(phasename);
                         moduleContainer.appendChild(containerphasecard);
-                    });
-
+                    }
+                
                     container.appendChild(moduleContainer);
-
-
-
-
-                });
+                }
+                
             }
         } else {
             console.log("No data available");

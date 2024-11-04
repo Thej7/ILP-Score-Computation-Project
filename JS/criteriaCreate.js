@@ -187,10 +187,11 @@ function editCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBod
         criteriaTitle = document.createElement('input');
         criteriaTitle.type = 'text';
         criteriaTitle.value = criteriaHeadName.textContent;
-        criteriaBody.appendChild(criteriaTitle);
+        criteriaBodyTable.appendChild(criteriaTitle);
     }
 
     const newCriteriaTable = document.createElement('table');
+    newCriteriaTable.classList.add('Config-Page-Right-Criteria-Group-Body-Table-Table');
 
     const headerRow = document.createElement('tr');
     const headerCells = ['SL. No', 'Evaluation Criteria', 'Points', 'Actions'];
@@ -224,6 +225,7 @@ function editCriteriaForm(criteriaGroup, criteriaHead, criteriaBody, criteriaBod
 
     criteriaOptionSubmit.addEventListener('click', async () => {
         try {
+            await deleteFirebaseData(criteriaHeadName.innerText);
             const div = await submitFunction(criteriaTitle, newCriteriaTable, criteriaHeadName, criteriaBody, criteriaBodyTable, criteriaHead);
         } catch (error) {
             console.error(error);

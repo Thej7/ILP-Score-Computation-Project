@@ -195,29 +195,100 @@ document.addEventListener('submit', async function (event) {
 
 // Function to add a module entry form
 function addModuleOption() {
+    // Create main container div
     const optionContainer = document.createElement('div');
     optionContainer.classList.add('Config-Page-Right-bottom-addmodule-moduleform');
-    optionContainer.innerHTML = `
-        <form class="module-form">
-            <h5>New Module</h5><br>
-            <label>Module Name:</label>
-            <input type="text" class="module-name" required />
-            <label>Total Weightage:</label>
-            <input type="number" class="module-weightage" required /><br><br>
-            <label>Criteria:</label>
-            <select class="module-criteria" required>
-                <option value="">Select a criteria</option>
-            </select>
-            <label>Phase:</label>
-            <select class="module-phase" required>
-                <option value="">Select a phase</option>
-            </select>
-            <button type="button" class="delete-modules">
-                <i class="fa-solid fa-trash" style="width:20px;"></i>
-            </button>
-            <button type="submit" class="module-submit">Submit</button>
-        </form>
-    `;
+
+    // Create form element
+    const form = document.createElement('form');
+    form.classList.add('module-form');
+
+    // Create and append title
+    const title = document.createElement('h5');
+    title.textContent = 'New Module';
+    form.appendChild(title);
+
+    // Create and append Module Name label and input
+    form.appendChild(document.createElement('br'));
+
+    const moduleNameLabel = document.createElement('label');
+    moduleNameLabel.textContent = 'Module Name:';
+    form.appendChild(moduleNameLabel);
+
+    const moduleNameInput = document.createElement('input');
+    moduleNameInput.type = 'text';
+    moduleNameInput.classList.add('module-name');
+    moduleNameInput.required = true;
+    form.appendChild(moduleNameInput);
+
+    // Create and append Total Weightage label and input
+    const weightageLabel = document.createElement('label');
+    weightageLabel.textContent = 'Total Weightage:';
+    form.appendChild(weightageLabel);
+
+    const weightageInput = document.createElement('input');
+    weightageInput.type = 'number';
+    weightageInput.classList.add('module-weightage');
+    weightageInput.required = true;
+    form.appendChild(weightageInput);
+
+    // Line break for spacing
+    form.appendChild(document.createElement('br'));
+    form.appendChild(document.createElement('br'));
+
+    // Create and append Criteria label and select
+    const criteriaLabel = document.createElement('label');
+    criteriaLabel.textContent = 'Criteria:';
+    form.appendChild(criteriaLabel);
+
+    const criteriaSelect = document.createElement('select');
+    criteriaSelect.classList.add('module-criteria');
+    criteriaSelect.required = true;
+
+    // Create and append default option for Criteria
+    const defaultCriteriaOption = document.createElement('option');
+    defaultCriteriaOption.value = '';
+    defaultCriteriaOption.textContent = 'Select a criteria';
+    criteriaSelect.appendChild(defaultCriteriaOption);
+    form.appendChild(criteriaSelect);
+
+    // Create and append Phase label and select
+    const phaseLabel = document.createElement('label');
+    phaseLabel.textContent = 'Phase:';
+    form.appendChild(phaseLabel);
+
+    const phaseSelect = document.createElement('select');
+    phaseSelect.classList.add('module-phase');
+    phaseSelect.required = true;
+
+    // Create and append default option for Phase
+    const defaultPhaseOption = document.createElement('option');
+    defaultPhaseOption.value = '';
+    defaultPhaseOption.textContent = 'Select a phase';
+    phaseSelect.appendChild(defaultPhaseOption);
+    form.appendChild(phaseSelect);
+
+    // Create and append delete button with icon
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.classList.add('delete-modules');
+
+    const trashIcon = document.createElement('i');
+    trashIcon.classList.add('fa-solid', 'fa-trash');
+    trashIcon.style.width = '20px';
+    deleteButton.appendChild(trashIcon);
+    form.appendChild(deleteButton);
+
+    // Create and append submit button
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.classList.add('module-submit');
+    submitButton.textContent = 'Submit';
+    form.appendChild(submitButton);
+
+    // Append form to the main container
+    optionContainer.appendChild(form);
+
 
     const dropdown = optionContainer.querySelector('.module-criteria');
     fetchCriteria(dropdown);
@@ -275,30 +346,107 @@ function viewAllModules() {
         modulesList.classList.add('modules-list');
 
         modules.forEach((module, index) => {
+            // Create the main div for the module
             const moduleDiv = document.createElement('div');
             moduleDiv.classList.add('Config-Page-Right-bottom-viewmodule-moduleform');
-            moduleDiv.innerHTML = `
-                <form class="module-form" data-index="${index}">
-                    <h5>Module Name: <span>${module.moduleName}</span></h5>
-                    <label>Module Name:</label>
-                    <input type="text" class="module-name" value="${module.moduleName}" required readonly />
-                    <label>Total Weightage:</label>
-                    <input type="number" class="module-weightage" value="${module.totalWeightage}" required readonly /><br><br>
-                    <label>Criteria:</label>
-                    <select class="module-criteria" required disabled>
-                        <option value="${module.criteria}">${module.criteria}</option>
-                        <!-- Add more options here as necessary -->
-                    </select>
-                    <label>Phase:</label>
-                    <select class="module-phase" required disabled>
-                        <option value="${module.phase}">${module.phase}</option>
-                        <!-- Add more options here as necessary -->
-                    </select>
-                    <button type="button" class="module-Edit" data-index="${index}">Edit</button>
-                    <button type="button" class="delete-submitedModule" data-index="${index}">Delete</button>
-                    <hr />
-                </form>
-            `;
+
+            // Create the form element
+            const form = document.createElement('form');
+            form.classList.add('module-form');
+            form.setAttribute('data-index', index); // Set the data-index attribute
+
+            // Create and append Module Name heading
+            const moduleNameHeading = document.createElement('h5');
+            moduleNameHeading.innerHTML = `Module Name: <span>${module.moduleName}</span>`;
+            form.appendChild(moduleNameHeading);
+
+            // Create and append Module Name label and input
+            const moduleNameLabel = document.createElement('label');
+            moduleNameLabel.textContent = 'Module Name:';
+            form.appendChild(moduleNameLabel);
+
+            const moduleNameInput = document.createElement('input');
+            moduleNameInput.type = 'text';
+            moduleNameInput.classList.add('module-name');
+            moduleNameInput.value = module.moduleName; // Set the value
+            moduleNameInput.required = true;
+            moduleNameInput.readOnly = true; // Set input to read-only
+            form.appendChild(moduleNameInput);
+
+            // Create and append Total Weightage label and input
+            const weightageLabel = document.createElement('label');
+            weightageLabel.textContent = 'Total Weightage:';
+            form.appendChild(weightageLabel);
+
+            const weightageInput = document.createElement('input');
+            weightageInput.type = 'number';
+            weightageInput.classList.add('module-weightage');
+            weightageInput.value = module.totalWeightage; // Set the value
+            weightageInput.required = true;
+            weightageInput.readOnly = true; // Set input to read-only
+            form.appendChild(weightageInput);
+
+            // Line breaks for spacing
+            form.appendChild(document.createElement('br'));
+            form.appendChild(document.createElement('br'));
+
+            // Create and append Criteria label and select
+            const criteriaLabel = document.createElement('label');
+            criteriaLabel.textContent = 'Criteria:';
+            form.appendChild(criteriaLabel);
+
+            const criteriaSelect = document.createElement('select');
+            criteriaSelect.classList.add('module-criteria');
+            criteriaSelect.required = true;
+            criteriaSelect.disabled = true; // Set select to disabled
+
+            // Create and append the option for Criteria
+            const criteriaOption = document.createElement('option');
+            criteriaOption.value = module.criteria;
+            criteriaOption.textContent = module.criteria; // Set the text to criteria
+            criteriaSelect.appendChild(criteriaOption);
+            form.appendChild(criteriaSelect);
+
+            // Create and append Phase label and select
+            const phaseLabel = document.createElement('label');
+            phaseLabel.textContent = 'Phase:';
+            form.appendChild(phaseLabel);
+
+            const phaseSelect = document.createElement('select');
+            phaseSelect.classList.add('module-phase');
+            phaseSelect.required = true;
+            phaseSelect.disabled = true; // Set select to disabled
+
+            // Create and append the option for Phase
+            const phaseOption = document.createElement('option');
+            phaseOption.value = module.phase;
+            phaseOption.textContent = module.phase; // Set the text to phase
+            phaseSelect.appendChild(phaseOption);
+            form.appendChild(phaseSelect);
+
+            // Create and append Edit button
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.classList.add('module-Edit');
+            editButton.setAttribute('data-index', index); // Set data-index attribute
+            editButton.textContent = 'Edit';
+            form.appendChild(editButton);
+
+            // Create and append Delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.classList.add('delete-submitedModule');
+            deleteButton.setAttribute('data-index', index); // Set data-index attribute
+            deleteButton.textContent = 'Delete';
+            form.appendChild(deleteButton);
+
+            // Append a horizontal rule for separation
+            const hr = document.createElement('hr');
+            form.appendChild(hr);
+
+            // Append form to the module div
+            moduleDiv.appendChild(form);
+
             modulesList.appendChild(moduleDiv);
 
             // // Fetch and populate criteria options

@@ -82,107 +82,107 @@ body {
     font-family: Arial, sans-serif;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: auto;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-/* The Modal (background) */
-.popup {
-    display: none; /* Hidden by default */
-    position: fixed; 
-    z-index: 9999; 
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    background-color: rgba(0, 0, 0, 0.4); 
-    justify-content: center;
-    align-items: center;
-}
-
-/* Modal Content */
-.popup-content {
-    background-color: #fff;
+.container {
+    max-width: 100%;
+    margin: 0 auto;
     padding: 20px;
-    border-radius: 5px;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
-    animation: fadeIn 0.5s;
+    font-family: Arial, sans-serif;
+    color: #333;
 }
 
-/* Close Button */
-.close {
-    color: #aaa;
-    float: right;
+/* Header */
+.container h1 {
     font-size: 28px;
     font-weight: bold;
+    color: #4f46e5; /* Modern dark blue */
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-.close:hover, .close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-.container{
-    margin-top: 90px;
-    margin-left: 5pxpx;
-}
-
-
-/* Container for the table */
-.table-container {
+/* Search Input */
+#Search_input {
     width: 100%;
-    max-height: 400px;
-    overflow-x: auto;
-    overflow-y: auto;
-    border: 1px solid #ccc;
+    max-width: 300px;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
 }
 
-table {
+#Search_input:focus {
+    border-color: #4f46e5;
+}
+
+/* Button Styling */
+button {
+    background-color: #4f46e5;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #3b34c0; /* Darker blue on hover */
+}
+
+/* Scrollable Table Container */
+.table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+/* Table Styling */
+#marklist-table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 16px;
 }
 
-th, td {
-    padding: 8px;
+/* Table Head */
+#table-head th {
+    background-color: #4f46e5;
+    color: #fff;
+    padding: 12px;
     text-align: left;
-    border: 1px solid #ddd;
-}
-
-th {
-    background-color: #f4f4f4;
+    font-weight: bold;
     position: sticky;
     top: 0;
-    cursor: pointer;
-    white-space: nowrap;
 }
 
-/* Style for sort arrows */
-.sort-arrow {
-    display: inline-block;
-    margin-left: 10px;
-    font-size: 12px;
+/* Table Body */
+#table-body tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease;
 }
 
-th.sorting-asc .sort-arrow::before {
-    content: "▲"; /* Up arrow */
+#table-body td {
+    padding: 12px;
+    text-align: left;
 }
 
-th.sorting-desc .sort-arrow::before {
-    content: "▼"; /* Down arrow */
+#table-body tr:hover {
+    background-color: #f7f7f7;
+}
+
+/* Download Button */
+#download-btn {
+    background-color: #28a745; /* Green for download */
+    margin-top: 20px;
+}
+
+#download-btn:hover {
+    background-color: #218838; /* Darker green on hover */
 }
 
 

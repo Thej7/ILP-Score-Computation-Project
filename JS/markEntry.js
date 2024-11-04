@@ -1,9 +1,9 @@
-import { db, ref, get, set} from './firebaseConfig.mjs'; // Import necessary Firebase functions
-
+import { db, ref, get, set } from './firebaseConfig.mjs'; // Import necessary Firebase functions
 let studentsList;
 let evalCriterias;
 const selectedPhase = localStorage.getItem("selectedPhase"); // Get selected phase from localStorage
 const selectedModule = localStorage.getItem("selectedModule"); // Get selected module from localStorage
+console.log("selectedmodule" + selectedModule);
 const lastBatchData = JSON.parse(localStorage.getItem("lastBatchData")); // Get last active batch data
 const lastBatchYear = localStorage.getItem("lastBatchYear");
 const lastBatchKey = localStorage.getItem("lastBatchKey");
@@ -24,29 +24,25 @@ async function populateDropdownWithPhaseModules() {
         }
     }
 
-
-
-
-
     // // Function to fetch evaluation criteria and log name and points
     async function fetchEvaluationCriteria() {
         const criteriaRef = ref(db, `Evaluation Criteria/${criteria}`); // Adjust the path as needed
         const evaluationCriteria = []; // Array to store fetched criteria
-    
+
         try {
             const snapshot = await get(criteriaRef);
             if (snapshot.exists()) {
                 const criteriaData = snapshot.val();
-    
+
                 // Iterate over the criteria entries
                 Object.keys(criteriaData).forEach((criterionKey) => {
                     const criterion = criteriaData[criterionKey]; // This will be 1, 2, etc.
-    
+
                     // Log the details
                     console.log(`Criterion ID: ${criterion.id}`); // Log the ID
                     console.log(`Criterion Name: ${criterion.name}`); // Log the name
                     console.log(`Criterion Points: ${criterion.points}`); // Log the points
-    
+
                     // Store the criterion in the evaluationCriteria array
                     evaluationCriteria.push({
                         id: criterion.id,
@@ -60,10 +56,10 @@ async function populateDropdownWithPhaseModules() {
         } catch (error) {
             console.error("Error fetching evaluation criteria:", error);
         }
-    
+
         return evaluationCriteria; // Return the collected criteria
     }
-    
+
 
 
 
@@ -71,12 +67,12 @@ async function populateDropdownWithPhaseModules() {
         const studentListRef = ref(db, `studentList/${lastBatchYear}/${lastBatchKey}`);
         console.log(`Fetching data from: ${studentListRef.toString()}`); // Log the path
         const studentNames = []; // Array to store student names
-    
+
         try {
             const snapshot = await get(studentListRef);
             if (snapshot.exists()) {
                 const students = snapshot.val();
-                
+
                 // Collect each student's name in the studentNames array
                 Object.keys(students).forEach((studentId) => {
                     const student = students[studentId];
@@ -89,14 +85,14 @@ async function populateDropdownWithPhaseModules() {
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-    
+
         return studentNames; // Return the list of student names
     }
 
     studentsList = await fetchStudentList()
     // Call the function to fetch and log the criteria
     evalCriterias = await fetchEvaluationCriteria();
-    console.log(studentsList);
+    console.log("student list" + studentsList);
     console.log(evalCriterias);
     if (!selectedPhase || !lastBatchData) {
         console.error("No phase or batch data available");
@@ -137,19 +133,6 @@ async function populateDropdownWithPhaseModules() {
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Declare variables in the broader scope
 let currentCardIndex = 0;
@@ -208,35 +191,48 @@ function showCard(index) {
         cardContainer.appendChild(currentCard);
 
         // Create next card (hidden initially)
-         // Create next card if it exists
-        if (index + 1 < validCards.length) {
         const nextCard = createCardElement(validCards[index + 1]);
         nextCard.classList.add('next-card');
         cardContainer.appendChild(nextCard);
-        }
 
         // Create previous card (hidden initially)
-        // Create previous card if it exists
-        if (index - 1 >= 0) {
         const previousCard = createCardElement(validCards[index - 1]);
-        console.log("previous"+previousCard);
         previousCard.classList.add('next-next-card');
         cardContainer.appendChild(previousCard);
-        }
     } else {
         alert("No more cards available!");
     }
 }
 
 // Function to create card element
-function createCardElement(cardData)
- {
+function createCardElement(cardData) {
     const card = document.createElement('div');
     card.className = 'card';
-    console.log("card"+cardData);
-    // Display validation errors from Excel import
-    for (const [key, value] of Object.entries(cardData))
-     {
+    // Populate card with data
+    console.log("Card data:", cardData.name); // Debugging line
+
+    // Handle the Name field first
+    const nameInputContainer = document.createElement('div');
+    nameInputContainer.className = 'input-container';
+
+    const nameLabel = document.createElement('label');
+    nameLabel.textContent = "Name:";
+    nameInputContainer.appendChild(nameLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text'; // Assuming name is a string
+    nameInput.value = cardData.name || ''; // Set the name value or empty if not present
+    nameInput.className = 'input-field';
+    nameInput.readOnly = !isEditing; // Make input editable only in edit mode
+
+    nameInputContainer.appendChild(nameInput);
+    card.appendChild(nameInputContainer);
+
+    // Handle other fields
+    for (const [key, value] of Object.entries(cardData)) {
+        // Skip the 'name' key since we've already handled it
+        if (key === 'name') continue;
+
         const inputContainer = document.createElement('div');
         inputContainer.className = 'input-container';
 
@@ -245,18 +241,29 @@ function createCardElement(cardData)
         inputContainer.appendChild(label);
 
         const input = document.createElement('input');
-        input.type = 'text';
+        input.type = 'number'; // Change type to 'number' for numeric input
         input.value = value;
         input.className = 'input-field';
         input.readOnly = !isEditing; // Make input editable only in edit mode
 
         // Find the points for the corresponding criterion
-        const criterion = evalCriterias.find(criterion => criterion.name === key);
+        console.log("evalCriterias array:", JSON.stringify(evalCriterias, null, 2));
+        console.log(`Checking value for ${key}:`, value);
 
+        const criterion = evalCriterias.find(criterion => criterion.name.trim().toLowerCase() === key.trim().toLowerCase());
+
+        console.log(`Criterion for ${key}:`, criterion); // Debugging line
+        console.log("All keys being checked:", Object.keys(cardData));
+        if (!criterion) {
+            console.warn(`No criterion found for key: ${key}`);
+        } else {
+            console.log(`Criterion found for ${key}:`, criterion);
+        }
         // Validate input field as user types
         if (criterion) {
             input.addEventListener('input', () => {
                 const inputValue = parseFloat(input.value);
+                console.log(`Input value for ${key}:`, inputValue); // Debugging line
 
                 if (inputValue > criterion.points) {
                     input.setCustomValidity(`Value must be less than or equal to ${criterion.points}`);
@@ -282,9 +289,10 @@ function createCardElement(cardData)
 }
 
 
+
+
 // Function to create a button with text and click handler
-function createButton(text, onClick)
- {
+function createButton(text, onClick) {
     const button = document.createElement('button');
     button.textContent = text;
     button.className = text.toLowerCase(); // e.g., "edit" or "save"
@@ -318,14 +326,14 @@ async function saveChanges() {
             const value = parseFloat(input.value) || 0;
 
             // Find and validate the criterion points
-            const criterion = evalCriterias.find(c => c.name === key);
+            const criterion = evalCriterias.find(c => c.name.trim().toLowerCase() === key.trim().toLowerCase());
             if (criterion && value > criterion.points) {
                 input.setCustomValidity(`Value must be less than or equal to ${criterion.points}`);
                 input.reportValidity();
                 hasError = true;
             } else {
                 input.setCustomValidity('');
-                
+
                 // Use sanitized key to prevent errors
                 const sanitizedKey = sanitizeKey(key);
                 updatedCriteria[sanitizedKey] = value;
@@ -447,7 +455,7 @@ function handleFile(event) {
     reader.readAsArrayBuffer(file);
 }
 
-async function createCards(data) {
+function createCards(data) {
     cards = [];
     const headers = data[0].map(header => header.trim().toLowerCase()); // Normalize headers
     const validHeaders = evalCriterias.map(criterion => criterion.name.toLowerCase()); // Get valid headers from criteria
@@ -459,18 +467,20 @@ async function createCards(data) {
         return; // Exit if the first header is not "name"
     }
 
-    // Step 2: Check for unmatched headers
+    // Step 2: Create a Set of valid student names for faster lookup
+    const validStudentNames = new Set(studentsList.map(name => name.toLowerCase()));
+
+    // Step 3: Check for unmatched headers
     const unmatchedHeaders = headers.filter(header => header !== 'name' && !validHeaders.includes(header));
 
     // If there are unmatched headers (excluding "name"), add to validation errors
     if (unmatchedHeaders.length > 0) {
         unmatchedHeaders.forEach(header => {
             validationErrors.add(`The header "${header}" does not match any expected criteria.`);
-            
         });
     }
 
-    // Step 3: Process each row and create cards
+    // Step 4: Process each row and create cards
     data.slice(1).forEach(row => {
         const card = {};
         let isValid = true; // Flag to track if the card is valid
@@ -478,23 +488,29 @@ async function createCards(data) {
         headers.forEach((header, index) => {
             const cellValue = row[index] !== undefined ? row[index].toString().trim() : ''; // Ensure cellValue is a string
             card[header] = cellValue;
-            console.log("CELL VALUE"+cellValue);
+
+            // Check if name matches
+            if (header === 'name' && !validStudentNames.has(cellValue.toLowerCase())) {
+                validationErrors.add(`Error: The name "${cellValue}" is not in the student list.`);
+                isValid = false; // Mark card as invalid
+            }
 
             // Perform validation based on criteria (skip the "name" field)
             if (header !== 'name') {
-                const criterion = evalCriterias.find(crit => crit.name.toLowerCase() === header);
+                const criterion = evalCriterias.find(crit => crit.name.trim().toLowerCase() === header);
                 if (criterion) {
                     const cellNumberValue = parseFloat(cellValue);
-                       console.log(cellNumberValue);
-
+                    console.log("cell number value" + cellNumberValue);
+                    console.log("points" + criterion.points);
                     // Check if cell is a number and exceeds allowed points
-                    if (!isNaN(cellNumberValue) && cellNumberValue > criterion.points) {
+                    if (cellNumberValue > criterion.points) {
                         validationErrors.add(`Error in ${header}: Value ${cellNumberValue} exceeds maximum of ${criterion.points}`); // Use Set to avoid duplicates
                         isValid = false; // Mark card as invalid
+                        alert("dsfdjfjd");
                     } else if (isNaN(cellNumberValue) && cellValue !== '') {
                         // Optional: Add error if non-numeric value provided for a numeric criterion
                         validationErrors.add(`Error in ${header}: Value "${cellValue}" is not a valid number.`);
-                        isValid = false; // Mark card as invalid
+                        isValid = false;
                     }
                 } else if (cellValue !== '') {
                     // If no matching criterion was found for this header and it's not empty
@@ -513,39 +529,20 @@ async function createCards(data) {
     // If there are validation errors, show them in a popup
     if (validationErrors.size > 0) {
         alert(Array.from(validationErrors).join('\n')); // Convert Set to array for alert
+        currentCardIndex = 0; // Reset index to the first card to avoid pointing to an invalid index
         return; // Exit function after showing errors
     }
 
-    currentCardIndex = 0; // Reset index to the first card
+    // // Check if we have any valid cards and set the currentCardIndex
+    // if (cards.length > 0) {
+    //     currentCardIndex = 0; // Reset index to the first card only if we have valid cards
+    // } else {
+    //     currentCardIndex = -1; // No valid cards means there are none to display
+    // }
+
     updateDisplay(); // Display cards on the UI
-
-     // Save each valid card to Firebase
-     for (const card of cards) {
-        await saveCardToFirebase(card);
-    }
-    
 }
-// Function to save each card to Firebase
-async function saveCardToFirebase(card) {
-    const studentName = card.name;
-    const studentId = `id${currentCardIndex + 1}`;
 
-    const studentRef = ref(db, `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students/${studentId}`);
-
-    const studentData = {
-        studentName: studentName,
-        criteria: Object.fromEntries(
-            Object.entries(card).filter(([key]) => key !== 'name') // Filter out 'name' from criteria
-        )
-    };
-
-    try {
-        await set(studentRef, studentData);
-        console.log("Data saved to Firebase:", studentData);
-    } catch (error) {
-        console.error("Error saving data to Firebase:", error);
-    }
-}
 
 
 function updateDisplay() {
@@ -594,7 +591,6 @@ function searchCards() {
         updateDisplay(); // Update the display to show the matching card
     } else {
         alert("No matching card found!"); // Alert if no match is found
-        
     }
 }
 
@@ -620,5 +616,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     cards = sampleCards; // Assign the initialized sample cards to `cards`
     await fetchCardsFromDatabase(); // Fetch data after populating dropdown
     updateDisplay(); // Run updateDisplay last to ensure everything is set up
-   
+
 });

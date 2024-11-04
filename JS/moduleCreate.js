@@ -102,13 +102,24 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
 
         moduleBodyDetail.innerHTML = '';
 
-        const moduleBodyDesc = document.createElement('textarea');
-        moduleBodyDesc.placeholder = 'Enter a module Description';
+        const moduleBodyTop = document.createElement('div');
+        const moduleBodyBottom = document.createElement('div');
 
-        getEvaluationNames()
-            .then(assessments => {
+        const moduleBodyDesc = document.createElement('textarea');
+        moduleBodyDesc.placeholder = 'Enter a module description';
+        moduleBodyTop.appendChild(moduleBodyDesc); // Append the textarea to the DOM
+        moduleBodyDetail.appendChild(moduleBodyTop);
+
+        let selectedCriteria;
+        let selectedPhase;
+
+        // Asynchronous function to handle the dropdown creation within the larger code block
+        (async () => {
+            try {
+                const assessments = await getEvaluationNames();
                 console.log(assessments); // Log the retrieved assessments
 
+                // Create a dropdown element for assessments
                 const moduleDropdown = document.createElement('select');
 
                 // Check if assessments is an array before iterating
@@ -124,28 +135,61 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
                 }
 
                 // Append the dropdown to the DOM
-                document.getElementById('dropdown-container').appendChild(moduleDropdown);
-
-                // Variable to hold the selected option
-                let selectedCriteria;
+                moduleBodyBottom.appendChild(moduleDropdown);
 
                 // Add an event listener to capture the selected option
                 moduleDropdown.addEventListener('change', (event) => {
                     selectedCriteria = event.target.value; // Get the selected value
                     console.log("Selected option:", selectedCriteria); // Log the selected value
                 });
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error("Error retrieving assessment names:", error);
-            });
+            }
+        })();
 
-        moduleBodyDetail.appendChild(moduleBodyDesc);
+        (async function () {
+            try {
+                // Fetch the phase names
+                const phases = await getPhase();
+                console.log(phases); // Log the retrieved phases
+
+                // Create a dropdown element for phases
+                const phaseDropdown = document.createElement('select');
+
+                // Check if phases is an array before iterating
+                if (Array.isArray(phases)) {
+                    phases.forEach(phase => {
+                        const phaseOption = document.createElement('option'); // Create an <option> element
+                        phaseOption.value = phase; // Set the value of the option
+                        phaseOption.textContent = phase; // Set the display text for the option
+                        phaseDropdown.appendChild(phaseOption); // Append the option to the dropdown
+                    });
+                } else {
+                    console.error("Expected an array but got:", phases);
+                }
+
+                // Append the dropdown to the DOM
+                moduleBodyBottom.appendChild(phaseDropdown);
+
+                // Add an event listener to capture the selected option
+                phaseDropdown.addEventListener('change', (event) => {
+                    selectedPhase = event.target.value; // Get the selected value
+                    console.log("Selected phase:", selectedPhase); // Log the selected value
+                });
+            } catch (error) {
+                console.error("Error retrieving phase names:", error);
+            }
+        })();
+
+        moduleBodyDetail.appendChild(moduleBodyBottom);
+        moduleBody.appendChild(moduleBodyDetail);
+
 
         moduleOptionSubmit.addEventListener('click', async () => {
             try {
-                const moduleBodyText = await submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail, moduleOptionSubmit, moduleHeadName, moduleTitle, moduleBodyDesc);
+                const moduleBodyText = await submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail, moduleOptionSubmit, moduleHeadName, moduleTitle, moduleBodyDesc, selectedCriteria, selectedPhase);
                 console.log("well" + moduleBodyText);
-                await writeFirebaseData(moduleTitle.value, moduleBodyDesc.value);
+                await writeFirebaseData(moduleTitle.value, moduleBodyDesc.value, selectedCriteria, selectedPhase);
                 createModule();
                 resolve(moduleBodyText);
             } catch (error) {
@@ -176,18 +220,94 @@ function editModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
 
     const moduleBodyDiv = document.createElement('div');
 
+    const moduleBodyTop = document.createElement('div');
+    const moduleBodyBottom = document.createElement('div');
+
     const moduleBodyDesc = document.createElement('textarea');
     moduleBodyDesc.value = moduleBodyText;
 
-    moduleBodyDiv.appendChild(moduleBodyDesc);
-    moduleBodyDetail.appendChild(moduleBodyDiv);
+    let selectedCriteria;
+        let selectedPhase;
+
+        // Asynchronous function to handle the dropdown creation within the larger code block
+        (async () => {
+            try {
+                const assessments = await getEvaluationNames();
+                console.log(assessments); // Log the retrieved assessments
+
+                // Create a dropdown element for assessments
+                const moduleDropdown = document.createElement('select');
+
+                // Check if assessments is an array before iterating
+                if (Array.isArray(assessments)) {
+                    assessments.forEach(assessment => {
+                        const moduleDropOption = document.createElement('option'); // Create an <option> element
+                        moduleDropOption.value = assessment; // Set the value of the option
+                        moduleDropOption.textContent = assessment; // Set the display text for the option
+                        moduleDropdown.appendChild(moduleDropOption); // Append the option to the dropdown
+                    });
+                } else {
+                    console.error("Expected an array but got:", assessments);
+                }
+
+                // Append the dropdown to the DOM
+                moduleBodyBottom.appendChild(moduleDropdown);
+
+                // Add an event listener to capture the selected option
+                moduleDropdown.addEventListener('change', (event) => {
+                    selectedCriteria = event.target.value; // Get the selected value
+                    console.log("Selected option:", selectedCriteria); // Log the selected value
+                });
+            } catch (error) {
+                console.error("Error retrieving assessment names:", error);
+            }
+        })();
+
+        (async function () {
+            try {
+                // Fetch the phase names
+                const phases = await getPhase();
+                console.log(phases); // Log the retrieved phases
+
+                // Create a dropdown element for phases
+                const phaseDropdown = document.createElement('select');
+
+                // Check if phases is an array before iterating
+                if (Array.isArray(phases)) {
+                    phases.forEach(phase => {
+                        const phaseOption = document.createElement('option'); // Create an <option> element
+                        phaseOption.value = phase; // Set the value of the option
+                        phaseOption.textContent = phase; // Set the display text for the option
+                        phaseDropdown.appendChild(phaseOption); // Append the option to the dropdown
+                    });
+                } else {
+                    console.error("Expected an array but got:", phases);
+                }
+
+                // Append the dropdown to the DOM
+                moduleBodyBottom.appendChild(phaseDropdown);
+
+                // Add an event listener to capture the selected option
+                phaseDropdown.addEventListener('change', (event) => {
+                    selectedPhase = event.target.value; // Get the selected value
+                    console.log("Selected phase:", selectedPhase); // Log the selected value
+                });
+            } catch (error) {
+                console.error("Error retrieving phase names:", error);
+            }
+        })();
+
+    moduleBodyTop.appendChild(moduleBodyDesc);
+    moduleBodyDetail.appendChild(moduleBodyTop);
+
+    moduleBodyDetail.appendChild(moduleBodyBottom);
 
     moduleBody.appendChild(moduleBodyDetail);
 
-    moduleptionSubmit.replaceWith(moduleOptionSubmit.cloneNode(true));
+    moduleOptionSubmit.replaceWith(moduleOptionSubmit.cloneNode(true));
     moduleOptionSubmit = moduleBody.querySelector('.Module-Page-Right-Module-Body-Options-Submit');
 
-    ModuleOptionSubmit.addEventListener('click', async () => {
+    moduleOptionSubmit.addEventListener('click', async () => {
         try {
             moduleBodyText = await submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail, moduleOptionSubmit, moduleHeadName, moduleTitle, moduleBodyDesc, oldHeadName);
         } catch (error) {
@@ -196,7 +316,7 @@ function editModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
     });
 }
 
-function submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail, moduleOptionSubmit, moduleHeadName, moduleTitle, moduleBodyDesc, oldHeadName) {
+function submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail, moduleOptionSubmit, moduleHeadName, moduleTitle, moduleBodyDesc, oldHeadName, selectedCriteria, selectedPhase) {
     return new Promise(async (resolve, reject) => {
 
         const moduleName = moduleTitle.value;
@@ -214,6 +334,10 @@ function submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
 
         const moduleBodyText = document.createElement('div');
         moduleBodyText.innerText = moduleDesc;
+        const moduleBodyCriteria = document.createElement('div');
+        moduleBodyCriteria.innerText = selectedCriteria;
+        const moduleBodyPhase = document.createElement('div');
+        moduleBodyPhase.innerText = selectedPhase;
         console.log(moduleDesc);
         moduleBodyDetail.appendChild(moduleBodyText);
         moduleTitle.remove();
@@ -221,7 +345,7 @@ function submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
         moduleHead.style.display = 'flex';
 
         await deleteModule(oldHeadName);
-        await writeFirebaseData(moduleName, moduleDesc)
+        await writeFirebaseData(moduleName, moduleDesc, selectedCriteria, selectedPhase)
 
         resolve(moduleDesc);
     });
@@ -235,7 +359,7 @@ async function loadFirebaseData() {
 
         moduleData.forEach((module) => {
 
-            const moduleection = document.createElement('div');
+            const moduleSection = document.createElement('div');
             moduleSection.classList.add('Module-Page-Right-Module');
 
             const moduleHead = document.createElement('div');
@@ -262,8 +386,14 @@ async function loadFirebaseData() {
 
             const moduleBodyDesc = document.createElement('div');
             moduleBodyDesc.innerText = module.Desc;
+            const moduleBodyCriteria = document.createElement('div');
+            moduleBodyCriteria.innerText = module.Criteria;
+            const moduleBodyPhase = document.createElement('div');
+            moduleBodyPhase.innerText = module.Phase;
 
             moduleBodyDetail.appendChild(moduleBodyDesc);
+            moduleBodyDetail.appendChild(moduleBodyCriteria);
+            moduleBodyDetail.appendChild(moduleBodyPhase);
 
             const moduleBodyOption = document.createElement('div');
             moduleBodyOption.classList.add('Module-Page-Right-Module-Body-Option');
@@ -315,12 +445,14 @@ async function loadFirebaseData() {
     }
 }
 
-async function writeFirebaseData(moduleName, moduleDesc) {
+async function writeFirebaseData(moduleName, moduleDesc, selectedCriteria, selectedPhase) {
     try {
         const dbRef = ref(db, `Modules/${moduleName}`);
         await set(dbRef, {
             Desc: moduleDesc,
-            Name: moduleName
+            Name: moduleName,
+            Phase: selectedPhase,
+            Criteria: selectedCriteria
         });
         console.log(`Module "${moduleName}" successfully written to the database`);
     } catch (error) {
@@ -330,7 +462,7 @@ async function writeFirebaseData(moduleName, moduleDesc) {
 
 async function readFirebaseData() {
     try {
-        const dbRef = ref(db, `Module`);
+        const dbRef = ref(db, `Modules`);
         const snapshot = await get(dbRef);
 
         if (snapshot.exists()) {
@@ -355,28 +487,48 @@ async function readFirebaseData() {
     }
 }
 
-function getEvaluationNames() {
-    const dbRef = ref(db, 'Evaluation Criteria');
+async function getEvaluationNames() {
+    try {
+        const dbRef = ref(db, 'Evaluation Criteria');
+        const snapshot = await get(dbRef);
 
-    // Return a promise
-    return get(dbRef)
-        .then((snapshot) => {
-            if (snapshot.exists()) {
-                const criteriaData = snapshot.val(); // Get the data under "Evaluation Criteria"
-                const assessmentNames = Object.keys(criteriaData); // Get the keys (names)
+        if (snapshot.exists()) {
+            const criteriaData = snapshot.val(); // Get the data under "Evaluation Criteria"
+            const assessmentNames = Object.keys(criteriaData); // Get the keys (names)
 
-                console.log(assessmentNames); // Log the names or use them as needed
-                return assessmentNames; // Return the array of names
-            } else {
-                console.log("No data available");
-                return []; // Return an empty array if no data exists
-            }
-        })
-        .catch((error) => {
-            console.error("Error getting data: ", error);
-            return []; // Return an empty array in case of error
-        });
+            console.log(assessmentNames); // Log the names or use them as needed
+            return assessmentNames; // Return the array of names
+        } else {
+            console.log("No data available");
+            return []; // Return an empty array if no data exists
+        }
+    } catch (error) {
+        console.error("Error getting data:", error);
+        return []; // Return an empty array in case of error
+    }
 }
+
+async function getPhase() {
+    try {
+        const dbRef = ref(db, 'Phases');
+        const snapshot = await get(dbRef);
+
+        if (snapshot.exists()) {
+            const phaseData = snapshot.val(); // Get the data under "Phases"
+            const phaseNames = Object.keys(phaseData); // Get the keys (names)
+
+            console.log(phaseNames); // Log the names or use them as needed
+            return phaseNames; // Return the array of names
+        } else {
+            console.log("No data available");
+            return []; // Return an empty array if no data exists
+        }
+    } catch (error) {
+        console.error("Error getting phase data:", error);
+        return []; // Return an empty array in case of error
+    }
+}
+
 
 async function deleteModule(moduleName) {
     try {

@@ -40,14 +40,15 @@ async function fetchFirebase(year, batchName) {
     // Add "Name" as the first header
     const headers = ["Name", ...Object.keys(modules)];
 
-    // Step 2: Initialize jsonData with headers
+    // Step 2: Initialize jsonData with headers and a map for students
     const jsonData = {
         headers,
         data: []
     };
+    const studentMap = {}; // Map to store student data by id
 
     // Step 3: Loop through each module key to fetch students' marks from `Marks/${year}/${batchname}/studentlist/${modulekey}`
-    for (const moduleKey of headers.slice(1)) {  // Skip "Name" in headers for moduleKey
+    for (const moduleKey of headers.slice(1)) { // Skip "Name" in headers for moduleKey
         const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
         const studentListSnapshot = await get(studentListRef);
 
@@ -57,29 +58,31 @@ async function fetchFirebase(year, batchName) {
             // For each student (id), retrieve "name" and "total"
             for (const id in students) {
                 const studentData = students[id];
-                const studentNameRef = ref(db, `studentList/${year}/${batchName}/${id}/name`);
-                const studentNameSnapshot = await get(studentNameRef);
+                
+                // If the student isn't already in the map, initialize their row
+                if (!studentMap[id]) {
+                    const studentNameRef = ref(db, `studentList/${year}/${batchName}/${id}/name`);
+                    const studentNameSnapshot = await get(studentNameRef);
+                    const studentName = studentNameSnapshot.exists() ? studentNameSnapshot.val() : "Unknown";
 
-                // Fetch student name
-                const studentName = studentNameSnapshot.exists() ? studentNameSnapshot.val() : "Unknown";
-
-                // Create row with student name and module marks
-                const row = [
-                    studentName, // Name column
-                    ...headers.slice(1).map(header => header === moduleKey ? studentData.total || 0 : null)
-                ];
-
-                // Only add this row if it doesn't already exist
-                if (!jsonData.data.some(r => r[0] === studentName)) {
-                    jsonData.data.push(row);
+                    // Initialize the row with "Name" and empty values for each module
+                    studentMap[id] = [studentName, ...headers.slice(1).map(() => null)];
                 }
+
+                // Update the row with the student's mark for the current module
+                const moduleIndex = headers.indexOf(moduleKey);
+                studentMap[id][moduleIndex] = studentData.total || 0;
             }
         }
     }
 
+    // Convert the studentMap to jsonData.data
+    jsonData.data = Object.values(studentMap);
+
     console.log(jsonData);
     return jsonData;
 }
+
 
 function renderHead(headings) {
     const tableHead = document.getElementById('table-head')
@@ -134,6 +137,7 @@ function searchTable() {
         rows[i].style.display = found ? '' : 'none';
     }
 }
+
 function calculateTotalMarks(student) {
     return student.slice(1).reduce((sum, mark) => sum + parseFloat(mark), 0)
 
@@ -176,6 +180,8 @@ sortHighest5Btn.addEventListener('click', sortTop5);
 sortLowest5Btn.addEventListener('click', sortBottom5);
 showAllBtn.addEventListener('click', showAll); // Re-renders the full dataset
 downloadBtn.addEventListener('click', downloadExcel);
+document.getElementById('Search_input').addEventListener('input', searchTable);
+
 
 // Fetch data and render the table on page load
 window.onload = async function() {

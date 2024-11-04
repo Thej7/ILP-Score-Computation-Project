@@ -12,12 +12,10 @@ body {
 .layout-container {
     display: flex;
     height: 100vh; /* Full height of the viewport */
-    position: fixed;
-    width: 100%;
 }
 
 .sidebar {
-    width: 20%; /* Sidebar takes 20% of the screen width */
+    width: 60%; /* Sidebar takes 20% of the screen width */
     background-color: #8061C3; /* Light background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
@@ -57,7 +55,7 @@ body {
 }
 
 .nav-item:hover {
-    background-color: #7a5f9e; /* Darker shade on hover */
+    background-color: #5e89df; /* Darker shade on hover */
 }
 
 .nav-icon {
@@ -73,7 +71,8 @@ body {
 
 .Phase-Page-Workspace {
     margin-top: 10px;
-    width: 100%;
+    width:60%;
+    margin-left: -188px;
     display: flex;
     flex-direction: column;
 }
