@@ -84,7 +84,6 @@ body {
 
 .container {
     max-width: 100%;
-    margin: 0 auto;
     padding: 20px;
     font-family: Arial, sans-serif;
     color: #333;
@@ -94,7 +93,7 @@ body {
 .container h1 {
     font-size: 28px;
     font-weight: bold;
-    color: #4f46e5; /* Modern dark blue */
+    color: #8061C3; /* Modern dark blue */
     margin-bottom: 20px;
     text-align: center;
 }
@@ -113,12 +112,12 @@ body {
 }
 
 #Search_input:focus {
-    border-color: #4f46e5;
+    border-color: #8061C3;
 }
 
 /* Button Styling */
 button {
-    background-color: #4f46e5;
+    background-color: #8061C3;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -151,7 +150,7 @@ button:hover {
 
 /* Table Head */
 #table-head th {
-    background-color: #4f46e5;
+    background-color: #8061C3;
     color: #fff;
     padding: 12px;
     text-align: left;

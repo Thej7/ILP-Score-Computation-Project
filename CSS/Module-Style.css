@@ -2,20 +2,105 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-
+ 
 }
-
+ 
 body {
     display: flex;
     /* Use flexbox for layout */
 }
 
+button {
+    background-color: #8061C3; /* Updated background color */
+    color: #e0e7ff; /* Text color */
+    padding: 5px 10px; /* Smaller padding for a smaller button */
+    margin: 10px;
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Smaller font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #6849A1; /* Darker background on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+button:disabled {
+    background-color: #ccc; /* Disabled button background */
+    color: #666; /* Disabled text color */
+    cursor: not-allowed; /* Not-allowed cursor */
+}
+
+/* General Reset for Input Elements */
+input,
+textarea,
+select {
+    border: 1px solid #ccc; /* Light border for inputs */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px; /* Padding inside input */
+    font-size: 16px; /* Font size */
+    font-family: 'Arial', sans-serif; /* Modern font */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for effects */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Focus State for Inputs */
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #8061C3; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(128, 97, 195, 0.5); /* Subtle shadow on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Textarea Specific Styles */
+textarea {
+    resize: vertical; /* Allow vertical resizing only */
+}
+
+/* Placeholder Styling */
+input::placeholder,
+textarea::placeholder {
+    color: #aaa; /* Placeholder color */
+    opacity: 1; /* Make sure it is fully opaque */
+}
+
+/* Input Types */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+    background-color: #f9f9f9; /* Light background for inputs */
+}
+
+input[type="submit"],
+input[type="button"] {
+    background-color: #8061C3; /* Button background color */
+    color: #fff; /* Button text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    border: none; /* No border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for buttons */
+    transition: background-color 0.3s, transform 0.3s; /* Transition for hover effects */
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background-color: #674f9f; /* Darker shade on hover */
+    transform: translateY(-2px); /* Lift effect on hover */
+}
+
+ 
 .layout-container {
     display: flex;
     height: 100vh;
     /* Full height of the viewport */
 }
-
+ 
 .sidebar {
     width: 60%;
     /* Sidebar takes 20% of the screen width */
@@ -29,7 +114,7 @@ body {
     padding: 20px 0;
     /* Top and bottom padding */
 }
-
+ 
 .logo {
     max-width: 80%;
     /* Make logo fit within button size */
@@ -38,7 +123,7 @@ body {
     margin-bottom: 20px;
     /* Space below the logo */
 }
-
+ 
 .nav-menu {
     display: flex;
     flex-direction: column;
@@ -50,9 +135,9 @@ body {
     width: 80%;
     /* Full width of the sidebar */
     border-radius: 8px;
-
+ 
 }
-
+ 
 .nav-item {
     display: flex;
     /* Flexbox for alignment */
@@ -79,12 +164,12 @@ body {
     transition: background-color 0.3s;
     /* Smooth background transition */
 }
-
+ 
 .nav-item:hover {
     background-color: #5e89df;
     /* Darker shade on hover */
 }
-
+ 
 .nav-icon {
     max-width: 25px;
     /* Limit icon size */
@@ -93,14 +178,14 @@ body {
     margin-right: 10px;
     /* Space between icon and text */
 }
-
+ 
 .footer-logo {
     max-width: 80%;
     /* Responsive footer logo */
     margin-top: auto;
     /* Push footer logo to the bottom */
 }
-
+ 
 .Module-Page-Workspace {
     margin-top: 10px;
     width: 100%;
@@ -108,7 +193,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-
+ 
 .Module-Page-Bar {
     display: flex;
     justify-content: space-around;
@@ -121,7 +206,7 @@ body {
     width: 92%;
     margin-left: 70px;
 }
-
+ 
 .Module-Page-Link {
     text-decoration: none;
     color: #333;
@@ -130,25 +215,26 @@ body {
     padding: 5px 15px;
     transition: color 0.2s;
 }
-
+ 
 .Module-Page-Link:hover {
     color: #4f46e5;
     /* Customize hover color */
 }
-
+ 
 .Module-Page-Right {
     margin-top: 10px;
     height: auto;
     padding: 20px;
     width: 98.5%;
 }
-
+ 
 .Module-Page-Right-Module {
     border: 1px solid black;
     background-color: rgba(128, 97, 195, 0.2);
+    margin-top: 20px;
     margin-left: 50px;
 }
-
+ 
 .Module-Page-Right-Module-Head {
     display: flex;
     justify-content: space-between;
@@ -157,7 +243,7 @@ body {
     font-weight: bold;
     padding: 10px;
 }
-
+ 
 .Module-Page-Right-Module-Body {
     display: flex;
     flex-direction: row;
@@ -165,20 +251,38 @@ body {
     align-items: flex-start;
     gap: 1rem; /* Space between details and options */
 }
-
+ 
+.Module-Page-Right-Module-Body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 15px; /* Adds padding inside the module body */
+    gap: 1rem; /* Adds space between the detail and option sections */
+}
+ 
 .Module-Page-Right-Module-Body-Detail {
     flex: 2;
+    padding-right: 15px; /* Adds right padding for better separation */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* Space between detail elements */
 }
-
+ 
 .Module-Page-Right-Module-Body-Option {
     flex: 1;
     display: flex;
     flex-direction: row;
-    gap: 0.5rem; /* Space between buttons */
+    gap: 0.75rem; /* Slightly larger gap between buttons */
+    justify-content: flex-end; /* Aligns buttons to the right */
 }
-
+ 
 .Module-Page-Right-Module-Body-Detail input {
-    border: none;
+    border: 1px solid #ccc; /* Adds a subtle border for visibility */
     outline: none;
-    padding: 0;
+    padding: 8px; /* Adds padding inside input fields for usability */
+    border-radius: 4px; /* Slight rounding for consistency with other elements */
+    width: 80%; /* Ensures input fields take full width */
+    box-sizing: border-box; /* Ensures padding does not affect width */
 }
+ 

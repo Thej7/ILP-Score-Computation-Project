@@ -2,111 +2,176 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    
+
 }
 
+button {
+    background-color: #8061C3; /* Updated background color */
+    color: #e0e7ff; /* Text color */
+    padding: 5px 10px; /* Smaller padding for a smaller button */
+    margin: 10px;
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Smaller font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
+}
+
+button:hover {
+    background-color: #6849A1; /* Darker background on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+button:disabled {
+    background-color: #ccc; /* Disabled button background */
+    color: #666; /* Disabled text color */
+    cursor: not-allowed; /* Not-allowed cursor */
+}
+
+
 body {
-    display: flex; /* Use flexbox for layout */
+    display: flex;
+    /* Use flexbox for layout */
 }
 
 .layout-container {
     display: flex;
-    height: 100vh; /* Full height of the viewport */
+    height: 100vh;
+    /* Full height of the viewport */
 }
 
 .sidebar {
-    width: 60%; /* Sidebar takes 20% of the screen width */
-    background-color: #8061C3; /* Light background color */
+    width: 60%;
+    /* Sidebar takes 20% of the screen width */
+    background-color: #8061C3;
+    /* Light background color */
     display: flex;
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Center items horizontally */
-    padding: 20px 0; /* Top and bottom padding */
+    flex-direction: column;
+    /* Stack items vertically */
+    align-items: center;
+    /* Center items horizontally */
+    padding: 20px 0;
+    /* Top and bottom padding */
 }
 
 .logo {
-    max-width: 80%; /* Make logo fit within button size */
-    height: auto; /* Maintain aspect ratio */
-    margin-bottom: 20px; /* Space below the logo */
+    max-width: 80%;
+    /* Make logo fit within button size */
+    height: auto;
+    /* Maintain aspect ratio */
+    margin-bottom: 20px;
+    /* Space below the logo */
 }
 
 .nav-menu {
     display: flex;
-    flex-direction: column; /* Stack links vertically */
-    justify-content:center; /* Even spacing between buttons */
-    flex-grow: 1; /* Allow nav-menu to grow */
-    width: 80%; /* Full width of the sidebar */
+    flex-direction: column;
+    /* Stack links vertically */
+    justify-content: center;
+    /* Even spacing between buttons */
+    flex-grow: 1;
+    /* Allow nav-menu to grow */
+    width: 80%;
+    /* Full width of the sidebar */
     border-radius: 8px;
-    
+
 }
 
 .nav-item {
-    display: flex; /* Flexbox for alignment */
-    align-items: center; /* Center items vertically */
-    justify-content: center; /* Center items horizontally */
-    padding: 15px; /* Space around the items */
-    text-decoration: none; /* Remove underline */
-    color: white; /* White text color */
-    background-color: #967CCF; /* Button background color */
-    border-radius: 4px; /* Rounded corners */
-    margin: 20px 0; /* Space between buttons */
-    height: 50px; /* Fixed height for equal button size */
-    width: 100%; /* Full width for buttons */
-    transition: background-color 0.3s; /* Smooth background transition */
+    display: flex;
+    /* Flexbox for alignment */
+    align-items: center;
+    /* Center items vertically */
+    justify-content: center;
+    /* Center items horizontally */
+    padding: 15px;
+    /* Space around the items */
+    text-decoration: none;
+    /* Remove underline */
+    color: white;
+    /* White text color */
+    background-color: #967CCF;
+    /* Button background color */
+    border-radius: 4px;
+    /* Rounded corners */
+    margin: 20px 0;
+    /* Space between buttons */
+    height: 50px;
+    /* Fixed height for equal button size */
+    width: 100%;
+    /* Full width for buttons */
+    transition: background-color 0.3s;
+    /* Smooth background transition */
 }
 
 .nav-item:hover {
-    background-color: #5e89df; /* Darker shade on hover */
+    background-color: #5e89df;
+    /* Darker shade on hover */
 }
 
 .nav-icon {
-    max-width: 25px; /* Limit icon size */
-    height: auto; /* Maintain aspect ratio */
-    margin-right: 10px; /* Space between icon and text */
+    max-width: 25px;
+    /* Limit icon size */
+    height: auto;
+    /* Maintain aspect ratio */
+    margin-right: 10px;
+    /* Space between icon and text */
 }
 
 .footer-logo {
-    max-width: 80%; /* Responsive footer logo */
-    margin-top: auto; /* Push footer logo to the bottom */
+    max-width: 80%;
+    /* Responsive footer logo */
+    margin-top: auto;
+    /* Push footer logo to the bottom */
 }
-.right-container{
+
+.right-container {
+    margin-top: 10px;
+    width: 100%;
+    margin-left: -188px;
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
-    width:60%;
-    margin-left: -188px;
 }
 
 .Config-Page-Bar {
-    margin-top: 10px;
     display: flex;
     justify-content: space-around;
-    background-color: #f3f3f3; /* Customize as needed */
+    background-color: #f3f3f3;
+    /* Customize as needed */
     padding: 10px 0;
-    border-bottom: 1px solid #ccc; /* Adds a separator line */
+    border-bottom: 1px solid #ccc;
+    /* Adds a separator line */
+    margin-top: 50px;
+    width: 92%;
+    margin-left: 70px;
 }
 
 .Config-Page-Link {
     text-decoration: none;
-    color: #333; /* Customize link color */
+    color: #333;
+    /* Customize link color */
     font-weight: bold;
     padding: 5px 15px;
     transition: color 0.2s;
 }
 
 .Config-Page-Link:hover {
-    color: #4f46e5; /* Customize hover color */
+    color: #4f46e5;
+    /* Customize hover color */
 }
 
 .Config-Page-Right {
     margin-top: 10px;
-    width: 80%;
     height: auto;
     padding: 20px;
+    width: 98.5%;
 }
 
 .Config-Page-Right-Criteria-Group {
     background-color: rgba(128, 97, 195, 0.2);
-    margin: 20px;
+    margin-top: 20px;
+    width: 96%;
+    margin-left: 50px;
 }
 
 .Config-Page-Right-Criteria-Group-Head {
@@ -127,11 +192,14 @@ body {
 
 .Config-Page-Right-Criteria-Group-Body-Table {
     width: 80%;
-    max-width: 100%; /* Prevents table from exceeding container width */
+    max-width: 100%;
+    /* Prevents table from exceeding container width */
     border: 2px solid red;
     box-sizing: border-box;
-    overflow-x: auto; /* Enables horizontal scrolling if content overflows */
-    padding: 10px; /* Adds padding for a buffer between border and content */
+    overflow-x: auto;
+    /* Enables horizontal scrolling if content overflows */
+    padding: 10px;
+    /* Adds padding for a buffer between border and content */
 }
 
 .Config-Page-Right-Criteria-Group-Body-Options {
@@ -146,8 +214,10 @@ body {
     border: none;
     outline: none;
     padding: 0;
-    background-color: inherit; /* Inherit parent's background color */
-    color: inherit; /* Inherit parent's text color if needed */
+    background-color: inherit;
+    /* Inherit parent's background color */
+    color: inherit;
+    /* Inherit parent's text color if needed */
 }
 
 .Config-Page-Right-Criteria-Group-Body-Table input:not(table input) {
@@ -155,56 +225,74 @@ body {
     border: 1px solid #ccc;
     outline: none;
     padding: 5px;
-    background-color: #f0f0f0; /* Customize as needed */
-    color: #333; /* Customize text color */
-    border-radius: 4px; /* Optional styling */
+    background-color: #f0f0f0;
+    /* Customize as needed */
+    color: #333;
+    /* Customize text color */
+    border-radius: 4px;
+    /* Optional styling */
 }
 
 .Config-Page-Right-Criteria-Group-Body-Table table {
-    width: 100%; /* Ensure table stretches to fill container width */
-    border-collapse: collapse; /* Clean up spacing between table cells */
+    width: 100%;
+    /* Ensure table stretches to fill container width */
+    border-collapse: collapse;
+    /* Clean up spacing between table cells */
     background-color: #ffffff;
     margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a floating effect */
-    border-radius: 8px; /* Rounded corners */
-    overflow: hidden; /* Hide any overflow from border-radius */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Soft shadow for a floating effect */
+    border-radius: 8px;
+    /* Rounded corners */
+    overflow: hidden;
+    /* Hide any overflow from border-radius */
 }
 
-.Config-Page-Right-Criteria-Group-Body-Table th, 
+.Config-Page-Right-Criteria-Group-Body-Table th,
 .Config-Page-Right-Criteria-Group-Body-Table td {
-    padding: 12px 15px; /* Add padding for spacing */
+    padding: 12px 15px;
+    /* Add padding for spacing */
     text-align: left;
-    color: #333; /* Dark text color for contrast */
+    color: #333;
+    /* Dark text color for contrast */
 }
 
 .Config-Page-Right-Criteria-Group-Body-Table th {
-    background-color: #f4f6f8; /* Light background for header */
-    color: #555; /* Softer color for header text */
+    background-color: #f4f6f8;
+    /* Light background for header */
+    color: #555;
+    /* Softer color for header text */
     font-weight: bold;
     text-transform: uppercase;
     font-size: 14px;
-    border-bottom: 2px solid #e0e0e0; /* Subtle bottom border */
+    border-bottom: 2px solid #e0e0e0;
+    /* Subtle bottom border */
 }
 
 .Config-Page-Right-Criteria-Group-Body-Table td {
-    border-bottom: 1px solid #e0e0e0; /* Light line between rows */
+    border-bottom: 1px solid #e0e0e0;
+    /* Light line between rows */
     font-size: 14px;
 }
 
 .Config-Page-Right-Criteria-Group-Body-Table tr:nth-child(even) {
-    background-color: #f9fafb; /* Slightly different background for alternating rows */
+    background-color: #f9fafb;
+    /* Slightly different background for alternating rows */
 }
 
 .Config-Page-Right-Criteria-Group-Body-Table tr:hover {
-    background-color: #f1f5f9; /* Highlight row on hover */
+    background-color: #f1f5f9;
+    /* Highlight row on hover */
 }
 
-.Config-Page-Right-Criteria-Group-Body-Table td:first-child, 
+.Config-Page-Right-Criteria-Group-Body-Table td:first-child,
 .Config-Page-Right-Criteria-Group-Body-Table th:first-child {
-    padding-left: 20px; /* Extra padding for the first column */
+    padding-left: 20px;
+    /* Extra padding for the first column */
 }
 
-.Config-Page-Right-Criteria-Group-Body-Table td:last-child, 
+.Config-Page-Right-Criteria-Group-Body-Table td:last-child,
 .Config-Page-Right-Criteria-Group-Body-Table th:last-child {
-    padding-right: 20px; /* Extra padding for the last column */
+    padding-right: 20px;
+    /* Extra padding for the last column */
 }

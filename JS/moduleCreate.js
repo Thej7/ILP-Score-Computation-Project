@@ -80,7 +80,7 @@ function createModule() {
 
     moduleOptionDelete.addEventListener('click', async function () {
         moduleSection.remove();
-        await deleteFirebaseData(moduleHeadName.innerText)
+        await deleteModule(moduleHeadName.innerText)
         if (moduleHeadName.innerText === 'Add a new Module') {
             createModule();
         }
@@ -98,9 +98,7 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
         const moduleTitle = document.createElement('input');
         moduleTitle.type = 'text';
         moduleTitle.placeholder = 'Enter the Module name';
-        moduleBody.appendChild(moduleTitle);
-
-        moduleBodyDetail.innerHTML = '';
+        moduleBodyDetail.appendChild(moduleTitle);
 
         const moduleBodyTop = document.createElement('div');
         const moduleBodyBottom = document.createElement('div');
@@ -126,7 +124,7 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
                 if (Array.isArray(assessments)) {
                     assessments.forEach(assessment => {
                         const moduleDropOption = document.createElement('option'); // Create an <option> element
-                        moduleDropOption.value = assessment; // Set the value of the option
+                        moduleDropOption.value = "Evaluation Criteria: " + assessment; // Set the value of the option
                         moduleDropOption.textContent = assessment; // Set the display text for the option
                         moduleDropdown.appendChild(moduleDropOption); // Append the option to the dropdown
                     });
@@ -160,7 +158,7 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
                 if (Array.isArray(phases)) {
                     phases.forEach(phase => {
                         const phaseOption = document.createElement('option'); // Create an <option> element
-                        phaseOption.value = phase; // Set the value of the option
+                        phaseOption.value = "Phase: " + phase; // Set the value of the option
                         phaseOption.textContent = phase; // Set the display text for the option
                         phaseDropdown.appendChild(phaseOption); // Append the option to the dropdown
                     });
@@ -189,6 +187,7 @@ function showModuleForm(moduleSection, moduleHead, moduleBody, moduleBodyDetail,
             try {
                 const moduleBodyText = await submitFunction(moduleSection, moduleHead, moduleBody, moduleBodyDetail, moduleOptionSubmit, moduleHeadName, moduleTitle, moduleBodyDesc, selectedCriteria, selectedPhase);
                 console.log("well" + moduleBodyText);
+                deleteModule(moduleHeadName.innerText)
                 await writeFirebaseData(moduleTitle.value, moduleBodyDesc.value, selectedCriteria, selectedPhase);
                 createModule();
                 resolve(moduleBodyText);
@@ -387,9 +386,9 @@ async function loadFirebaseData() {
             const moduleBodyDesc = document.createElement('div');
             moduleBodyDesc.innerText = module.Desc;
             const moduleBodyCriteria = document.createElement('div');
-            moduleBodyCriteria.innerText = module.Criteria;
+            moduleBodyCriteria.innerText = "Evaluation Criteria: " + module.Criteria;
             const moduleBodyPhase = document.createElement('div');
-            moduleBodyPhase.innerText = module.Phase;
+            moduleBodyPhase.innerText = "Phase: " + module.Phase;
 
             moduleBodyDetail.appendChild(moduleBodyDesc);
             moduleBodyDetail.appendChild(moduleBodyCriteria);
@@ -457,6 +456,16 @@ async function writeFirebaseData(moduleName, moduleDesc, selectedCriteria, selec
         console.log(`Module "${moduleName}" successfully written to the database`);
     } catch (error) {
         console.error("Error writing Module data:", error);
+    }
+}
+
+async function deleteFirebaseData(moduleName) {
+    try {
+        const dbRef = ref(db, `Modules/${moduleName}`);
+        await remove(dbRef);
+        console.log(`Module "${moduleName}" successfully deleted from the database`);
+    } catch (error) {
+        console.error("Error deleting Module data:", error);
     }
 }
 
@@ -532,7 +541,7 @@ async function getPhase() {
 
 async function deleteModule(moduleName) {
     try {
-        const moduleRef = ref(db, `Module/${moduleName}`);
+        const moduleRef = ref(db, `Modules/${moduleName}`);
         await remove(moduleRef); // Delete the specified module
         console.log(`Module '${moduleName}' deleted successfully.`);
     } catch (error) {
