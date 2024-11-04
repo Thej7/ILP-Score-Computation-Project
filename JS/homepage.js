@@ -77,7 +77,7 @@ async function getLastAddedBatch() {
                 
                         // Summing the points in the Evaluation Criteria
                         evalCriteriaSnapshot.forEach((childSnapshot) => {
-                            const points = parseFloat(childSnapshot.child('points').val()) || 0;
+                            const points = parseInt(childSnapshot.child('points').val()) || 0;
                             maxScore += points;
                         });
                         console.log('max score', maxScore);
@@ -103,7 +103,7 @@ async function getLastAddedBatch() {
                         const averageScore = studentCount > 0 ? totalScore / studentCount : 0;
                 
                         // Convert average score to a percentage based on maxScore
-                        const percentage = (averageScore / maxScore) * 100;
+                        const percentage = Math.round((averageScore / maxScore) * 100);
                 
                         card.innerHTML = percentage + "%";
                         const phasename = document.createElement("div");

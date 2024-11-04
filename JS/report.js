@@ -62,7 +62,7 @@ async function fetchFirebase(year, batchName) {
                 // If the student isn't already in the map, initialize their row
                 if (!studentMap[id]) {
                     console.log("batch name", batchName)
-                    const studentNameRef = ref(db, `studentList/${year}/${batchName}/${id}/name`);
+                    const studentNameRef = ref(db, `studentList/${year}/${batchName}/${id}/Name`);
                     const studentNameSnapshot = await get(studentNameRef);
                     const studentName = studentNameSnapshot.exists() ? studentNameSnapshot.val() : "Unknown";
 

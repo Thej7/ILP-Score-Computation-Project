@@ -1,7 +1,6 @@
 import { db, ref, get, set } from './firebaseConfig.mjs'; // Import necessary Firebase functions
 let studentsList;
 let evalCriterias;
-let globalCriteria;
 const selectedPhase = localStorage.getItem("selectedPhase"); // Get selected phase from localStorage
 const selectedModule = localStorage.getItem("selectedModule"); // Get selected module from localStorage
 console.log("selectedmodule" + selectedModule);
@@ -21,7 +20,6 @@ async function populateDropdownWithPhaseModules() {
         // Check if the selected module exists in lastBatchData
         if (modules[selectedModule]) {
             criteria = modules[selectedModule].criteria; // Access the criteria of the selected module
-            globalCriteria = criteria;
             console.log(`Criteria for ${selectedModule}: ${criteria}`);
         }
     }
@@ -139,61 +137,39 @@ async function populateDropdownWithPhaseModules() {
 
 async function downloadTemplate() {
     // Fetch the evaluation criteria
-    const evaluationCriteria = await fetchEvaluationCriteria(globalCriteria);
+    const evaluationCriteria = await fetchEvaluationCriteria();
 
     // Prepare the data for the Excel file
     const headers = ['Name']; // First heading should be 'Name'
+    const dataRows = []; // This will hold the rows of data
 
     // Add each criterion name to the headers
     for (const criterion of evaluationCriteria) {
         headers.push(criterion.name); // Add criterion name to headers
     }
 
-    // Since you don't need sample data, create a workbook and a worksheet
+    // Here you can populate dataRows with sample data; for example:
+    const sampleData = [
+        { name: 'John Doe', scores: evaluationCriteria.map(criterion => Math.random() * criterion.points) },
+        { name: 'Jane Smith', scores: evaluationCriteria.map(criterion => Math.random() * criterion.points) },
+        // Add more sample data as needed
+    ];
+
+    // Populate dataRows with names and corresponding scores
+    sampleData.forEach(item => {
+        const row = [item.name, ...item.scores]; // Create row array
+        dataRows.push(row);
+    });
+
+    // Create a workbook and a worksheet
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.aoa_to_sheet([headers]); // Convert only headers to a worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...dataRows]); // Convert array of arrays to a worksheet
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     // Create an Excel file and trigger download
     XLSX.writeFile(workbook, 'Template.xlsx');
-}
-
-
-async function fetchEvaluationCriteria(criterix) {
-    const criteriaRef = ref(db, `Evaluation Criteria/${criterix}`); // Adjust the path as needed
-    const evaluationCriteria = []; // Array to store fetched criteria
-
-    try {
-        const snapshot = await get(criteriaRef);
-        if (snapshot.exists()) {
-            const criteriaData = snapshot.val();
-
-            // Iterate over the criteria entries
-            Object.keys(criteriaData).forEach((criterionKey) => {
-                const criterion = criteriaData[criterionKey];
-
-                // Log the details
-                console.log(`Criterion ID: ${criterion.id}`);
-                console.log(`Criterion Name: ${criterion.name}`);
-                console.log(`Criterion Points: ${criterion.points}`);
-
-                // Store the criterion in the evaluationCriteria array
-                evaluationCriteria.push({
-                    id: criterion.id,
-                    name: criterion.name,
-                    points: criterion.points
-                });
-            });
-        } else {
-            console.log("No evaluation criteria data available.");
-        }
-    } catch (error) {
-        console.error("Error fetching evaluation criteria:", error);
-    }
-
-    return evaluationCriteria; // Return the collected criteria
 }
 
 // Declare variables in the broader scope
@@ -423,6 +399,13 @@ async function saveChanges() {
     try {
         await set(studentRef, studentData);
         console.log("Data saved successfully:", studentData);
+        cards[currentCardIndex] = { ...cards[currentCardIndex], ...updatedCriteria };
+
+        // Save the updated `cards` array to localStorage
+        localStorage.setItem('cards', JSON.stringify(cards));
+
+        // Re-render the cards to reflect the changes
+        updateDisplay();
     } catch (error) {
         console.error("Error saving data:", error);
     }

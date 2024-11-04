@@ -1,0 +1,180 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-container {
+    display: flex;
+    height: 100vh; /* Full height of the viewport */
+    position: fixed;
+}
+
+.sidebar {
+    width: 300px; /* Fixed width for sidebar */
+    background-color: #3F69BA; /* Light background color */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    padding: 20px 0; /* Top and bottom padding */
+}
+
+.logo {
+    max-width: 80%; /* Make logo fit within button size */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 20px; /* Space below the logo */
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    justify-content: center; /* Even spacing between buttons */
+    flex-grow: 1; /* Allow nav-menu to grow */
+    width: 80%; /* Full width of the sidebar */
+}
+
+.nav-item {
+    display: flex; /* Flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    padding: 15px; /* Space around the items */
+    text-decoration: none; /* Remove underline */
+    color: white; /* White text color */
+    background-color: #6B92DE; /* Button background color */
+    border-radius: 4px; /* Rounded corners */
+    margin: 10px 0; /* Space between buttons */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.nav-item:hover {
+    background-color: #5e89df; /* Darker shade on hover */
+}
+
+.nav-icon {
+    max-width: 25px; /* Limit icon size */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.footer-logo {
+    max-width: 80%; /* Responsive footer logo */
+    margin-top: auto; /* Push footer logo to the bottom */
+}
+
+/******************************************    Right side    ******************************************/
+.Config-Page-Right {
+    margin-left: 300px; /* Adjusted to match sidebar width */
+    padding: 20px; /* Add padding for better spacing */
+    flex-grow: 1; /* Allow it to take remaining space */
+    background-color: #f0f0f0; /* Light background for contrast */
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    /* align-items: center; */
+}
+
+.Config-Page-Right-Topbuttons {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    margin-left: 60px;
+}
+
+#batchYearSelect {
+    background-color: #7a5f9e; /* Consistent background color */
+    color: white; /* Text color */
+    border: none; /* Remove border */
+    border-radius: 4px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for buttons */
+    cursor: pointer; /* Pointer cursor */
+}
+
+#batchYearSelect {
+    flex-grow: 1; /* Allow dropdown to take available space */
+    margin-right: 10px; /* Space between dropdown and button */
+}
+
+.Config-Page-Right-batchLists {
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.Config-Page-Right-eachBatchList {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin: 10px 0; /* Space between batch lists */
+    padding:  20px;
+    background-color: #F5F5F5;
+    border-radius: 8px; /* Optional: Rounded corners for a softer look */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+.Config-Page-Right-eachBatchList-graphContainer {
+    width: 25%; /* Adjust width for graphs */
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.Config-Page-Right-eachBatchList-batchNameBox{
+    margin-bottom: 3rem;
+}
+.Config-Page-Right-eachBatchList-dataBox {
+    display: flex;
+    flex-direction: row;
+    font-size: 18px;
+    gap: 1rem; /* Space between data items */
+}
+
+/* Additional styles for better readability */
+.Config-Page-Right-eachBatchList-labelBox,
+.Config-Page-Right-eachBatchList-valueBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align text to the left */
+    gap: 2rem;
+}
+ .Config-Page-Right-eachBatchList-activeBox{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.Config-Page-Right-eachBatchList-activeButton{
+    padding: 10px 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #5e89df;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.graph-popup {
+    position: fixed;
+    display: none;
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 10px;
+    z-index: 1000;
+    width: 300px;
+    height: 200px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.graph-popup h6 {
+    margin: 0 0 10px 0;
+}
