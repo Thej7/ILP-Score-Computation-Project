@@ -1,4 +1,5 @@
-import { db, ref, set, get, remove} from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 function createPhase() {
     const workspace = document.getElementsByClassName('Phase-Page-Right')[0];
@@ -335,6 +336,25 @@ async function deletePhase(phaseName) {
         console.error(`Error deleting phase '${phaseName}':`, error);
     }
 }
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+    } else {
+        window.location.href = "loginMain.html";
+    }
+}); 
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});
 
 
 document.addEventListener('DOMContentLoaded', async function () {

@@ -1,4 +1,6 @@
-import { db, ref, get, set } from './firebaseConfig.mjs'; // Import necessary Firebase functions
+import { db, ref, get, set, remove, auth } from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
 let studentsList;
 let evalCriterias;
 let selectedCriteria;
@@ -427,7 +429,7 @@ async function autoSaveExcelData(cards) {
 
     for (let i = 0; i < cards.length - 1; i++) {
         const card = cards[i];
-        
+
         // Generate studentId in the same format as saveChanges function
         const studentId = `id${i + 1}`;
         const savePath = `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students/${studentId}`;
@@ -699,6 +701,25 @@ textbox.addEventListener('keypress', function (event) {
 //     await populateDropdownWithPhaseModules();
 //     initializeCards(); // Initialize cards after dropdown is populated
 // });
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+    } else {
+        window.location.href = "loginMain.html";
+    }
+}); 
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Wait for the dropdown to populate first

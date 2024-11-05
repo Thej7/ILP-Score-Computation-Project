@@ -7,7 +7,8 @@
 //but editing works but when entering phase and criteria and submit in the view module only the first option is showing also got corrected everything in modules fine
 // active field in module is given
 //startdateand end were added
-import { db, ref, set, get } from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { fetchPhase, fetchCriteria } from './getDropdown.js';  // Import the fetch function
 
 export let currentBatchName = '';
@@ -566,6 +567,25 @@ function toggleEditState(form, isEditable) {
     criteriaSelect.disabled = !isEditable;
     phaseSelect.disabled = !isEditable;
 }
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+    } else {
+        window.location.href = "loginMain.html";
+    }
+}); 
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});
 
 
 

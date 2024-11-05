@@ -1,4 +1,5 @@
-import { db, ref, get, set, remove } from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 // Store all batch data by year
 let batchData = {}; 
 let studentData = {};
@@ -419,3 +420,22 @@ function showNotification(message, type = 'error') {
         setTimeout(() => notification.remove(), 500); // Wait for fade-out
     }, 3000);
 }
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+    } else {
+        window.location.href = "loginMain.html";
+    }
+}); 
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});

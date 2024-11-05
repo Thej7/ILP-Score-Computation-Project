@@ -2,7 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    
+    font-family: Arial, Helvetica, sans-serif; 
 }
 
 body {
@@ -15,7 +15,7 @@ body {
 }
 
 .sidebar {
-    width: 282.5px; /* Sidebar takes 20% of the screen width */
+    width: 282px; /* Sidebar takes 20% of the screen width */
     background-color: #8061C3; /* Light background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
@@ -72,7 +72,7 @@ body {
 .right-container {
     margin-top: 10px;
     width: 100%;
-    margin-left: -18px;
+    margin-left: -17px;
     display: flex;
     flex-direction: column;
 }
