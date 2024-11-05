@@ -1,10 +1,10 @@
-import { db, ref, get, set} from './firebaseConfig.mjs'; // Import necessary Firebase functions
+import { db, ref, get, set } from './firebaseConfig.mjs'; // Import necessary Firebase functions
 let studentsList;
 let evalCriterias;
 let selectedCriteria;
 const selectedPhase = localStorage.getItem("selectedPhase"); // Get selected phase from localStorage
-const selectedModule = localStorage.getItem("selectedModule"); // Get selected module from localStorage
-console.log("selectedmodule"+selectedModule);
+let selectedModule = localStorage.getItem("selectedModule"); // Get selected module from localStorage
+console.log("selectedmodule" + selectedModule);
 const lastBatchData = JSON.parse(localStorage.getItem("lastBatchData")); // Get last active batch data
 const lastBatchYear = localStorage.getItem("lastBatchYear");
 const lastBatchKey = localStorage.getItem("lastBatchKey");
@@ -137,7 +137,22 @@ async function populateDropdownWithPhaseModules() {
             dropdown.appendChild(option); // Append each module as an option
         }
     });
+
+    // Add event listener to update selectedModule on dropdown change
+    dropdown.addEventListener("change", async (event) => {
+        // Set the selected module in localStorage
+        selectedModule = event.target.value;
+        localStorage.setItem("selectedModule", selectedModule);
+
+        // Call necessary functions to refresh data and UI
+        await populateDropdownWithPhaseModules(); // Repopulate dropdown if needed
+        initializeCards();
+        cards = sampleCards; // Assign the initialized sample cards to `cards`
+        await fetchCardsFromDatabase(); // Fetch data after changing selectedModule
+        updateDisplay(); // Run updateDisplay last to ensure everything is set up
+    });
 }
+
 
 document.querySelector('.download-template').addEventListener('click', async () => {
 
@@ -147,7 +162,7 @@ document.querySelector('.download-template').addEventListener('click', async () 
 
     // Prepare Excel data structure
     const excelData = [];
- 
+
     // Add header row with "Name" and each criterion's name
     const headerRow = ["Name", ...evalCriterias.map(criteria => criteria.name)];
     excelData.push(headerRow);
@@ -280,7 +295,7 @@ function createCardElement(cardData) {
         input.value = value;
         input.className = 'input-field';
         input.readOnly = !isEditing; // Make input editable only in edit mode
-     
+
         // Find the points for the corresponding criterion
         console.log("evalCriterias array:", JSON.stringify(evalCriterias, null, 2));
         console.log(`Checking value for ${key}:`, value);
@@ -368,7 +383,7 @@ async function saveChanges() {
                 hasError = true;
             } else {
                 input.setCustomValidity('');
-                
+
                 // Use sanitized key to prevent errors
                 const sanitizedKey = sanitizeKey(key);
                 updatedCriteria[sanitizedKey] = value;
@@ -405,6 +420,45 @@ async function saveChanges() {
     await fetchCardsFromDatabase();
     updateDisplay();
 }
+
+async function autoSaveExcelData(cards) {
+    console.log("Students List:", studentsList);
+    console.log(cards);
+
+    for (let i = 0; i < cards.length - 1; i++) {
+        const card = cards[i];
+        
+        // Generate studentId in the same format as saveChanges function
+        const studentId = `id${i + 1}`;
+        const savePath = `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students/${studentId}`;
+
+        // Separate the name and criteria
+        const { name, ...criteria } = card;
+
+        // Calculate the total of all criteria values
+        let total = 0;
+        for (const value of Object.values(criteria)) {
+            total += parseFloat(value) || 0; // Ensure value is numeric
+        }
+
+        // Save each card data under the student's path with total
+        try {
+            await set(ref(db, savePath), {
+                studentName: name,
+                criteria: criteria,
+                total: total
+            });
+            console.log(`Auto-saved data for ${name} at ${savePath} with total: ${total}`);
+        } catch (error) {
+            console.error(`Error auto-saving data for ${name} at ${savePath}:`, error);
+        }
+    }
+}
+
+
+document.getElementById('saveButton').addEventListener('click', async () => {
+    await autoSaveExcelData(cards);
+});
 
 
 
@@ -530,7 +584,7 @@ function createCards(data) {
             card[header] = cellValue;
 
             // Check if name matches
-            if (header === 'name' && !validStudentNames.has(cellValue.toLowerCase())) {
+            if (header === 'Name' && !validStudentNames.has(cellValue.toLowerCase())) {
                 validationErrors.add(`Error: The name "${cellValue}" is not in the student list.`);
                 isValid = false; // Mark card as invalid
             }
@@ -548,7 +602,7 @@ function createCards(data) {
 
                 if (criterion) {
                     const cellNumberValue = parseFloat(cellValue);
-                    
+
                     // Check if cell is a number and exceeds allowed points
                     if (cellNumberValue > criterion.points) {
                         validationErrors.add(`Error in ${header}: Value ${cellNumberValue} exceeds maximum of ${criterion.points}.`);
@@ -656,5 +710,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     cards = sampleCards; // Assign the initialized sample cards to `cards`
     await fetchCardsFromDatabase(); // Fetch data after populating dropdown
     updateDisplay(); // Run updateDisplay last to ensure everything is set up
-   
+
 });

@@ -70,7 +70,7 @@ body {
 }
 .right-container{
     width:60%;
-    margin-left: -188px;
+    margin-left: 0px;
 }
 
 
@@ -89,7 +89,6 @@ body {
 .Config-Page-Right {
     width: 80%;
     height: auto;
-    margin-left: 20em;
     padding-top: 2em;
     font-size: 1.3em;
 }

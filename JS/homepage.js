@@ -105,7 +105,7 @@ async function getLastAddedBatch() {
                         // Convert average score to a percentage based on maxScore
                         const percentage = Math.round((averageScore / maxScore) * 100);
                 
-                        card.innerHTML = percentage + "%";
+                        card.innerHTML = "Avg Score: " + percentage + "%";
                         const phasename = document.createElement("div");
                         phasename.classList.add("phasename");
                         phasename.innerHTML = `<h1>${moduleData.moduleName}</h1>`;

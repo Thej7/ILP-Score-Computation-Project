@@ -311,6 +311,11 @@ function displayBatch(batch, studentCount) {
         }
     });
 
+    document.getElementById("add-batch-button").addEventListener("click", () => {
+        // Navigate to Add-Batch.html
+        window.location.href = "Batch-Entry.html";
+    });
+
     eachBatchList.appendChild(graphContainer1);
    
     const activeBox = document.createElement('div')
@@ -502,3 +507,5 @@ function showNotification(message, type = 'error') {
         setTimeout(() => notification.remove(), 500); // Wait for fade-out
     }, 3000);
 }
+
+//checking
