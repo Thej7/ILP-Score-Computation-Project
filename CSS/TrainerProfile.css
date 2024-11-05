@@ -2,6 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: Arial, Helvetica, sans-serif; 
 }
 
 body {
@@ -195,6 +196,74 @@ body {
     margin-top: 30px;
     margin-left: 70%;
 
+}
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 170%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;   
+}
+/* Popup content box */
+.popup-content {
+    background-color:#1d5454bc;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px; /* Increased width */
+    text-align: center;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3); /* Deeper shadow */
+    position: relative;
+    font-weight: bold;
+    animation: fadeIn 0.3s ease-in-out; /* Smooth entry animation */
+}
+
+/* Fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+/* Close button styling */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #ff4d4d;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 10%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+/* Close button hover effect */
+.close-button:hover {
+    background-color: #e60000;
+}
+/* Text styling */
+#popupText {
+    font-size: 20px;
+    color: #ffffff;
+    margin-top: 15px;
+    line-height: 1.5;
 }
 
 

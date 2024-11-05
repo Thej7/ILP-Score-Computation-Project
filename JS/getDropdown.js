@@ -1,5 +1,5 @@
-// fetchOptions.js
-import { db, ref, get } from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 // Function to fetch document names from the 'Evaluation Criteria' and populate dropdown
 async function fetchCriteria(dropdown) {

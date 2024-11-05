@@ -1,4 +1,5 @@
-import { db, ref, set, get, remove, child } from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const lastBatchKey = localStorage.getItem("lastBatchKey");
 const lastBatchYear = localStorage.getItem("lastBatchYear");
@@ -175,6 +176,25 @@ function downloadExcel() {
     XLSX.writeFile(workbook, 'marklist_batch5.xlsx');
 }
 
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+    } else {
+        window.location.href = "loginMain.html";
+    }
+}); 
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});
+
 // Event listeners for buttons
 sortNameAZ.addEventListener('click', sortByName)
 sortHighest5Btn.addEventListener('click', sortTop5);
@@ -186,6 +206,17 @@ document.getElementById('Search_input').addEventListener('input', searchTable);
 
 // Fetch data and render the table on page load
 window.onload = async function() {
-    json = await fetchFirebase(lastBatchYear, lastBatchKey);
-    fetchData(json);
+    // Show the loader
+    document.getElementById("loader").style.display = "block";
+    
+    try {
+        // Start loading the data
+        json = await fetchFirebase(lastBatchYear, lastBatchKey);
+        fetchData(json);
+    } catch (error) {
+        console.error("Error loading data:", error);
+    } finally {
+        // Hide the loader
+        document.getElementById("loader").style.display = "none";
+    }
 };

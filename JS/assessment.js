@@ -1,5 +1,6 @@
-import { db, ref, get } from './firebaseConfig.mjs';
-
+import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+let studentsList;
 async function getLastAddedBatch() {
     const batchesRef = ref(db, 'Batches');
 
@@ -35,6 +36,8 @@ async function getLastAddedBatch() {
             // Display the batch data and populate module cards
             if (lastBatchData && lastBatchData.modules) {
                 document.getElementById("batchName").innerHTML = `Score Assessment: ${lastBatchKey}`;
+                document.getElementById("startDate").innerHTML = `Start Date&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;${lastBatchData.startDate}`;
+                document.getElementById("endDate").innerHTML = `End Date&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;${lastBatchData.endDate}`;
                 const container = document.getElementById("phaseName");
                 const phaseGroups = {};
 
@@ -58,7 +61,7 @@ async function getLastAddedBatch() {
                     phaseGroups[phase].forEach(moduleData => {
                         const card = document.createElement("div");
                         card.classList.add("card");
-                        card.innerHTML = `<h1>${moduleData.moduleName}</h1><img src="Graph.png">`;
+                        card.innerHTML = `<h1>${moduleData.moduleName}</h1><img src="./Assets/Graph.png" class="card-image">`;
                         card.onclick = () => {
                             // Store selected phase and module, along with last active batch data
                             localStorage.setItem("selectedPhase", phase);
@@ -86,3 +89,54 @@ async function getLastAddedBatch() {
 }
 
 getLastAddedBatch();
+const lastBatchYear = localStorage.getItem("lastBatchYear");
+const lastBatchKey = localStorage.getItem("lastBatchKey");
+async function fetchStudentList() {
+    const studentListRef = ref(db, `studentList/${lastBatchYear}/${lastBatchKey}`);
+    console.log(`Fetching data from: ${studentListRef.toString()}`); // Log the path
+    const studentNames = []; // Array to store student names
+
+    try {
+        const snapshot = await get(studentListRef);
+        if (snapshot.exists()) {
+            const students = snapshot.val();
+            
+            // Collect each student's name in the studentNames array
+            Object.keys(students).forEach((studentId) => {
+                const student = students[studentId];
+                console.log("studentname"+student.Name); // Log each student's name
+                studentNames.push(student.Name); // Add the name to the array
+            });
+        } else {
+            console.log("No data available for the specified path.");
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+
+    return studentNames; // Return the list of student names
+}
+
+studentsList = await fetchStudentList()
+document.getElementById("numberOfTrainees").innerHTML ="Number of Trainees&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;"+studentsList.length;
+
+
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+    } else {
+        window.location.href = "loginMain.html";
+    }
+}); 
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});

@@ -2,6 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: Arial, Helvetica, sans-serif; 
 }
 
 body {
@@ -69,7 +70,7 @@ body {
 
 /******************************************    Right side    ******************************************/
 .Config-Page-Right {
-    margin-left: -200px; /* Adjusted to match sidebar width */
+    margin-left: -188px; /* Adjusted to match sidebar width */
     padding: 20px; /* Add padding for better spacing */
     flex-grow: 1; /* Allow it to take remaining space */
     background-color: #f0f0f0; /* Light background for contrast */
