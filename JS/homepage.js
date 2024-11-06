@@ -143,7 +143,18 @@ async function getLastAddedBatch() {
 }
 
 document.getElementById("view-report").addEventListener("click", () => {
-    window.location.href = "Report.html";
+    const referrerURL = document.referrer;
+    const referrerPage = referrerURL.split("/").pop(); // Extracts just the page name
+
+    let targetPage = "Report.html"; // Default page
+
+    if (referrerPage === "Admin-Homepage.html") {
+        targetPage = "Admin-Report.html";
+    } else if (referrerPage === "Trainer-Homepage.html") {
+        targetPage = "Trainer-Report.html";
+    }
+
+    window.location.href = targetPage;
 });
 
 onAuthStateChanged(auth, (user) => {
