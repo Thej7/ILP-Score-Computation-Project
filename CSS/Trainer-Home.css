@@ -144,3 +144,8 @@ body {
     border: 2px solid #ffff;
     padding:10px 10px;
 }
+
+#view-report{
+    cursor: pointer;
+    color: white;
+}

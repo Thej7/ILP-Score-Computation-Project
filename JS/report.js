@@ -147,13 +147,12 @@ function calculateTotalMarks(student) {
 
 function sortTop5() {
     const sortedData = [...fullData].sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
-    renderTable(sortedData.slice(0, 5));
+    renderTable(sortedData.slice(0, 5)); // Top 5 entries
 }
 
-// Sort bottom 5 by total marks
 function sortBottom5() {
-    const sortedData = [...fullData].sort((a, b) => calculateTotalMarks(a) - calculateTotalMarks(b));
-    renderTable(sortedData.slice(0, 5));
+    const sortedData = [...fullData].sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
+    renderTable(sortedData.slice(-5)); // Bottom 5 entries
 }
 
 // Sort A-Z by Name

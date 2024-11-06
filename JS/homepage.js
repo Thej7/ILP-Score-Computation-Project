@@ -106,24 +106,24 @@ async function getLastAddedBatch() {
                         // Convert average score to a percentage based on maxScore
                         const percentage = Math.round((averageScore / maxScore) * 100);
                 
-                        card.innerHTML = "Avg Score: " + percentage + "%";
+                        card.innerHTML = "Avg Score " + percentage + "%";
                         const phasename = document.createElement("div");
                         phasename.classList.add("phasename");
                         phasename.innerHTML = `<h1>${moduleData.moduleName}</h1>`;
                         console.log("moduleData", moduleData.moduleName);
                         
-                        card.onclick = () => {
-                            // Store selected phase and module, along with last active batch data
-                            localStorage.setItem("selectedPhase", phase);
-                            localStorage.setItem("selectedModule", moduleData.moduleName);
-                            localStorage.setItem("lastBatchData", JSON.stringify(lastBatchData));
-                            localStorage.setItem("lastBatchKey", lastBatchKey);
-                            console.log(lastBatchKey);
-                            // Store whole last batch data
-                            localStorage.setItem("lastBatchYear", lastBatchYear); // Store the year of the batch
+                        // card.onclick = () => {
+                        //     // Store selected phase and module, along with last active batch data
+                        //     localStorage.setItem("selectedPhase", phase);
+                        //     localStorage.setItem("selectedModule", moduleData.moduleName);
+                        //     localStorage.setItem("lastBatchData", JSON.stringify(lastBatchData));
+                        //     localStorage.setItem("lastBatchKey", lastBatchKey);
+                        //     console.log(lastBatchKey);
+                        //     // Store whole last batch data
+                        //     localStorage.setItem("lastBatchYear", lastBatchYear); // Store the year of the batch
                 
-                            window.location.href = "TrainerAssessment.html";
-                        };
+                        //     window.location.href = "TrainerAssessment.html";
+                        // };
                 
                         containerphasecard.appendChild(card);
                         containerphasecard.appendChild(phasename);

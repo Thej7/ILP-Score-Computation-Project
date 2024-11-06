@@ -2,8 +2,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    
+    font-family: Arial, Helvetica, sans-serif; 
 }
 
 body {
@@ -89,9 +88,9 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 20px;
-    padding-top: 40px;
-   
+    padding-top: 40px;  
 }
+
 .containerphasecard{
     display:flex;
     flex-direction: column;
@@ -144,4 +143,9 @@ body {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     border: 2px solid #ffff;
     padding:10px 10px;
+}
+
+#view-report{
+    cursor: pointer;
+    color: white;
 }
