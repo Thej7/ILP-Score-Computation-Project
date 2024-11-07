@@ -135,7 +135,7 @@ button:hover {
 /* Scrollable Table Container */
 .table-container {
     max-height: 400px;
-    overflow-y: auto;
+    overflow: auto;
     margin-top: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;

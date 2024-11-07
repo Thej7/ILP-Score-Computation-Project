@@ -141,19 +141,35 @@ function searchTable() {
 }
 
 function calculateTotalMarks(student) {
-    return student.slice(1).reduce((sum, mark) => sum + parseFloat(mark), 0)
-
+    // Remove any null, undefined, or non-numeric marks, then sum up
+    return student.slice(1).reduce((sum, mark) => {
+        const numericMark = parseFloat(mark);
+        return !isNaN(numericMark) ? sum + numericMark : sum;
+    }, 0);
 }
 
+// Sort and render the top 5 entries by total marks
 function sortTop5() {
-    const sortedData = [...fullData].sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
+    const filteredData = fullData.filter(entry => {
+        const totalMarks = calculateTotalMarks(entry);
+        return totalMarks > 0; // Filter out entries with non-numeric or zero marks
+    });
+
+    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
     renderTable(sortedData.slice(0, 5)); // Top 5 entries
 }
 
+// Sort and render the bottom 5 entries by total marks
 function sortBottom5() {
-    const sortedData = [...fullData].sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
-    renderTable(sortedData.slice(-5)); // Bottom 5 entries
+    const filteredData = fullData.filter(entry => {
+        const totalMarks = calculateTotalMarks(entry);
+        return totalMarks > 0; // Filter out entries with non-numeric or zero marks
+    });
+
+    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(a) - calculateTotalMarks(b));
+    renderTable(sortedData.slice(0, 5)); // Bottom 5 entries
 }
+
 
 // Sort A-Z by Name
 function sortByName() {
@@ -164,8 +180,13 @@ function sortByName() {
 
 // Function to show all rows (re-render fullData)
 function showAll() {
-    renderTable(fullData);
-    console.log('Show all data');
+    const filteredData = fullData.filter(entry => {
+        const totalMarks = calculateTotalMarks(entry);
+        return totalMarks > 0; // Filter out entries with non-numeric or zero marks
+    });
+
+    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
+    renderTable(sortedData); // Top 5 entries
 }
 
 // Download function for exporting the table as Excel
@@ -175,10 +196,39 @@ function downloadExcel() {
     XLSX.writeFile(workbook, 'marklist_batch5.xlsx');
 }
 
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour
+
+let inactivityTimer;
+
+// Function to reset the inactivity timer
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+        // Log out the user after 1 hour of inactivity
+        signOut(auth)
+            .then(() => {
+                console.log("User signed out due to inactivity");
+                window.location.href = "loginMain.html";
+            })
+            .catch((error) => {
+                console.error("Error signing out:", error);
+            });
+    }, INACTIVITY_TIMEOUT);
+}
+
+// Listen for authentication state changes
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User is signed in:", user.email);
+
+        // Reset inactivity timer whenever the user is authenticated
+        resetInactivityTimer();
+
+        // Monitor user activity to reset the timer on interaction
+        document.addEventListener("mousemove", resetInactivityTimer);
+        document.addEventListener("keypress", resetInactivityTimer);
     } else {
+        // Redirect to login page if no user is signed in
         window.location.href = "loginMain.html";
     }
 }); 

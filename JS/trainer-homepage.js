@@ -146,13 +146,42 @@ document.getElementById("view-report").addEventListener("click", () => {
     window.location.href = "Trainer-Report.html";
 });
 
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour
+
+let inactivityTimer;
+
+// Function to reset the inactivity timer
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+        // Log out the user after 1 hour of inactivity
+        signOut(auth)
+            .then(() => {
+                console.log("User signed out due to inactivity");
+                window.location.href = "loginMain.html";
+            })
+            .catch((error) => {
+                console.error("Error signing out:", error);
+            });
+    }, INACTIVITY_TIMEOUT);
+}
+
+// Listen for authentication state changes
 onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User is signed in:", user.email);
+
+        // Reset inactivity timer whenever the user is authenticated
+        resetInactivityTimer();
+
+        // Monitor user activity to reset the timer on interaction
+        document.addEventListener("mousemove", resetInactivityTimer);
+        document.addEventListener("keypress", resetInactivityTimer);
     } else {
+        // Redirect to login page if no user is signed in
         window.location.href = "loginMain.html";
     }
-}); 
+});
 
 document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
