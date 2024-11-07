@@ -164,7 +164,8 @@ document.getElementById('Config-Page-Right-bottom-submit').addEventListener('cli
             try {
                 await Promise.all([
                     addBatch(year),
-                    saveToDatabase(savedData) // Pass the parsed data
+                    saveToDatabase(savedData), // Pass the parsed data
+                    updateModuleText(currentBatchName)
                 ]);
             } catch (error) {
                 console.error("Error saving data:", error);
@@ -200,6 +201,16 @@ document.addEventListener('submit', async function (event) {
         }
     }
 });
+
+function updateModuleText(currentBatchName) {
+    const elements = document.getElementsByClassName("Config-Page-Right-bottom-addmodule");
+    for (let i = 0; i < elements.length; i++) {
+        const h4 = elements[i].querySelector("h4");
+        if (h4) {
+            h4.innerText = "Add Module for " + currentBatchName;
+        }
+    }
+}
 
 // Function to add a module entry form
 function addModuleOption() {

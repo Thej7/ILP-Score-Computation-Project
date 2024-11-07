@@ -172,24 +172,23 @@ input {
     box-sizing: border-box;
     margin-top: 1em;
     padding-top: 1em;
+    padding-left: 10px;
 }
 
 .Config-Page-Right-bottom-addmodule {
-    width: 96%;
-    height: 3em;
+    width: 96.5%;
+    min-height: 3em;
     background-color: #967ccf;
     display: flex;
-    flex-direction: row;
-    border-radius: 1em;
-    margin-left: 1em;
-
+    margin-left: 25px;
     margin-top: 2em;
-
-
+    padding: 10px;
+    box-sizing: border-box;
 }
 
+
 .Config-Page-Right-bottom-module {
-    width: 90%;
+    width: 93%;
     height: 13em;
     display: flex;
     flex-direction: column;
@@ -206,16 +205,29 @@ input {
 }
 
 .Config-Page-Right-bottom-addmodule-moduleform {
-    width: 80%;
+    width: 82%;
     height: 13em;
     border: 1px solid #ddd;
-    border-radius: 5px;
     margin-left: 25px;
     padding-left: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-bottom: 1em;
     /* optional margin */
 
+}
+
+.Config-Page-Right-bottom-addmodule-moduleform {
+    width: 96.45%;
+    /* or any desired width */
+
+
+    border: 1px solid #ccc;
+    /* optional border */
+    /* optional border radius */
+    background-color: #f9f9f9;
+    /* optional background color */
+    margin-bottom: 1em;
+    /* optional margin */
 }
 
 .edit-modules {
@@ -300,20 +312,7 @@ input {
 
 
 /* edited */
-.Config-Page-Right-bottom-addmodule-moduleform {
-    width: 48em;
-    /* or any desired width */
 
-
-    border: 1px solid #ccc;
-    /* optional border */
-    border-radius: 5px;
-    /* optional border radius */
-    background-color: #f9f9f9;
-    /* optional background color */
-    margin-bottom: 1em;
-    /* optional margin */
-}
 
 .Config-Page-Right-bottom-viewmodule-moduleform {
     width: 48em;
