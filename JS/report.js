@@ -1,4 +1,4 @@
-import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth } from './firebaseConfig.mjs';
 import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 const lastBatchKey = localStorage.getItem("lastBatchKey");
@@ -13,6 +13,7 @@ const downloadBtn = document.getElementById('download-btn');
 
 let fullData = [];
 let json;
+let weightJson = [];
 
 async function fetchData(jsonData) {
     try {
@@ -21,7 +22,7 @@ async function fetchData(jsonData) {
 
         // Check JSON structure and render if correct
         if (json.headers && json.data) {
-            renderHead(json.headers); 
+            renderHead(json.headers);
             fullData = json.data;
             renderTable(fullData);
         } else {
@@ -33,55 +34,74 @@ async function fetchData(jsonData) {
 }
 
 async function fetchFirebase(year, batchName) {
-    // Step 1: Fetch module headers from `Batches/${year}/${batchname}/modules`
+    // Step 1: Fetch module headers from `Batches/${year}/${batchName}/modules`
     const modulesRef = ref(db, `Batches/${year}/${batchName}/modules`);
     const modulesSnapshot = await get(modulesRef);
     const modules = modulesSnapshot.exists() ? modulesSnapshot.val() : {};
+
+    // Fetch total weightage for each module
+    for (const moduleName of Object.keys(modules)) {
+        const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
+        const weightageSnapshot = await get(weightageRef);
+
+        if (weightageSnapshot.exists()) {
+            const totalWeightage = weightageSnapshot.val();
+            weightJson.push({
+                modulename: moduleName,
+                weightage: totalWeightage
+            });
+        }
+    }
+
+    console.log(weightJson);
 
     // Add "Name" as the first header
     const headers = ["Name", ...Object.keys(modules)];
 
     // Step 2: Initialize jsonData with headers and a map for students
-    const jsonData = {
+    let jsonData = {
         headers,
         data: []
     };
-    const studentMap = {}; // Map to store student data by id
+    const studentMap = {};
 
-    // Step 3: Loop through each module key to fetch students' marks from `Marks/${year}/${batchname}/studentlist/${modulekey}`
-    for (const moduleKey of headers.slice(1)) { // Skip "Name" in headers for moduleKey
+    // Fetch all student names once
+    const studentNamesRef = ref(db, `studentList/${year}/${batchName}`);
+    const studentNamesSnapshot = await get(studentNamesRef);
+    const studentNames = studentNamesSnapshot.exists() ? studentNamesSnapshot.val() : {};
+
+    // Step 3: Loop through each module key to fetch students' marks
+    for (const moduleKey of headers.slice(1)) {
         const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
         const studentListSnapshot = await get(studentListRef);
 
         if (studentListSnapshot.exists()) {
             const students = studentListSnapshot.val();
 
-            // For each student (id), retrieve "name" and "total"
+            // For each student, retrieve "name" and "total"
             for (const id in students) {
                 const studentData = students[id];
-                
-                // If the student isn't already in the map, initialize their row
-                if (!studentMap[id]) {
-                    console.log("batch name", batchName)
-                    const studentNameRef = ref(db, `studentList/${year}/${batchName}/${id}/Name`);
-                    const studentNameSnapshot = await get(studentNameRef);
-                    const studentName = studentNameSnapshot.exists() ? studentNameSnapshot.val() : "Unknown";
+                const studentName = studentNames[id]?.Name || "Unknown";
 
-                    // Initialize the row with "Name" and empty values for each module
+                // Initialize the student's row if not already present
+                if (!studentMap[id]) {
                     studentMap[id] = [studentName, ...headers.slice(1).map(() => null)];
                 }
 
-                // Update the row with the student's mark for the current module
+                // Update the student's mark for the current module
                 const moduleIndex = headers.indexOf(moduleKey);
-                studentMap[id][moduleIndex] = studentData.total || 0;
+                if (moduleIndex >= 0) {
+                    studentMap[id][moduleIndex] = studentData.total || 0;
+                }
             }
         }
     }
 
-    // Convert the studentMap to jsonData.data
+    // Convert studentMap to jsonData.data
     jsonData.data = Object.values(studentMap);
+    jsonData = transformJsonData(jsonData, weightJson);
 
-    console.log(jsonData);
+    console.log("jsonData", jsonData);
     return jsonData;
 }
 
@@ -161,6 +181,53 @@ function renderTable(data) {
         });
         tableBody.appendChild(row);
     });
+}
+
+function transformJsonData(jsonData, weightJson) {
+    // Initialize the new headers with the first header unchanged ("Name")
+    const transformedHeaders = [jsonData.headers[0]];
+
+    // Create a lookup map for weightage based on weightJson
+    const weightMap = {};
+    if (Array.isArray(weightJson)) {
+        for (let i = 0; i < weightJson.length; i++) {
+            const { modulename, weightage } = weightJson[i];
+            if (modulename && weightage !== undefined) {
+                weightMap[modulename] = weightage;
+            }
+        }
+    }
+    console.log("weight map", weightMap);
+
+    // Loop through headers starting from the second element
+    for (let i = 1; i < jsonData.headers.length; i++) {
+        const moduleName = jsonData.headers[i];
+        transformedHeaders.push(`${moduleName} mark`, `${moduleName} weight`);
+    }
+
+    // Initialize the transformed data array
+    const transformedData = jsonData.data.map(row => {
+        // Start the transformed row with the first element unchanged ("Name")
+        const transformedRow = [row[0]];
+
+        // Loop through the data values starting from the second element
+        for (let j = 1; j < row.length; j++) {
+            const moduleName = jsonData.headers[j];
+            const mark = row[j];
+            const weightage = weightMap[moduleName] || 0; // Default to 0 if not found
+
+            // Calculate the weight using the specific weightage of the module
+            const weight = ((mark / 50) * weightage).toFixed(2);
+            transformedRow.push(mark, weight);
+        }
+
+        return transformedRow;
+    });
+
+    return {
+        headers: transformedHeaders,
+        data: transformedData
+    };
 }
 
 
@@ -278,7 +345,7 @@ onAuthStateChanged(auth, (user) => {
         // Redirect to login page if no user is signed in
         window.location.href = "index.html";
     }
-}); 
+});
 
 document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
@@ -301,10 +368,10 @@ document.getElementById('Search_input').addEventListener('input', searchTable);
 
 
 // Fetch data and render the table on page load
-window.onload = async function() {
+window.onload = async function () {
     // Show the loader
     document.getElementById("loader").style.display = "block";
-    
+
     try {
         // Start loading the data
         json = await fetchFirebase(lastBatchYear, lastBatchKey);

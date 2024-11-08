@@ -468,7 +468,14 @@ function showGraphPopup(event, batch, graphType, batchName) {
         }];
     }
 
-    const layout = { title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}` };
+    const layout = { title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}`,
+    xaxis: {
+        title: 'Modules' // Label for the x-axis
+    },
+    yaxis: {
+        title: 'Average (%)' // Label for the y-axis
+    }
+};
 
     Plotly.newPlot("graphContent", data, layout);
     // Center the popup in the middle of the viewport
@@ -501,7 +508,7 @@ function resetInactivityTimer() {
         signOut(auth)
             .then(() => {
                 console.log("User signed out due to inactivity");
-                window.location.href = "loginMain.html";
+                window.location.href = "index.html";
             })
             .catch((error) => {
                 console.error("Error signing out:", error);
@@ -522,7 +529,7 @@ onAuthStateChanged(auth, (user) => {
         document.addEventListener("keypress", resetInactivityTimer);
     } else {
         // Redirect to login page if no user is signed in
-        window.location.href = "loginMain.html";
+        window.location.href = "index.html";
     }
 });
 
@@ -530,7 +537,7 @@ document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
         .then(() => {
             // localStorage.setItem("logoutMessage", "Logged out successfully.");
-            window.location.href = "./loginMain.html";
+            window.location.href = "index.html";
         })
         .catch((error) => {
             console.error("Sign out error:", error);

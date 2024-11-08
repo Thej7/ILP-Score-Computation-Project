@@ -7,7 +7,7 @@
 //but editing works but when entering phase and criteria and submit in the view module only the first option is showing also got corrected everything in modules fine
 // active field in module is given
 //startdateand end were added
-import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth } from './firebaseConfig.mjs';
 import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { fetchPhase, fetchCriteria } from './getDropdown.js';  // Import the fetch function
 
@@ -15,52 +15,62 @@ export let currentBatchName = '';
 export let currentBatchYear = '';
 let phaseWeightage = {};
 let modules = [];
+let batchData;
 
 console.log(localStorage.getItem("savedData"))
+
+function prepareBatchData() {
+    const name = document.getElementById('batch-name').value;
+    const startDate = document.getElementById('batch-startyear').value;
+    const endDate = document.getElementById('batch-endyear').value;
+
+    // Validation
+    if (!name) {
+        alert("Please enter a batch name.");
+        return null;
+    }
+    if (!startDate) {
+        alert("Please enter a batch start date.");
+        return null;
+    }
+    if (!endDate) {
+        alert("Please enter a batch end date.");
+        return null;
+    }
+
+    // Create the batch data object
+    const batchData = {
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        active: 'yes',
+        modules: []
+    };
+
+    return batchData;
+}
 
 // Function to add a batch
 async function addBatch(year) {
     try {
-        const name = document.getElementById('batch-name').value;
-        currentBatchName = name;
-        if (!name) {
-            alert("Please enter a batch name.");
-            return;
-        }
+        // Get the batch data from prepareBatchData
+        if (!batchData) return; // Exit if batch data is not valid
+
+        currentBatchName = batchData.name;
 
         // Reference to the batches for the specified year
         const batchesRef = ref(db, `Batches/${year}`);
         const snapshot = await get(batchesRef);
 
         // Check if the batch already exists
-        if (snapshot.exists() && snapshot.val()[name]) {
+        if (snapshot.exists() && snapshot.val()[batchData.name]) {
             console.log("same batch and year");
-            alert(`Batch "${name}" already exists for the year ${year}.`);
+            alert(`Batch "${batchData.name}" already exists for the year ${year}.`);
             return;
         }
-
-        // Proceed with creating the new batch if it doesn't exist
-        const startDate = document.getElementById('batch-startyear').value;
-        const endDate = document.getElementById('batch-endyear').value;
-        if (!startDate) {
-            alert("Please enter a batch start date.");
-            return;
-        }
-        // Check for end date
-        if (!endDate) {
-            alert("Please enter a batch end date.");
-            return;
-        }
-        const batchData = {
-            name: name,
-            startDate: startDate,
-            endDate: endDate,
-            active: 'yes',
-            modules: []
-        };
 
         // Save the new batch to Firebase
-        const batchRef = ref(db, `Batches/${year}/${name}`);
+        const batchRef = ref(db, `Batches/${year}/${batchData.name}`);
         await set(batchRef, batchData);
 
         console.log("Batch added successfully!");
@@ -163,7 +173,7 @@ document.getElementById('Config-Page-Right-bottom-submit').addEventListener('cli
         if (savedData && savedData.students) { // Ensure students is defined
             try {
                 await Promise.all([
-                    addBatch(year),
+                    batchData = prepareBatchData(),
                     saveToDatabase(savedData), // Pass the parsed data
                     updateModuleText(currentBatchName)
                 ]);
@@ -334,6 +344,7 @@ async function submitAllModules() {
             alert("No modules to submit.");
             return;
         }
+        await addBatch(currentBatchYear);
         for (const module of modules) {
             const moduleRef = ref(db, `Batches/${currentBatchYear}/${currentBatchName}/modules/${module.moduleName}`);
             await set(moduleRef, module);
@@ -483,29 +494,31 @@ function viewAllModules() {
             });
             // Function to calculate total weightage per phase
             function calculatePhaseWeightage() {
-
-                const weightageByPhase = {};
+                // Reset the global phaseWeightage object
+                phaseWeightage = {};
+            
+                // Iterate over all modules to calculate the weightage per phase
                 modules.forEach(module => {
-                    const currentWeightage = weightageByPhase[module.phase] || 0;
-                    weightageByPhase[module.phase] = currentWeightage + module.totalWeightage;
-                    console.log(weightageByPhase[module.phase]);
+                    const currentWeightage = phaseWeightage[module.phase] || 0;
+                    phaseWeightage[module.phase] = currentWeightage + module.totalWeightage;
                 });
-                console.log("phase")
-                console.log(modules[index].phase);
-                console.log(weightageByPhase[module.phase]);
-                phaseWeightage[modules[index].phase] = weightageByPhase[module.phase];
-                console.log("value: " + phaseWeightage[modules[index].phase]);
-                return weightageByPhase;
+            
+                console.log("Updated phaseWeightage:", phaseWeightage);
+                return phaseWeightage;
             }
+            
 
 
             // Event listener for the Edit button
             moduleDiv.querySelector('.module-Edit').addEventListener('click', function () {
+                console.log("here");
                 const form = moduleDiv.querySelector('.module-form');
                 const isEditing = form.dataset.editing === 'true';
-
+                console.log(isEditing);
+            
                 if (isEditing) {
-                    // Save changes
+                    console.log("is editing");
+                
                     const updatedModule = {
                         moduleName: form.querySelector('.module-name').value,
                         totalWeightage: parseFloat(form.querySelector('.module-weightage').value),
@@ -513,24 +526,33 @@ function viewAllModules() {
                         phase: form.querySelector('.module-phase').value,
                     };
                     console.log(updatedModule);
-                    console.log("yo");
+                
                     const originalModule = modules[index];
-                    // Validation: Check if total weightage exceeds 100
-                    modules[index] = updatedModule; // Update temporarily
-                    const weightageByPhase = calculatePhaseWeightage();
-
-                    // Check if the total weightage exceeds 100 for the updated module's phase
-                    if (weightageByPhase[updatedModule.phase] > 100) {
-                        console.log(weightageByPhase[updatedModule.phase]);
-                        alert(`Total weightage for phase "${updatedModule.phase}" cannot exceed 100.`);
-                        modules[index] = originalModule; // Restore the original module
-                        return; // Exit if validation fails
+                
+                    // Check if the phase or weightage has changed
+                    const phaseChanged = updatedModule.phase !== originalModule.phase;
+                    const weightageChanged = updatedModule.totalWeightage !== originalModule.totalWeightage;
+                
+                    if (phaseChanged || weightageChanged) {
+                        const weightageByPhase = calculatePhaseWeightage();
+                
+                        // Subtract the old weightage from the old phase
+                        weightageByPhase[originalModule.phase] -= originalModule.totalWeightage || 0;
+                
+                        // Add the new weightage to the new phase
+                        weightageByPhase[updatedModule.phase] += updatedModule.totalWeightage;
+                
+                        // Validate the total weightage for the new phase
+                        if (weightageByPhase[updatedModule.phase] > 100) {
+                            alert(`Total weightage for phase "${updatedModule.phase}" cannot exceed 100.`);
+                            modules[index] = originalModule; // Restore the original module
+                            return; // Exit if validation fails
+                        }
                     }
-
+                
                     // If validation passes, update the modules array
                     modules[index] = updatedModule;
-
-
+                
                     // Reset form to read-only state
                     toggleEditState(form, false);
                     this.textContent = "Edit"; // Change button text back to "Edit"
