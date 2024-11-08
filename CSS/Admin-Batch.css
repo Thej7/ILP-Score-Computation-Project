@@ -108,13 +108,13 @@ body {
     
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
     padding: 10px;
 }
 
 .Config-Page-Right-eachBatchList {
-    width: 90%;
+    width: 40%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -124,13 +124,13 @@ body {
     border-radius: 8px; /* Optional: Rounded corners for a softer look */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
 }
-
-.Config-Page-Right-eachBatchList-graphContainer {
-    width: 25%; /* Adjust width for graphs */
+ 
+/* .Config-Page-Right-eachBatchList-graphContainer {
+    width: 25%; /* Adjust width for graphs 
     display: flex;
     flex-direction: column;
     text-align: center;
-}
+} */
 .Config-Page-Right-eachBatchList-batchNameBox{
     margin-bottom: 3rem;
 }
@@ -150,6 +150,7 @@ body {
     gap: 2rem;
 }
  .Config-Page-Right-eachBatchList-activeBox{
+    margin-top: 48px;
     padding: 20px;
     display: flex;
     flex-direction: column;

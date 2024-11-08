@@ -50,6 +50,8 @@ async function fetchApiForBatches() {
             }
 
             initializeBatchData(lastBatchYear, availableYears);
+            const selectedYear = document.getElementById('batchYearSelect').value; // Get the current selected year
+            displayModuleAverages(lastBatchYear, lastBatchData.name);
         }
         else {
             console.log("No data available");
@@ -362,6 +364,7 @@ async function displayModuleAverages(year, batchName,) {
     // Fetch the module averages as a percentage
     const moduleAverages = await fetchModuleAverages(year, batchName);
     console.log('Module Averages', moduleAverages)
+  
 
     // Prepare data in a format suitable for the graph popup
     const graphData = {
@@ -370,7 +373,7 @@ async function displayModuleAverages(year, batchName,) {
     };
 
     // Call the function to show the popup and pass the data
-    showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals');
+    showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals', batchName);
 }
 
 
@@ -437,10 +440,11 @@ async function fetchModuleAverages(year, batchName, maxScore = 100) {
 }
 
 // Function to show the graph popup
-function showGraphPopup(event, batch, graphType) {
+function showGraphPopup(event, batch, graphType, batchName) {
 
     const popup = document.getElementById('graphPopup');
     const graphContent = document.getElementById('graphContent');
+    const batchYear = document.getElementById("batchYearSelect").value
 
     // Clear previous graph content
     graphContent.innerHTML = '';
@@ -464,15 +468,17 @@ function showGraphPopup(event, batch, graphType) {
         }];
     }
 
-    const layout = { title: "MODULE" };
+    const layout = { title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}` };
 
     Plotly.newPlot("graphContent", data, layout);
     // Center the popup in the middle of the viewport
     const popupWidth = 400; // Set your popup width
     const popupHeight = 300; // Set your popup height
+    const offset = 325; // Adjust this value to move the popup left
+    const offsetTop = 50; // Adjust this value to move the popup up
 
-    popup.style.left = (window.innerWidth / 2 - popupWidth / 2) + 'px';
-    popup.style.top = (window.innerHeight / 2 - popupHeight / 2) + 'px';
+    popup.style.left = (window.innerWidth - popupWidth - 20 - offset) + 'px'; // 20px margin + offset
+    popup.style.top = (window.innerHeight / 2 - popupHeight / 2 - offsetTop) + 'px'; // Vertically centered with top offset
     popup.style.display = 'block'; // Ensure the popup is visible
 
 }
@@ -495,7 +501,7 @@ function resetInactivityTimer() {
         signOut(auth)
             .then(() => {
                 console.log("User signed out due to inactivity");
-                window.location.href = "index.html";
+                window.location.href = "loginMain.html";
             })
             .catch((error) => {
                 console.error("Error signing out:", error);
@@ -516,7 +522,7 @@ onAuthStateChanged(auth, (user) => {
         document.addEventListener("keypress", resetInactivityTimer);
     } else {
         // Redirect to login page if no user is signed in
-        window.location.href = "index.html";
+        window.location.href = "loginMain.html";
     }
 });
 
@@ -524,7 +530,7 @@ document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
         .then(() => {
             // localStorage.setItem("logoutMessage", "Logged out successfully.");
-            window.location.href = ".index.html";
+            window.location.href = "./loginMain.html";
         })
         .catch((error) => {
             console.error("Sign out error:", error);
