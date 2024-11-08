@@ -31,7 +31,7 @@ onAuthStateChanged(auth, async (user) => {
         await fetchUserProfile(user);
     } else {
         console.log("No user is signed in, redirecting to login.");
-        window.location.href = "loginMain.html";
+        window.location.href = "index.html";
     }
 
     onAuthStateChanged(auth, (user) => {
@@ -96,7 +96,7 @@ function resetInactivityTimer() {
         signOut(auth)
             .then(() => {
                 console.log("User signed out due to inactivity");
-                window.location.href = "loginMain.html";
+                window.location.href = "index.html";
             })
             .catch((error) => {
                 console.error("Error signing out:", error);
@@ -117,7 +117,7 @@ onAuthStateChanged(auth, (user) => {
         document.addEventListener("keypress", resetInactivityTimer);
     } else {
         // Redirect to login page if no user is signed in
-        window.location.href = "loginMain.html";
+        window.location.href = "index.html";
     }
 });
 
@@ -125,7 +125,7 @@ document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
         .then(() => {
             // localStorage.setItem("logoutMessage", "Logged out successfully.");
-            window.location.href = "./loginMain.html";
+            window.location.href = "index.html";
         })
         .catch((error) => {
             console.error("Sign out error:", error);
