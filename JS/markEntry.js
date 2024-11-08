@@ -11,6 +11,8 @@ const lastBatchData = JSON.parse(localStorage.getItem("lastBatchData")); // Get 
 const lastBatchYear = localStorage.getItem("lastBatchYear");
 const lastBatchKey = localStorage.getItem("lastBatchKey");
 
+document.getElementById("batchName").innerHTML = `Mark Entry: ${lastBatchKey}`;
+
 // Function to fetch evaluation criteria and log name and points
 async function fetchEvaluationCriteria(criteria) {
     const criteriaRef = ref(db, `Evaluation Criteria/${criteria}`); // Adjust the path as needed

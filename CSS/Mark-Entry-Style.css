@@ -94,12 +94,12 @@ body {
 }
 .next-card {
     top: 0%; 
-    left:14%;
+    left:20%;
     transform: scale(0.9); 
     opacity: 0.7;
 }
 .next-next-card{
-    right:45%;
+    right:50%;
     transform: scale(0.9);
     opacity: 0.7; 
 }
@@ -108,20 +108,22 @@ body {
    width:80px;
    height:40px;
    margin-left: 100px;
+   margin-top: 250px;
    z-index: 5;
    background-color:#127FD3; 
    border: #127FD3;
    color: white;
-   margin-top:190px ;
+   
    border-radius: 5px 5px 5px 5px;
 }
 #nextButton{
     position: absolute;
-    margin-left: 1000px;
+    margin-left: 1100px;
+    margin-top: 10px;
     z-index: 5;
     width:80px;
     height:40px;
-    margin-top: -210px;
+    margin-top: -170px;
     background-color:#127FD3; 
     border: #127FD3;
     color: white;
@@ -149,8 +151,8 @@ body {
 
 
 #search-box{
-    width:180px;
-    height:40px;
+    width:350px;
+    height:50px;
     margin-left:310px;
     border-radius: 5px 5px 5px 5px;
     border: 1px solid rgb(190, 190, 190);
@@ -160,12 +162,21 @@ body {
 
 }
 #excelFile{
-    margin-left:250px;
+    margin-left:150px;
     display: none;
+}
+#selectModule{
+    margin-top: 10px;
+}
+#selectModule-dropdown{
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+    margin-left: 10px;
 }
 .top-assessmentpage{
     display:flex;
-    margin-top: 10px;
+   
 }
 #module-dropdown{
     background-color: #3F69BA;
@@ -174,7 +185,7 @@ body {
     height: 40px;
     border-radius:5px 5px 5px 5px;
     width:150px;
-    margin-top: 20px;
+    
    
 }
 .input-field{
@@ -197,9 +208,9 @@ body {
     color: white; /* White text */
     border-radius: 5px; /* Rounded corners */
     border: none; /* No border */
-    margin-left: 325px;
+    margin-left: 240px;
     margin-top: 3px;
-    width:150px;
+    width:160px;
     height:40px;
 
 }
@@ -223,9 +234,9 @@ body {
     color: white; /* White text */
     border-radius: 5px; /* Rounded corners */
     border: none; /* No border */
-    margin-left: 325px;
+    margin-left: 240px;
     margin-top: 7px;
-    width:150px;
+    width:160px;
     height:40px;
 
 }
@@ -239,4 +250,5 @@ body {
     color: white;
     border:none;
     border-radius: 5px;
+    cursor: pointer;
 }

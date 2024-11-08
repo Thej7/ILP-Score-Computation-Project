@@ -71,7 +71,7 @@ body {
     margin-top: auto; /* Push footer logo to the bottom */
 }
 .right-container{
-    width:60%;
+    width:75%;
     margin-left: 300px;
 }
 #batchName{
@@ -112,7 +112,7 @@ body {
     border-radius: 15px 15px;
     padding: 20px 20px;
     gap:20px;
-    width:80%;
+    width:100%;
 
 }
 

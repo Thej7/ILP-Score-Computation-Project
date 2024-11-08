@@ -85,6 +85,53 @@ async function fetchFirebase(year, batchName) {
     return jsonData;
 }
 
+let sortDirection = {}; // Keeps track of the sorting direction for each column
+
+// Initialize headers and make each module header clickable
+function initializeHeaders(headers) {
+    const headerRow = document.getElementById('table-head');
+    headerRow.innerHTML = ''; // Clear any existing headers
+
+    headers.forEach((header, index) => {
+        const th = document.createElement('th');
+        th.textContent = header;
+
+        // Make module headers clickable for sorting by highest score
+        if (index > 0) {  // Skip the "Name" column
+            th.addEventListener('click', () => sortColumnByHighestScore(index));
+        }
+
+        headerRow.appendChild(th);
+    });
+}
+
+// Sort data by the selected module's score in descending or ascending order
+function sortColumnByHighestScore(columnIndex) {
+    if (!fullData || fullData.length === 0) return;
+
+    // Check the current sorting direction for this column, default is descending
+    let direction = sortDirection[columnIndex] || 'descending';
+
+    // Sort data based on the direction
+    const sortedData = [...fullData].sort((a, b) => {
+        const scoreA = parseFloat(a[columnIndex]) || 0;
+        const scoreB = parseFloat(b[columnIndex]) || 0;
+
+        // Toggle between descending and ascending sorting
+        if (direction === 'descending') {
+            return scoreB - scoreA; // Sort descending for highest score
+        } else {
+            return scoreA - scoreB; // Sort ascending for lowest score
+        }
+    });
+
+    // Reinsert the first student at the top of the sorted data
+    renderTable(sortedData);
+
+    // Toggle the sorting direction for next click
+    sortDirection[columnIndex] = direction === 'descending' ? 'ascending' : 'descending';
+}
+
 
 function renderHead(headings) {
     const tableHead = document.getElementById('table-head')
@@ -262,6 +309,7 @@ window.onload = async function() {
         // Start loading the data
         json = await fetchFirebase(lastBatchYear, lastBatchKey);
         fetchData(json);
+        initializeHeaders(json.headers);
     } catch (error) {
         console.error("Error loading data:", error);
     } finally {

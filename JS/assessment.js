@@ -54,6 +54,9 @@ async function getLastAddedBatch() {
                     phaseHeading.classList.add("phase");
                     phaseHeading.textContent = phase;
                     container.appendChild(phaseHeading);
+                    const phaseInfo = document.createElement("h3");
+                    phaseInfo.classList.add("information");
+                    phaseInfo.textContent = "Click a tile to update the mark";
 
                     const moduleContainer = document.createElement("div");
                     moduleContainer.classList.add("module-container");
@@ -78,6 +81,7 @@ async function getLastAddedBatch() {
                     });
 
                     container.appendChild(moduleContainer);
+                    container.appendChild(phaseInfo);
                 });
             }
         } else {
