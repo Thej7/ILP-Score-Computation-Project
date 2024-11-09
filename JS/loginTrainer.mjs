@@ -27,14 +27,24 @@ async function isTrainerEmail(email) {
 }
 
 // Add event listener for the login button
-document.getElementById("loginbtn").addEventListener("click", async function () {
+document.getElementById("loginbtn").addEventListener("click", handleLogin);
+
+// Listen for Enter key press anywhere on the page
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        handleLogin();
+    }
+});
+
+// Login function
+async function handleLogin() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
     try {
         // Check if the entered email is a trainer email first
         const isTrainer = await isTrainerEmail(email);
-        
+
         if (!isTrainer) {
             alert("You do not have Trainer privileges.");
             return; // Stop further execution if not a trainer
@@ -72,7 +82,7 @@ document.getElementById("loginbtn").addEventListener("click", async function () 
         document.getElementById("error-message").innerText = errorMessage;
         console.error("Error logging in:", errorMessage);
     }
-});
+}
 
 // Monitor authentication state
 onAuthStateChanged(auth, (user) => {

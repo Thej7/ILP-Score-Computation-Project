@@ -245,14 +245,18 @@ function showCard(index) {
         cardContainer.appendChild(currentCard);
 
         // Create next card (hidden initially)
-        const nextCard = createCardElement(validCards[index + 1]);
-        nextCard.classList.add('next-card');
-        cardContainer.appendChild(nextCard);
+        if (validCards[index + 1]) {
+            const nextCard = createCardElement(validCards[index + 1]);
+            nextCard.classList.add('next-card');
+            cardContainer.appendChild(nextCard);
+        }
 
         // Create previous card (hidden initially)
-        const previousCard = createCardElement(validCards[index - 1]);
-        previousCard.classList.add('next-next-card');
-        cardContainer.appendChild(previousCard);
+        if (validCards[index - 1]) {
+            const previousCard = createCardElement(validCards[index - 1]);
+            previousCard.classList.add('next-next-card');
+            cardContainer.appendChild(previousCard);
+        }
     } else {
         alert("No more cards available!");
     }
@@ -524,6 +528,29 @@ document.getElementById('previousButton').addEventListener('click', () => {
         showCard(currentCardIndex);
     } else {
         alert("You're at the first card!");
+    }
+});
+
+// Listen for arrow keys (left and right)
+document.addEventListener('keydown', (event) => {
+    // Check for right arrow key (ArrowRight) or 'd' key for next card
+    if (event.key === 'ArrowRight' || event.key === 'd') {
+        if (currentCardIndex < cards.length - 1) {
+            currentCardIndex++;
+            showCard(currentCardIndex);
+        } else {
+            alert("You've reached the last card!");
+        }
+    }
+
+    // Check for left arrow key (ArrowLeft) or 'a' key for previous card
+    if (event.key === 'ArrowLeft' || event.key === 'a') {
+        if (currentCardIndex > 0) {
+            currentCardIndex--;
+            showCard(currentCardIndex);
+        } else {
+            alert("You're at the first card!");
+        }
     }
 });
 

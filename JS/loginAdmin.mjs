@@ -28,6 +28,19 @@ async function isAdminEmail(email) {
 
 // Add event listener for the login button
 document.getElementById("loginbtn").addEventListener("click", async function () {
+    await handleLogin();
+});
+
+// Listen for the Enter key press to trigger login
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Prevent form submission
+        handleLogin();
+    }
+});
+
+// Login function
+async function handleLogin() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
@@ -71,7 +84,7 @@ document.getElementById("loginbtn").addEventListener("click", async function () 
         document.getElementById("error-message").innerText = errorMessage;
         console.error("Error logging in:", errorMessage);
     }
-});
+}
 
 // Monitor authentication state
 onAuthStateChanged(auth, (user) => {
