@@ -95,3 +95,7 @@ onAuthStateChanged(auth, (user) => {
         console.log("User is signed out."); // Log when the user is signed out
     }
 });
+
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};

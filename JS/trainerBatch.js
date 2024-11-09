@@ -507,4 +507,8 @@ function showNotification(message, type = 'error') {
     }, 3000);
 }
 
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};
+
 //checking

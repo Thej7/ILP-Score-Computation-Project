@@ -98,4 +98,8 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};
+
 

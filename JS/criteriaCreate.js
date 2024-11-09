@@ -630,6 +630,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     await createCriteriaGroup();
 });
 
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};
+
 
 // Now add this to firebase - check if submit is from edit or straight up - delete for the whole thing and just the whole row
 // don't forget to load the pre-existing ones

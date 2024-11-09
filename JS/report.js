@@ -429,6 +429,7 @@ window.onload = async function () {
     document.getElementById("loader").style.display = "block";
 
     try {
+        document.body.style.zoom = "80%";
         // Start loading the data
         json = await fetchFirebase(lastBatchYear, lastBatchKey, neededPhase);
         fetchData(json);

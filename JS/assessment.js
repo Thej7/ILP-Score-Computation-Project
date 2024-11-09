@@ -1,4 +1,4 @@
-import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth } from './firebaseConfig.mjs';
 import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 let studentsList;
 async function getLastAddedBatch() {
@@ -23,12 +23,12 @@ async function getLastAddedBatch() {
                     const currentBatchData = yearBatches[batchKey];
                     if (currentBatchData.active === "yes") {
                         lastBatchYear = yearKey;
-                        
+
                         lastBatchKey = batchKey;
-                        localStorage.setItem("lastBatchKey",lastBatchKey);
+                        localStorage.setItem("lastBatchKey", lastBatchKey);
                         console.log(lastBatchKey);
                         lastBatchData = currentBatchData;
-                       
+
                     }
                 }
             }
@@ -70,9 +70,9 @@ async function getLastAddedBatch() {
                             localStorage.setItem("selectedPhase", phase);
                             localStorage.setItem("selectedModule", moduleData.moduleName);
                             localStorage.setItem("lastBatchData", JSON.stringify(lastBatchData));
-                            localStorage.setItem("lastBatchKey",lastBatchKey);
-                           console.log(lastBatchKey);
-                           // Store whole last batch data
+                            localStorage.setItem("lastBatchKey", lastBatchKey);
+                            console.log(lastBatchKey);
+                            // Store whole last batch data
                             localStorage.setItem("lastBatchYear", lastBatchYear); // Store the year of the batch
 
                             window.location.href = "Mark-Entry.html";
@@ -104,11 +104,11 @@ async function fetchStudentList() {
         const snapshot = await get(studentListRef);
         if (snapshot.exists()) {
             const students = snapshot.val();
-            
+
             // Collect each student's name in the studentNames array
             Object.keys(students).forEach((studentId) => {
                 const student = students[studentId];
-                console.log("studentname"+student.Name); // Log each student's name
+                console.log("studentname" + student.Name); // Log each student's name
                 studentNames.push(student.Name); // Add the name to the array
             });
         } else {
@@ -120,9 +120,6 @@ async function fetchStudentList() {
 
     return studentNames; // Return the list of student names
 }
-
-studentsList = await fetchStudentList()
-document.getElementById("numberOfTrainees").innerHTML ="Number of Trainees&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;"+studentsList.length;
 
 
 
@@ -161,7 +158,7 @@ onAuthStateChanged(auth, (user) => {
         // Redirect to login page if no user is signed in
         window.location.href = "index.html";
     }
-}); 
+});
 
 document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
@@ -173,3 +170,9 @@ document.getElementById("logout_button").addEventListener("click", () => {
             console.error("Sign out error:", error);
         });
 });
+
+window.onload = async () => {
+    document.body.style.zoom = "80%";
+    studentsList = await fetchStudentList()
+    document.getElementById("numberOfTrainees").innerHTML = "Number of Trainees&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;" + studentsList.length;
+};

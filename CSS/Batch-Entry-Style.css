@@ -15,12 +15,14 @@ body {
 }
 
 .sidebar {
-    width: 60%; /* Sidebar takes 20% of the screen width */
+    width: 282.5px; /* Sidebar takes 20% of the screen width */
     background-color: #8061C3; /* Light background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     padding: 20px 0; /* Top and bottom padding */
+    position: fixed;
+    height: 125vh;
 }
 
 .logo {
@@ -91,6 +93,7 @@ body {
     height: auto;
     padding-top: 2em;
     font-size: 1.3em;
+    margin-left: 300px;
 }
 
 .Config-Page-Right-Criteria {

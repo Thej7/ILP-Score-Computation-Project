@@ -390,3 +390,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadFirebaseData();
     await createPhase();
 });
+
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};

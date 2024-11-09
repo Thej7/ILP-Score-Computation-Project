@@ -15,12 +15,14 @@ body {
 }
 
 .sidebar {
-    width: 282px; /* Sidebar takes 20% of the screen width */
+    width: 282.5px; /* Sidebar takes 20% of the screen width */
     background-color: #8061C3; /* Light background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     padding: 20px 0; /* Top and bottom padding */
+    position: fixed;
+    height: 125vh;
 }
 
 .logo {
@@ -87,7 +89,7 @@ body {
     /* Adds a separator line */
     margin-top: 50px;
     width: 92%;
-    margin-left: 70px;
+    margin-left: 300px;
 }
 
 .Config-Page-Link {
@@ -105,10 +107,11 @@ body {
 }
 
 .Config-Page-Right {
+    margin-left: 250px;
     margin-top: 10px;
     height: auto;
     padding: 20px;
-    width: 98.5%;
+    width: 80%;
 }
 
 .Config-Page-Right-Criteria-Group {

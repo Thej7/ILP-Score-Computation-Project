@@ -8,11 +8,10 @@ body {
 
 /* Container for the whole login page */
 .container {
-    display: flex;
     justify-content: center;
     align-items: center; /* Center content vertically */
-    height: 100vh; /* Full viewport height */
-    background: linear-gradient(524.5deg, #dc143c 60%, white 25%);
+    height: 125vh; /* Full viewport height */
+    background: linear-gradient(524.5deg, #dc143c 60%, white 35%);
     background-size: cover;
     flex-direction: column;
     align-content: center;
@@ -32,6 +31,8 @@ body {
     margin: 0; /* No margin for better alignment */
     height: auto; /* Automatic height to fit content */
     margin-top: 90px;
+    align-self: center;
+    margin-left: 34%;
 }
 
 /* Logo styling */
@@ -108,5 +109,5 @@ body {
 }
 
 .footer img {
-    width: 70%; /* Adjust footer image size */
+    width: 30%; /* Adjust footer image size */
 }

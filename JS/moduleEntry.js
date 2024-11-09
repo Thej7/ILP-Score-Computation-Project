@@ -673,3 +673,7 @@ document.getElementById('viewmodules-button').addEventListener('click', function
     event.preventDefault();
     viewAllModules();
 });
+
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};

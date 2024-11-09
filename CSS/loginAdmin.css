@@ -12,7 +12,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    height: 100vh;
+    height: 125vh;
     background: linear-gradient(524.5deg, #8061C3 60%, white 25%);
     background-size: cover;
     flex-direction: column;

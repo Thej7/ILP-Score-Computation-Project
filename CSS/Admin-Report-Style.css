@@ -17,12 +17,14 @@ body {
 }
 
 .sidebar {
-    width: 60%; /* Sidebar takes 20% of the screen width */
+    width: 282.5px; /* Sidebar takes 20% of the screen width */
     background-color: #8061C3; /* Light background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     padding: 20px 0; /* Top and bottom padding */
+    position: fixed;
+    height: 125vh;
 }
 
 .logo {
@@ -84,7 +86,7 @@ body {
 
 .container {
     max-width: 70%;
-    margin-left: -100px;
+    margin-left: 350px;
     padding: 0px;
     font-family: Arial, sans-serif;
     color: #333;
@@ -140,6 +142,7 @@ button:hover {
     margin-top: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
+    margin-left: 0px;
 }
 
 .loader {

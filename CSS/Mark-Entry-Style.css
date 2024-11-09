@@ -21,6 +21,8 @@ body {
     flex-direction: column; 
     align-items: center; 
     padding: 20px 0; 
+    position: fixed;
+    height: 125vh;
 }
 .logo {
     max-width: 80%;
@@ -65,7 +67,7 @@ body {
 }
 .right-container{
     margin-top: 25px;
-    margin-left: 20px;
+    margin-left: 282.5px;
     
 }
 #cardContainer {

@@ -603,3 +603,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadFirebaseData();
     await createModule();
 });
+
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};

@@ -134,3 +134,7 @@ document.getElementById("logout_button").addEventListener("click", () => {
         });
 });
 
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};
+

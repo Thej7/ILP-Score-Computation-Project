@@ -202,3 +202,7 @@ document.getElementById("logout_button").addEventListener("click", () => {
 });
 
 getLastAddedBatch();
+
+window.onload = () => {
+    document.body.style.zoom = "80%";
+};

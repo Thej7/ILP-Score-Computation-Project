@@ -15,12 +15,14 @@ body {
 }
 
 .sidebar {
-    width: 60%; /* Sidebar takes 40% of the screen width */
+    width: 282.5px; /* Sidebar takes 40% of the screen width */
     background-color: #3F69BA; /* Sidebar background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     padding: 20px 0; /* Top and bottom padding */
+    position: fixed;
+    height: 125vh;
 }
 
 .logo {
@@ -76,7 +78,7 @@ body {
 
 .container {
     max-width: 70%;
-    margin-left: -100px;
+    margin-left: 350px;
     font-family: Arial, sans-serif;
     color: #333;
 }

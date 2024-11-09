@@ -15,12 +15,14 @@ body {
 }
 
 .sidebar {
-    width: 60%; /* Sidebar takes 40% of the screen width */
+    width: 282.5px; /* Sidebar takes 40% of the screen width */
     background-color: #3F69BA; /* Sidebar background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     padding: 20px 0; /* Top and bottom padding */
+    position: fixed;
+    height: 125vh;
 }
 
 .logo {
@@ -69,7 +71,7 @@ body {
 }
 
 .profile-container {
-    margin-left: -50px;
+    margin-left: 350px;
     padding: 20px; /* Internal padding */
     background-color: #3F69BA; /* White background for the card */
     border-radius: 10px; /* Rounded corners */

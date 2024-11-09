@@ -15,12 +15,14 @@ body {
 }
 
 .sidebar {
-    width: 60%; /* Sidebar takes 40% of the screen width */
+    width: 282.5px; /* Sidebar takes 40% of the screen width */
     background-color: #3F69BA; /* Sidebar background color */
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     padding: 20px 0; /* Top and bottom padding */
+    position: fixed;
+    height: 125vh;
 }
 
 .logo {
@@ -70,12 +72,13 @@ body {
 
 /******************************************    Right side    ******************************************/
 .Config-Page-Right {
-    margin-left: -188px; /* Adjusted to match sidebar width */
+    margin-left: 282.5px; /* Adjusted to match sidebar width */
     padding: 20px; /* Add padding for better spacing */
     flex-grow: 1; /* Allow it to take remaining space */
     background-color: #f0f0f0; /* Light background for contrast */
     display: flex;
     flex-direction: column;
+    height: 125vh;
     /* justify-content: center; */
     /* align-items: center; */
 }
@@ -168,6 +171,7 @@ body {
     padding: 10px;
     z-index: 1000;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    margin-left: 282.5px;
 }
 
 .graph-popup h6 {
