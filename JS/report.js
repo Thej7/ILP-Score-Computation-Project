@@ -11,9 +11,12 @@ const sortLowest5Btn = document.getElementById('sort-lowest-5');
 const showAllBtn = document.getElementById('show-all');
 const downloadBtn = document.getElementById('download-btn');
 
+const neededPhase = localStorage.getItem('setPhase');
+
 let fullData = [];
 let json;
 let weightJson = [];
+let extendedHeaders = [];
 
 async function fetchData(jsonData) {
     try {
@@ -22,7 +25,8 @@ async function fetchData(jsonData) {
 
         // Check JSON structure and render if correct
         if (json.headers && json.data) {
-            renderHead(json.headers);
+            extendedHeaders = [...json.headers, 'Total'];
+            renderHead(extendedHeaders);
             fullData = json.data;
             renderTable(fullData);
         } else {
@@ -33,30 +37,49 @@ async function fetchData(jsonData) {
     }
 }
 
-async function fetchFirebase(year, batchName) {
+async function fetchFirebase(year, batchName, neededPhase) {
     // Step 1: Fetch module headers from `Batches/${year}/${batchName}/modules`
     const modulesRef = ref(db, `Batches/${year}/${batchName}/modules`);
     const modulesSnapshot = await get(modulesRef);
     const modules = modulesSnapshot.exists() ? modulesSnapshot.val() : {};
 
-    // Fetch total weightage for each module
-    for (const moduleName of Object.keys(modules)) {
-        const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
-        const weightageSnapshot = await get(weightageRef);
+    // Initialize an array to store the weightage data
+    let weightJson = [];
 
-        if (weightageSnapshot.exists()) {
-            const totalWeightage = weightageSnapshot.val();
-            weightJson.push({
-                modulename: moduleName,
-                weightage: totalWeightage
-            });
+    // Fetch total weightage for each module if the phase matches `neededPhase`
+    for (const moduleName of Object.keys(modules)) {
+        const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
+        const phaseSnapshot = await get(phaseRef);
+
+        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
+            // Only fetch weightage if the phase matches `neededPhase`
+            const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
+            const weightageSnapshot = await get(weightageRef);
+
+            if (weightageSnapshot.exists()) {
+                const totalWeightage = weightageSnapshot.val();
+                weightJson.push({
+                    modulename: moduleName,
+                    weightage: totalWeightage
+                });
+            }
         }
     }
 
     console.log(weightJson);
 
     // Add "Name" as the first header
-    const headers = ["Name", ...Object.keys(modules)];
+    const moduleNames = Object.keys(modules);
+
+    // Asynchronously check which modules match the `neededPhase`
+    const matchingModules = await Promise.all(moduleNames.map(async (moduleName) => {
+        const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
+        const phaseSnapshot = await get(phaseRef);
+        return phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase ? moduleName : null;
+    }));
+
+    // Filter out null values (modules that did not match the phase)
+    const headers = ["Name", ...matchingModules.filter(moduleName => moduleName !== null)];
 
     // Step 2: Initialize jsonData with headers and a map for students
     let jsonData = {
@@ -154,18 +177,19 @@ function sortColumnByHighestScore(columnIndex) {
 
 
 function renderHead(headings) {
-    const tableHead = document.getElementById('table-head')
+    const tableHead = document.getElementById('table-head');
     tableHead.innerHTML = '';
-    const tr = document.createElement('tr')
+    const tr = document.createElement('tr');
+
+    // Create table headers
     headings.forEach(heading => {
-        const th = document.createElement('th')
-        th.textContent = heading
-        tr.appendChild(th)
-        console.log('table handings are rendered')
+        const th = document.createElement('th');
+        th.textContent = heading;
+        tr.appendChild(th);
+    });
 
-    })
-    tableHead.appendChild(tr)
-
+    tableHead.appendChild(tr);
+    console.log('Table headings are rendered:', headings);
 }
 
 function renderTable(data) {
@@ -174,11 +198,21 @@ function renderTable(data) {
 
     data.forEach(student => {
         const row = document.createElement('tr');
+
+        // Populate row cells with student data
         student.forEach(value => {
             const cell = document.createElement('td');
             cell.textContent = value;
             row.appendChild(cell);
         });
+
+        // Calculate total marks and add the 'Total' cell
+        const totalMarks = calculateTotalMarks(student);
+        const totalCell = document.createElement('td');
+        totalCell.textContent = totalMarks;
+        row.appendChild(totalCell);
+
+        // Append the row to the table body
         tableBody.appendChild(row);
     });
 }
@@ -214,10 +248,9 @@ function transformJsonData(jsonData, weightJson) {
         for (let j = 1; j < row.length; j++) {
             const moduleName = jsonData.headers[j];
             const mark = row[j];
-            const weightage = weightMap[moduleName] || 0; // Default to 0 if not found
-
-            // Calculate the weight using the specific weightage of the module
-            const weight = ((mark / 50) * weightage).toFixed(2);
+        
+            // If the mark is empty, set weight to empty as well
+            const weight = mark ? ((mark / 50) * (weightMap[moduleName] || 0)).toFixed(2) : '';
             transformedRow.push(mark, weight);
         }
 
@@ -255,11 +288,18 @@ function searchTable() {
 }
 
 function calculateTotalMarks(student) {
-    // Remove any null, undefined, or non-numeric marks, then sum up
-    return student.slice(1).reduce((sum, mark) => {
+    const total = student.slice(2).reduce((sum, mark, index) => {
         const numericMark = parseFloat(mark);
-        return !isNaN(numericMark) ? sum + numericMark : sum;
+
+        // Check if the index within the sliced array is even (0, 2, 4, etc.)
+        if (index % 2 === 0 && !isNaN(numericMark)) {
+            return sum + numericMark;
+        }
+        return sum;
     }, 0);
+
+    // Return the total rounded to 2 decimal places
+    return total.toFixed(2);
 }
 
 // Sort and render the top 5 entries by total marks
@@ -374,9 +414,9 @@ window.onload = async function () {
 
     try {
         // Start loading the data
-        json = await fetchFirebase(lastBatchYear, lastBatchKey);
+        json = await fetchFirebase(lastBatchYear, lastBatchKey, neededPhase);
         fetchData(json);
-        initializeHeaders(json.headers);
+        initializeHeaders(extendedHeaders);
     } catch (error) {
         console.error("Error loading data:", error);
     } finally {

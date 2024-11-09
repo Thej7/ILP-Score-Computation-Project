@@ -125,7 +125,13 @@ body {
     width:100px;
     height:30px;
     background-color: #5e89df;
-    margin-left: 800px;
+    margin-left: 90%;
+    flex-shrink: 0;
+    /* Prevent shrinking */
+    flex-grow: 0;
+    /* Prevent growing */
+    margin-bottom: 10px;
+    /* Optional: Add space below the button */
    
 }
 

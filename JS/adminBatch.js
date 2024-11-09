@@ -361,6 +361,12 @@ function displayBatch(batch, studentCount) {
 }
 
 async function displayModuleAverages(year, batchName,) {
+
+    document.getElementById('loadingSpinner').style.display = 'block';
+
+    try{
+
+    
     // Fetch the module averages as a percentage
     const moduleAverages = await fetchModuleAverages(year, batchName);
     console.log('Module Averages', moduleAverages)
@@ -374,6 +380,12 @@ async function displayModuleAverages(year, batchName,) {
 
     // Call the function to show the popup and pass the data
     showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals', batchName);
+}catch(error){
+    console.error("Error displaying module averages:", error)
+} finally {
+    // Hide the loading spinner after data is processed
+    document.getElementById('loadingSpinner').style.display = 'none';
+}
 }
 
 
@@ -454,9 +466,7 @@ function showGraphPopup(event, batch, graphType, batchName) {
 
     const graphData = batch.graphs[graphType];
     console.log("graphData", graphData)
-    // Render Plotly graph in the popup
-    // const xArray = ["OOPS", "DBMS", "HTML", "ClOUD", "AGILE","GIT", "Mini Project", "Main Project"];
-    // const yArray = [74, 99, 84, 94, 75, 96, 76, 90,];
+    
     let data
     if (graphData) {
         data = [{
@@ -508,7 +518,7 @@ function resetInactivityTimer() {
         signOut(auth)
             .then(() => {
                 console.log("User signed out due to inactivity");
-                window.location.href = "index.html";
+                window.location.href = "loginMain.html";
             })
             .catch((error) => {
                 console.error("Error signing out:", error);
@@ -529,7 +539,7 @@ onAuthStateChanged(auth, (user) => {
         document.addEventListener("keypress", resetInactivityTimer);
     } else {
         // Redirect to login page if no user is signed in
-        window.location.href = "index.html";
+        window.location.href = "loginMain.html";
     }
 });
 
@@ -537,7 +547,7 @@ document.getElementById("logout_button").addEventListener("click", () => {
     signOut(auth)
         .then(() => {
             // localStorage.setItem("logoutMessage", "Logged out successfully.");
-            window.location.href = "index.html";
+            window.location.href = "./loginMain.html";
         })
         .catch((error) => {
             console.error("Sign out error:", error);

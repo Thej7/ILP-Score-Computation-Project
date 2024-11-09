@@ -56,6 +56,17 @@ async function getLastAddedBatch() {
                 
                     const moduleContainer = document.createElement("div");
                     moduleContainer.classList.add("module-container");
+
+                    const button = document.createElement('button');
+                    button.id = 'view-report';
+                    button.textContent = 'View Report';
+
+                    moduleContainer.appendChild(button);
+
+                    button.addEventListener("click", () => {
+                        localStorage.setItem('setPhase', phase);
+                        window.location.href = "Trainer-Report.html";
+                    });
                 
                     for (const moduleData of phaseGroups[phase]) {
                         const containerphasecard = document.createElement("div");
@@ -142,9 +153,6 @@ async function getLastAddedBatch() {
     }
 }
 
-document.getElementById("view-report").addEventListener("click", () => {
-    window.location.href = "Trainer-Report.html";
-});
 
 const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour
 
