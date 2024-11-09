@@ -107,13 +107,13 @@ body {
     
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
     padding: 10px;
 }
 
 .Config-Page-Right-eachBatchList {
-    width: 90%;
+    width: 40%;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -123,13 +123,7 @@ body {
     border-radius: 8px; /* Optional: Rounded corners for a softer look */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
 }
-
-.Config-Page-Right-eachBatchList-graphContainer {
-    width: 25%; /* Adjust width for graphs */
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-}
+ 
 .Config-Page-Right-eachBatchList-batchNameBox{
     margin-bottom: 3rem;
 }
@@ -149,6 +143,7 @@ body {
     gap: 2rem;
 }
  .Config-Page-Right-eachBatchList-activeBox{
+    margin-top: 48px;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -159,7 +154,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: #ffffff;
-    background-color: #5e89df;
+    background-color: #3498db;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -169,15 +164,31 @@ body {
 .graph-popup {
     position: fixed;
     display: none;
-    border: 1px solid #ccc;
-    background-color: white;
+    border: 1px solid #ccc; 
     padding: 10px;
     z-index: 1000;
-    width: 300px;
-    height: 200px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .graph-popup h6 {
     margin: 0 0 10px 0;
+}
+.spinner {
+    
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

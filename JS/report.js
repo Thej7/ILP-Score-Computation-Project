@@ -46,13 +46,20 @@ async function fetchFirebase(year, batchName, neededPhase) {
     // Initialize an array to store the weightage data
     let weightJson = [];
 
-    // Fetch total weightage for each module if the phase matches `neededPhase`
+    // Fetch total weightage for each module if the phase matches `neededPhase` and criteria is "Module Assessment"
     for (const moduleName of Object.keys(modules)) {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
-        const phaseSnapshot = await get(phaseRef);
+        const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
+        
+        const [phaseSnapshot, criteriaSnapshot] = await Promise.all([
+            get(phaseRef),
+            get(criteriaRef)
+        ]);
 
-        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
-            // Only fetch weightage if the phase matches `neededPhase`
+        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase &&
+            criteriaSnapshot.exists() && criteriaSnapshot.val() === "Module Assessment") {
+            
+            // Fetch total weightage
             const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
             const weightageSnapshot = await get(weightageRef);
 
@@ -68,20 +75,29 @@ async function fetchFirebase(year, batchName, neededPhase) {
 
     console.log(weightJson);
 
-    // Add "Name" as the first header
-    const moduleNames = Object.keys(modules);
-
-    // Asynchronously check which modules match the `neededPhase`
-    const matchingModules = await Promise.all(moduleNames.map(async (moduleName) => {
+    // Asynchronously check which modules match the `neededPhase` and criteria
+    const matchingModules = await Promise.all(Object.keys(modules).map(async (moduleName) => {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
-        const phaseSnapshot = await get(phaseRef);
-        return phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase ? moduleName : null;
+        const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
+        
+        const [phaseSnapshot, criteriaSnapshot] = await Promise.all([
+            get(phaseRef),
+            get(criteriaRef)
+        ]);
+
+        // Check if the phase matches `neededPhase` and criteria is "Module Assessment"
+        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase &&
+            criteriaSnapshot.exists() && criteriaSnapshot.val() === "Module Assessment") {
+            return moduleName;
+        }
+
+        return null;
     }));
 
-    // Filter out null values (modules that did not match the phase)
-    const headers = ["Name", ...matchingModules.filter(moduleName => moduleName !== null)];
+    // Filter out null values and construct the headers array
+    const headers = ["Name", ...matchingModules.filter(module => module !== null)];
 
-    // Step 2: Initialize jsonData with headers and a map for students
+    // Step 2: Initialize jsonData with headers and prepare for student data
     let jsonData = {
         headers,
         data: []

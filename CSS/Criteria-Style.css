@@ -138,7 +138,6 @@ body {
     width: 80%;
     max-width: 100%;
     /* Prevents table from exceeding container width */
-    border: 2px solid red;
     box-sizing: border-box;
     overflow-x: auto;
     /* Enables horizontal scrolling if content overflows */
@@ -148,7 +147,6 @@ body {
 
 .Config-Page-Right-Criteria-Group-Body-Options {
     width: 20%;
-    border: 2px solid red;
     display: flex;
     flex-direction: column;
     padding-left: 20px;

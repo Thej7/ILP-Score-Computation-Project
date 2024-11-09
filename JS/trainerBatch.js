@@ -1,7 +1,7 @@
 import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
 import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 // Store all batch data by year
-let batchData = {}; 
+let batchData = {};
 let studentData = {};
 let graphData;
 
@@ -11,25 +11,25 @@ const batchesRef = ref(db, 'Batches');
 const studentListRef = ref(db, 'studentList')
 
 async function fetchApiForBatches() {
-    
+
     try {
         const snapshot = await get(batchesRef);
         if (snapshot.exists()) {
-            
+
             const allYears = snapshot.val();
             const yearKeys = Object.keys(allYears);
-            console.log("BatchesData : ",allYears)
-            console.log("years :",yearKeys)
-            
+            console.log("BatchesData : ", allYears)
+            console.log("years :", yearKeys)
+
             let lastBatchYear = null;
             let lastBatchKey = null;
             let lastBatchData = null;
-            
-           
+
+
             for (const yearKey of yearKeys) {
                 const yearBatches = allYears[yearKey];
                 const batchKeys = Object.keys(yearBatches);
-                
+
                 // Add the year only if it's not already in availableYears
                 if (!availableYears.includes(yearKey)) {
                     availableYears.push(yearKey);
@@ -44,18 +44,20 @@ async function fetchApiForBatches() {
                         lastBatchYear = yearKey;
                         lastBatchKey = batchKey;
                         lastBatchData = currentBatchData;
-                            
+
                     }
                 }
             }
-            
-            initializeBatchData(lastBatchYear,availableYears);
-        }
-        else{
-                console.log("No data available");
-        } 
 
-    }catch (error) {
+            initializeBatchData(lastBatchYear, availableYears);
+            const selectedYear = document.getElementById('batchYearSelect').value; // Get the current selected year
+            displayModuleAverages(lastBatchYear, lastBatchData.name);
+        }
+        else {
+            console.log("No data available");
+        }
+
+    } catch (error) {
         console.error("Error fetching data:", error);
     }
 }
@@ -63,13 +65,13 @@ async function fetchApiForBatches() {
 async function fetchApiStudent() {
 
     const studentSnapshot = await get(studentListRef);
-        if (studentSnapshot.exists()) {
-            const allYears = studentSnapshot.val();
-            const YearKeys = Object.keys(allYears);
-            console.log("Student Data : ", allYears)
-            console.log("studentYearKeys : ", YearKeys)
+    if (studentSnapshot.exists()) {
+        const allYears = studentSnapshot.val();
+        const YearKeys = Object.keys(allYears);
+        console.log("Student Data : ", allYears)
+        console.log("studentYearKeys : ", YearKeys)
 
-            for (const yearKey of YearKeys) {
+        for (const yearKey of YearKeys) {
             // Get the batch data for the current year
             const yearBatches = allYears[yearKey];
             console.log("yearBatches : ", yearBatches)
@@ -81,16 +83,18 @@ async function fetchApiStudent() {
 
             // Store batch data for the year in batchData object
             studentData[yearKey] = yearBatches;
-            console.log("student Data",studentData);
-            }
-        } else {
-            console.log("No student data available");
+            console.log("student Data", studentData);
         }
-    } 
+    } else {
+        console.log("No student data available");
+    }
+}
 
 
 fetchApiStudent();
 fetchApiForBatches();
+
+
 
 
 // Initialize the dropdown and display for Firebase data
@@ -98,7 +102,7 @@ function initializeBatchData(lastBatchYear, availableYears) {
 
     // Populate dropdown and set latest year
     populateYearDropdown(availableYears);
-    
+
     document.getElementById('batchYearSelect').value = lastBatchYear;
     DisplayBatchesUnderYear(lastBatchYear); // Display batches for the latest year
 
@@ -111,7 +115,7 @@ function initializeBatchData(lastBatchYear, availableYears) {
 
 // Function to populate the year dropdown
 function populateYearDropdown(availableYears) {
-    
+
     const dropdown = document.getElementById("batchYearSelect");
     dropdown.innerHTML = ""; // Clear existing dropdown options
     // Default option
@@ -129,7 +133,7 @@ function clearBatchesDisplay() {
     const batchLists = document.querySelector('.Config-Page-Right-batchLists');
     // if any batch lists displayed
     if (batchLists) {
-        
+
         // Clear the inner content
         batchLists.innerHTML = '';
     }
@@ -164,10 +168,10 @@ function DisplayBatchesUnderYear(selectedYear) {
         // Display each batch for the selected year
         Object.keys(batches).forEach(batchKey => {
             const batch = batches[batchKey];
-            
+
             // Get the number of students for this batch
             const studentCount = getStudentCount(selectedYear, batchKey);
-            
+
             // Pass the batch and studentCount to displayBatch
             displayBatch(batch, studentCount);
         });
@@ -178,6 +182,8 @@ function DisplayBatchesUnderYear(selectedYear) {
         }
     }
 }
+
+
 
 
 function displayBatch(batch, studentCount) {
@@ -244,7 +250,8 @@ function displayBatch(batch, studentCount) {
     const graphContainer1Id = `${batch.batchName}`;
     graphContainer1.id = graphContainer1Id;
     graphContainer1.classList.add('Config-Page-Right-eachBatchList-graphContainer')
-    
+
+
     // Add the click listener for outside clicks to hide the popup
     document.addEventListener('click', (event) => {
         const popup = document.getElementById('graphPopup');
@@ -253,22 +260,27 @@ function displayBatch(batch, studentCount) {
         }
     });
 
+    
+
     eachBatchList.appendChild(graphContainer1);
-   
+
     const activeBox = document.createElement('div')
     activeBox.classList.add('Config-Page-Right-eachBatchList-activeBox');
 
+
     
+
     const graphViewButton = document.createElement('button')
     graphViewButton.classList.add('Config-Page-Right-eachBatchList-activeButton')
     graphViewButton.textContent = 'View Graph'
     graphViewButton.onclick = () => {
         const selectedYear = document.getElementById('batchYearSelect').value; // Get the current selected year
-        displayModuleAverages(selectedYear, batch.name );
+        displayModuleAverages(selectedYear, batch.name);
     }
     activeBox.appendChild(graphViewButton)
+
     eachBatchList.appendChild(activeBox)
-    
+
 
     // Append the complete batch element to the batchLists container
     const batchLists = document.querySelector(".Config-Page-Right-batchLists");
@@ -277,19 +289,32 @@ function displayBatch(batch, studentCount) {
 }
 
 async function displayModuleAverages(year, batchName,) {
+
+    document.getElementById('loadingSpinner').style.display = 'block';
+
+    try{
+
     // Fetch the module averages as a percentage
     const moduleAverages = await fetchModuleAverages(year, batchName);
     console.log('Module Averages', moduleAverages)
-    
+  
+
     // Prepare data in a format suitable for the graph popup
     const graphData = {
         labels: Object.keys(moduleAverages),      // Module names as x-axis labels
         values: Object.values(moduleAverages)     // Percentage values as y-axis data
     };
-    
+
     // Call the function to show the popup and pass the data
-    showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals');
+    showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals', batchName);
+}catch(error){
+    console.error("Error displaying module averages:", error)
+} finally {
+    // Hide the loading spinner after data is processed
+    document.getElementById('loadingSpinner').style.display = 'none';
 }
+}
+
 
 async function fetchModuleAverages(year, batchName, maxScore = 100) {
     // Initialize the output object
@@ -303,25 +328,25 @@ async function fetchModuleAverages(year, batchName, maxScore = 100) {
     // Step 2: Loop through each module to fetch students' marks from `Marks/${year}/${batchName}/${moduleKey}/students`
     for (const moduleKey of Object.keys(modules)) {
         const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleKey}/criteria`);
-    
+
         // Fetch criteriaName
         const criteriaSnapshot = await get(criteriaRef);
         const criteriaName = criteriaSnapshot.val();
-        
+
         // Reference to the Evaluation Criteria based on the criteriaName
         const evalCriteriaRef = ref(db, `Evaluation Criteria/${criteriaName}`);
-        
+
         // Fetch all keys within criteriaName and sum up the points
         const evalCriteriaSnapshot = await get(evalCriteriaRef);
-         maxScore = 0;
-        
+        maxScore = 0;
+
         // Summing the points in the Evaluation Criteria
         evalCriteriaSnapshot.forEach((childSnapshot) => {
             const points = parseFloat(childSnapshot.child('points').val()) || 0;
             maxScore += points;
         });
         console.log('max score', maxScore)
-        
+
         const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
         const studentListSnapshot = await get(studentListRef);
 
@@ -354,18 +379,21 @@ async function fetchModuleAverages(year, batchName, maxScore = 100) {
 }
 
 // Function to show the graph popup
-function showGraphPopup(event, batch, graphType) {
+function showGraphPopup(event, batch, graphType, batchName) {
 
     const popup = document.getElementById('graphPopup');
     const graphContent = document.getElementById('graphContent');
+    const batchYear = document.getElementById("batchYearSelect").value
 
     // Clear previous graph content
     graphContent.innerHTML = '';
 
-    
+    console.log("graphTypes:", graphType)
+    console.log("batch.graphs:", batch.graphs)
 
     const graphData = batch.graphs[graphType];
     console.log("graphData", graphData)
+    
     let data
     if (graphData) {
         data = [{
@@ -373,19 +401,28 @@ function showGraphPopup(event, batch, graphType) {
             y: graphData.values,
             type: "bar",
             orientation: "v",
-            marker: { color: "rgb(150, 124, 207)" }
+            marker: { color: "rgb(52, 152, 219)"}   
         }];
     }
 
-    const layout = { title: "MODULE" };
+    const layout = { title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}`,
+    xaxis: {
+        title: 'Modules' // Label for the x-axis
+    },
+    yaxis: {
+        title: 'Average (%)' // Label for the y-axis
+    }
+};
 
     Plotly.newPlot("graphContent", data, layout);
     // Center the popup in the middle of the viewport
     const popupWidth = 400; // Set your popup width
     const popupHeight = 300; // Set your popup height
+    const offset = 325; // Adjust this value to move the popup left
+    const offsetTop = 50; // Adjust this value to move the popup up
 
-    popup.style.left = (window.innerWidth / 2 - popupWidth / 2) + 'px';
-    popup.style.top = (window.innerHeight / 2 - popupHeight / 2) + 'px';
+    popup.style.left = (window.innerWidth - popupWidth - 20 - offset) + 'px'; // 20px margin + offset
+    popup.style.top = (window.innerHeight / 2 - popupHeight / 2 - offsetTop) + 'px'; // Vertically centered with top offset
     popup.style.display = 'block'; // Ensure the popup is visible
 
 }
@@ -395,6 +432,55 @@ function hideGraphPopup() {
     const popup = document.getElementById('graphPopup');
     popup.style.display = 'none';
 }
+
+const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour
+
+let inactivityTimer;
+
+// Function to reset the inactivity timer
+function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+        // Log out the user after 1 hour of inactivity
+        signOut(auth)
+            .then(() => {
+                console.log("User signed out due to inactivity");
+                window.location.href = "loginMain.html";
+            })
+            .catch((error) => {
+                console.error("Error signing out:", error);
+            });
+    }, INACTIVITY_TIMEOUT);
+}
+
+// Listen for authentication state changes
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user.email);
+
+        // Reset inactivity timer whenever the user is authenticated
+        resetInactivityTimer();
+
+        // Monitor user activity to reset the timer on interaction
+        document.addEventListener("mousemove", resetInactivityTimer);
+        document.addEventListener("keypress", resetInactivityTimer);
+    } else {
+        // Redirect to login page if no user is signed in
+        window.location.href = "loginMain.html";
+    }
+});
+
+document.getElementById("logout_button").addEventListener("click", () => {
+    signOut(auth)
+        .then(() => {
+            // localStorage.setItem("logoutMessage", "Logged out successfully.");
+            window.location.href = "./loginMain.html";
+        })
+        .catch((error) => {
+            console.error("Sign out error:", error);
+        });
+});
+
 
 function showNotification(message, type = 'error') {
     const notification = document.createElement('div');
@@ -421,50 +507,4 @@ function showNotification(message, type = 'error') {
     }, 3000);
 }
 
-const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour
-
-let inactivityTimer;
-
-// Function to reset the inactivity timer
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-        // Log out the user after 1 hour of inactivity
-        signOut(auth)
-            .then(() => {
-                console.log("User signed out due to inactivity");
-                window.location.href = "index.html";
-            })
-            .catch((error) => {
-                console.error("Error signing out:", error);
-            });
-    }, INACTIVITY_TIMEOUT);
-}
-
-// Listen for authentication state changes
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("User is signed in:", user.email);
-
-        // Reset inactivity timer whenever the user is authenticated
-        resetInactivityTimer();
-
-        // Monitor user activity to reset the timer on interaction
-        document.addEventListener("mousemove", resetInactivityTimer);
-        document.addEventListener("keypress", resetInactivityTimer);
-    } else {
-        // Redirect to login page if no user is signed in
-        window.location.href = "index.html";
-    }
-});
-
-document.getElementById("logout_button").addEventListener("click", () => {
-    signOut(auth)
-        .then(() => {
-            // localStorage.setItem("logoutMessage", "Logged out successfully.");
-            window.location.href = "index.html";
-        })
-        .catch((error) => {
-            console.error("Sign out error:", error);
-        });
-});
+//checking

@@ -160,7 +160,7 @@ body {
     width: 100px;
     height: 30px;
     background-color: #8061C3;
-    margin-left: 90%;
+    margin-left: 900px;
     flex-shrink: 0;
     /* Prevent shrinking */
     flex-grow: 0;
