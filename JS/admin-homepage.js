@@ -52,25 +52,27 @@ async function getLastAddedBatch() {
                     const phaseHeading = document.createElement("h2");
                     phaseHeading.classList.add("phase");
                     phaseHeading.textContent = phase;
-                    container.appendChild(phaseHeading);
-
-                    const moduleContainer = document.createElement("div");
-                    moduleContainer.classList.add("module-container");
-
                     const button = document.createElement('button');
                     button.id = 'view-report';
                     button.textContent = 'View Report';
 
-                    moduleContainer.appendChild(button);
+
 
                     button.addEventListener("click", () => {
                         localStorage.setItem('setPhase', phase);
                         window.location.href = "Admin-Report.html";
                     });
 
+                    container.appendChild(phaseHeading);
+                    container.appendChild(button);
+
+                    const moduleContainer = document.createElement("div");
+                    moduleContainer.classList.add("module-container");
+
+
+
                     for (const moduleData of phaseGroups[phase]) {
-                        const containerphasecard = document.createElement("div");
-                        containerphasecard.classList.add("containerphasecard");
+
                         const card = document.createElement("div");
                         card.classList.add("card");
 
@@ -99,6 +101,9 @@ async function getLastAddedBatch() {
 
                         let totalScore = 0;
                         let studentCount = 0;
+                        let scoreHigh = 0;
+                        let scoreMid = 0;
+                        let scoreLow = 0;
 
                         if (studentListSnapshot.exists()) {
                             const students = studentListSnapshot.val();
@@ -107,6 +112,16 @@ async function getLastAddedBatch() {
                             for (const id in students) {
                                 const studentData = students[id];
                                 totalScore += studentData.total || 0; // Add student score to the total
+                                const studentPercent = (studentData.total/maxScore)*100;
+                                if (studentPercent >= 80) {
+                                    scoreHigh++;
+                                }
+                                else if (studentPercent >= 60) {
+                                    scoreMid++;
+                                }
+                                else if (studentPercent < 60) {
+                                    scoreLow++;
+                                }
                                 studentCount++; // Count the student
                             }
                         }
@@ -117,11 +132,51 @@ async function getLastAddedBatch() {
                         // Convert average score to a percentage based on maxScore
                         const percentage = Math.round((averageScore / maxScore) * 100);
 
-                        card.innerHTML = "Avg Score " + percentage + "%";
+
                         const phasename = document.createElement("div");
                         phasename.classList.add("phasename");
                         phasename.innerHTML = `<h1>${moduleData.moduleName}</h1>`;
+                        // card.innerHTML = "Avg Score " + percentage + "%";
                         console.log("moduleData", moduleData.moduleName);
+
+                        // Create a unique div for the chart
+                        const chartDiv = document.createElement("div");
+                        chartDiv.id = `chart-${moduleData.moduleName}`;  // Unique ID for each chart
+
+                        let data
+
+                        data = [{
+                            x: ["80 above", "60-80", "below 60"],
+                            y: [scoreHigh, scoreMid, scoreLow],  // Dynamic data goes here
+                            type: "bar",
+                            orientation: "v",
+                            marker: { color: "rgb(150, 124, 207)" }
+                        }];
+
+                        const layout = {
+                            title: `${moduleData.moduleName} `,
+                            grid: { rows: 1, columns: 2, pattern: 'independent' }, // Two graphs in a single row
+                            height: 400,  // Height of the entire plot (both graphs will share this height)
+                            width: 600,
+                            showlegend: false,  // Hide legends for simplicity (you can turn it on if needed)
+                            xaxis: {
+                                title: 'Score Range' // Label for the x-axis
+                            },
+                            yaxis: {
+                                title: 'Number of students', // Label for the y-axis
+                                range: [0, studentCount]
+                            },
+                            // bargap: 0.1, // Controls the gap between bars (default is 0.2)
+                            // bargroupgap: 0.1, // Controls the gap between bar groups (default is 0.15)
+                            // barmode: "group" // Group bars together
+                        };
+                        // Create the mode bar configuration to hide it
+                        let config = {
+                            displayModeBar: false  // Disable the mode bar entirely
+                        };
+
+                        Plotly.newPlot(chartDiv, data, layout, config);
+
 
                         // card.onclick = () => {
                         //     // Store selected phase and module, along with last active batch data
@@ -136,9 +191,8 @@ async function getLastAddedBatch() {
                         //     window.location.href = "TrainerAssessment.html";
                         // };
 
-                        containerphasecard.appendChild(card);
-                        containerphasecard.appendChild(phasename);
-                        moduleContainer.appendChild(containerphasecard);
+                        card.appendChild(chartDiv);
+                        moduleContainer.appendChild(card);
                     }
 
                     container.appendChild(moduleContainer);
