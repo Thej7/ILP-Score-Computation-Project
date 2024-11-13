@@ -93,20 +93,17 @@ body {
     top: 0; 
     
     z-index: 2; 
-    opacity: 0; /* Start as invisible */
 }
 .next-card {
     top: 0%; 
     left:20%;
     transform: scale(0.9); 
     opacity: 0.7;
-    opacity: 0; /* Start as invisible */
 }
 .next-next-card{
     right:50%;
     transform: scale(0.9);
     opacity: 0.7; 
-    opacity: 0; /* Start as invisible */
 }
 
 @keyframes fadeIn {
