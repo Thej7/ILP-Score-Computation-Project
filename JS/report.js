@@ -250,7 +250,7 @@ function transformJsonData(jsonData, weightJson) {
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
         const moduleName = jsonData.headers[i];
-        transformedHeaders.push(`${moduleName} mark`, `${moduleName} weight`);
+        transformedHeaders.push(`${moduleName} Mark`, `${moduleName} out of ${weightMap[moduleName]}`);
     }
 
     // Initialize the transformed data array
