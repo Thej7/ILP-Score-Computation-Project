@@ -187,6 +187,7 @@ input {
     margin-top: 2em;
     padding: 10px;
     box-sizing: border-box;
+    justify-content: space-between;
 }
 
 
@@ -195,11 +196,10 @@ input {
     height: 13em;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-between;
 }
 
 #Config-Page-Right-bottom-addmodule-button {
-    margin-left: 60em;
     height: 2em;
     margin-top: 1em;
     width: 3em;

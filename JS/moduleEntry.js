@@ -312,7 +312,7 @@ function addModuleOption() {
     const submitButton = document.createElement('button');
     submitButton.type = 'submit';
     submitButton.classList.add('module-submit');
-    submitButton.textContent = 'Submit';
+    submitButton.textContent = 'Save';
     form.appendChild(submitButton);
 
     // Append form to the main container

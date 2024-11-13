@@ -50,15 +50,14 @@ async function fetchFirebase(year, batchName, neededPhase) {
     for (const moduleName of Object.keys(modules)) {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
         const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
-        
+
         const [phaseSnapshot, criteriaSnapshot] = await Promise.all([
             get(phaseRef),
             get(criteriaRef)
         ]);
 
-        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase &&
-            criteriaSnapshot.exists() && criteriaSnapshot.val() === "Module Assessment") {
-            
+        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
+
             // Fetch total weightage
             const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
             const weightageSnapshot = await get(weightageRef);
@@ -79,15 +78,14 @@ async function fetchFirebase(year, batchName, neededPhase) {
     const matchingModules = await Promise.all(Object.keys(modules).map(async (moduleName) => {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
         const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
-        
+
         const [phaseSnapshot, criteriaSnapshot] = await Promise.all([
             get(phaseRef),
             get(criteriaRef)
         ]);
 
         // Check if the phase matches `neededPhase` and criteria is "Module Assessment"
-        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase &&
-            criteriaSnapshot.exists() && criteriaSnapshot.val() === "Module Assessment") {
+        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
             return moduleName;
         }
 
@@ -264,7 +262,7 @@ function transformJsonData(jsonData, weightJson) {
         for (let j = 1; j < row.length; j++) {
             const moduleName = jsonData.headers[j];
             const mark = row[j];
-        
+
             // If the mark is empty, set weight to empty as well
             const weight = mark ? ((mark / 50) * (weightMap[moduleName] || 0)).toFixed(2) : '';
             transformedRow.push(mark, weight);
