@@ -94,7 +94,6 @@ body {
     
     z-index: 2; 
     opacity: 0; /* Start as invisible */
-    animation: fadeIn 0s ease-in forwards; /* Apply fade-in animation */
 }
 .next-card {
     top: 0%; 
@@ -102,14 +101,12 @@ body {
     transform: scale(0.9); 
     opacity: 0.7;
     opacity: 0; /* Start as invisible */
-    animation: slideInRight 0.4s ease-in forwards; /* Apply fade-in animation */
 }
 .next-next-card{
     right:50%;
     transform: scale(0.9);
     opacity: 0.7; 
     opacity: 0; /* Start as invisible */
-    animation: slideInLeft 0.4s ease-in forwards; /* Apply fade-in animation */
 }
 
 @keyframes fadeIn {
