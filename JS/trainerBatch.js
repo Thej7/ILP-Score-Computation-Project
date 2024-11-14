@@ -407,15 +407,16 @@ function showGraphPopup(event, batch, graphType, batchName) {
 
     const layout = { title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}`,
     xaxis: {
-        title: 'Modules' // Label for the x-axis
+        title: 'Modules'
     },
     yaxis: {
-        title: 'Average (%)' // Label for the y-axis
+        title: 'Average (%)',
+        range: [0, 100]
     }
 };
 
     Plotly.newPlot("graphContent", data, layout);
-    // Center the popup in the middle of the viewport
+    
     const popupWidth = 400; // Set your popup width
     const popupHeight = 300; // Set your popup height
     const offset = 325; // Adjust this value to move the popup left

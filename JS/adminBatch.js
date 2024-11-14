@@ -1,4 +1,4 @@
-import { db, ref, get, set, remove, auth} from './firebaseConfig.mjs';
+import { db, ref, get, set, remove, auth } from './firebaseConfig.mjs';
 import { onAuthStateChanged, getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 // Store all batch data by year
 let batchData = {};
@@ -364,28 +364,28 @@ async function displayModuleAverages(year, batchName,) {
 
     document.getElementById('loadingSpinner').style.display = 'block';
 
-    try{
+    try {
 
-    
-    // Fetch the module averages as a percentage
-    const moduleAverages = await fetchModuleAverages(year, batchName);
-    console.log('Module Averages', moduleAverages)
-  
 
-    // Prepare data in a format suitable for the graph popup
-    const graphData = {
-        labels: Object.keys(moduleAverages),      // Module names as x-axis labels
-        values: Object.values(moduleAverages)     // Percentage values as y-axis data
-    };
+        // Fetch the module averages as a percentage
+        const moduleAverages = await fetchModuleAverages(year, batchName);
+        console.log('Module Averages', moduleAverages)
 
-    // Call the function to show the popup and pass the data
-    showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals', batchName);
-}catch(error){
-    console.error("Error displaying module averages:", error)
-} finally {
-    // Hide the loading spinner after data is processed
-    document.getElementById('loadingSpinner').style.display = 'none';
-}
+
+        // Prepare data in a format suitable for the graph popup
+        const graphData = {
+            labels: Object.keys(moduleAverages),      // Module names as x-axis labels
+            values: Object.values(moduleAverages)     // Percentage values as y-axis data
+        };
+
+        // Call the function to show the popup and pass the data
+        showGraphPopup(null, { graphs: { 'Tech Fundamentals': graphData } }, 'Tech Fundamentals', batchName);
+    } catch (error) {
+        console.error("Error displaying module averages:", error)
+    } finally {
+        // Hide the loading spinner after data is processed
+        document.getElementById('loadingSpinner').style.display = 'none';
+    }
 }
 
 
@@ -466,7 +466,7 @@ function showGraphPopup(event, batch, graphType, batchName) {
 
     const graphData = batch.graphs[graphType];
     console.log("graphData", graphData)
-    
+
     let data
     if (graphData) {
         data = [{
@@ -478,14 +478,16 @@ function showGraphPopup(event, batch, graphType, batchName) {
         }];
     }
 
-    const layout = { title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}`,
-    xaxis: {
-        title: 'Modules' // Label for the x-axis
-    },
-    yaxis: {
-        title: 'Average (%)' // Label for the y-axis
-    }
-};
+    const layout = {
+        title: `Average Module Scores as Percentage for ${batchName} - ${batchYear}`,
+        xaxis: {
+            title: 'Modules' // Label for the x-axis
+        },
+        yaxis: {
+            title: 'Average (%)', // Label for the y-axis
+            range: [0, 100]
+        }
+    };
 
     Plotly.newPlot("graphContent", data, layout);
     // Center the popup in the middle of the viewport
