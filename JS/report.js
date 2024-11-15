@@ -37,7 +37,7 @@ async function fetchData(jsonData) {
     }
 }
 
-async function fetchFirebase(year, batchName, neededPhase) {
+async function fetchFirebaseTotal(year, batchName, neededPhase) {
     // Step 1: Fetch module headers from `Batches/${year}/${batchName}/modules`
     const modulesRef = ref(db, `Batches/${year}/${batchName}/modules`);
     const modulesSnapshot = await get(modulesRef);
@@ -429,7 +429,7 @@ window.onload = async function () {
     try {
         document.body.style.zoom = "80%";
         // Start loading the data
-        json = await fetchFirebase(lastBatchYear, lastBatchKey, neededPhase);
+        json = await fetchFirebaseTotal(lastBatchYear, lastBatchKey, neededPhase);
         fetchData(json);
         initializeHeaders(extendedHeaders);
     } catch (error) {
