@@ -87,6 +87,7 @@ async function populateDropdownWithPhaseModules() {
     // Check if lastBatchData and modules are defined
     if (lastBatchData && lastBatchData.modules) {
         const modules = lastBatchData.modules;
+        console.log(modules)
 
         // Check if the selected module exists in lastBatchData
         if (modules[selectedModule]) {

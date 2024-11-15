@@ -17,17 +17,41 @@ let fullData = [];
 let json;
 let weightJson = [];
 let extendedHeaders = [];
+let checker;
 
 async function fetchData(jsonData) {
     try {
         // Directly use the provided JSON data instead of fetching from a file
         const json = jsonData;
+        console.log("JSON", json)
 
         // Check JSON structure and render if correct
         if (json.headers && json.data) {
             extendedHeaders = [...json.headers, 'Total'];
             renderHead(extendedHeaders);
             fullData = json.data;
+            checker = true;
+            renderTable(fullData, checker);
+        } else {
+            console.log("JSON structure is incorrect.");
+        }
+    } catch (error) {
+        console.log('Error processing JSON data:', error);
+    }
+}
+
+async function fetchProject(jsonData) {
+    try {
+        // Directly use the provided JSON data instead of fetching from a file
+        const json = jsonData;
+        console.log("JSON", json)
+
+        // Check JSON structure and render if correct
+        if (json.criteriaHeaders && json.data) {
+            extendedHeaders = [...json.criteriaHeaders, 'Total'];
+            renderHead(extendedHeaders);
+            fullData = json.data;
+            checker = false;
             renderTable(fullData);
         } else {
             console.log("JSON structure is incorrect.");
@@ -46,6 +70,8 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
     // Initialize an array to store the weightage data
     let weightJson = [];
 
+    let criteriaMod = {};
+
     // Fetch total weightage for each module if the phase matches `neededPhase` and criteria is "Module Assessment"
     for (const moduleName of Object.keys(modules)) {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
@@ -58,7 +84,7 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
 
         if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
 
-            // Fetch total weightage
+            criteriaMod[moduleName] = criteriaSnapshot.exists() ? criteriaSnapshot.val() : {};
             const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
             const weightageSnapshot = await get(weightageRef);
 
@@ -136,8 +162,92 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
 
     // Convert studentMap to jsonData.data
     jsonData.data = Object.values(studentMap);
-    jsonData = transformJsonData(jsonData, weightJson);
+    jsonData = transformJsonData(jsonData, weightJson, criteriaMod);
 
+    console.log("jsonData", jsonData);
+    return jsonData;
+}
+
+async function fetchFirebaseOverall(year, batchName, neededPhase) {
+    // Step 1: Fetch module headers and initialize criteriaHeaders
+    const modulesRef = ref(db, `Batches/${year}/${batchName}/modules`);
+    const modulesSnapshot = await get(modulesRef);
+    const modules = modulesSnapshot.exists() ? modulesSnapshot.val() : {};
+
+    const matchingModules = await Promise.all(Object.keys(modules).map(async (moduleName) => {
+        const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
+        const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
+
+        const [phaseSnapshot, criteriaSnapshot] = await Promise.all([get(phaseRef), get(criteriaRef)]);
+
+        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
+            return moduleName;
+        }
+        return null;
+    }));
+
+    // Fetch criteria data for headers
+    const criteriaRef = ref(db, `Evaluation Criteria/Final Assessment`);
+    const criteriaSnapshot = await get(criteriaRef);
+    const criteriaData = criteriaSnapshot.exists() ? criteriaSnapshot.val() : {};
+
+    const matchingHeaders = await Promise.all(Object.keys(criteriaData).map(async (criteriaKey) => {
+        const nameRef = ref(db, `Evaluation Criteria/Final Assessment/${criteriaKey}/name`);
+        const nameSnapshot = await get(nameRef);
+        return nameSnapshot.exists() ? nameSnapshot.val() : null;
+    }));
+
+    const criteriaHeaders = ["Name", ...matchingHeaders.filter(header => header !== null)];
+
+    // Initialize jsonData and studentMap
+    let jsonData = {
+        criteriaHeaders,
+        data: []
+    };
+    const studentMap = {};
+
+    // Fetch all student names once
+    const studentNamesRef = ref(db, `studentList/${year}/${batchName}`);
+    const studentNamesSnapshot = await get(studentNamesRef);
+    const studentNames = studentNamesSnapshot.exists() ? studentNamesSnapshot.val() : {};
+
+    // Step 2: Loop through modules and fetch students' marks
+    for (const moduleKey of matchingModules.filter(module => module !== null)) {
+        const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
+        const studentListSnapshot = await get(studentListRef);
+
+        if (studentListSnapshot.exists()) {
+            const students = studentListSnapshot.val();
+
+            // For each student, retrieve "name" and their marks based on criteria
+            for (const id in students) {
+                const studentData = students[id];
+                const studentName = studentNames[id]?.Name || "Unknown";
+                const criteriaData = studentData.criteria || {};
+
+                // Initialize the student's row if not already present
+                if (!studentMap[id]) {
+                    studentMap[id] = [studentName, ...new Array(criteriaHeaders.length - 1).fill(null)];
+                }
+
+                // Update the student's marks based on criteria
+                for (const criteriaKey in criteriaData) {
+                    const normalizedCriteriaKey = criteriaKey.trim().toLowerCase().replace(/\s+/g, '');
+                    const normalizedHeaders = criteriaHeaders.slice(1).map(header => header.trim().toLowerCase().replace(/\s+/g, ''));
+
+                    // Find the index for the normalized criteriaKey in the normalizedHeaders
+                    const criteriaIndex = normalizedHeaders.indexOf(normalizedCriteriaKey);
+
+                    if (criteriaIndex >= 0) {
+                        studentMap[id][criteriaIndex + 1] = criteriaData[criteriaKey] || 0;
+                    }
+                }
+            }
+        }
+    }
+
+    // Step 3: Convert studentMap to jsonData.data
+    jsonData.data = Object.values(studentMap);
     console.log("jsonData", jsonData);
     return jsonData;
 }
@@ -206,7 +316,7 @@ function renderHead(headings) {
     console.log('Table headings are rendered:', headings);
 }
 
-function renderTable(data) {
+function renderTable(data, checker) {
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = ''; // Clear existing table data
 
@@ -221,7 +331,7 @@ function renderTable(data) {
         });
 
         // Calculate total marks and add the 'Total' cell
-        const totalMarks = calculateTotalMarks(student);
+        const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         totalCell.textContent = totalMarks;
         row.appendChild(totalCell);
@@ -231,7 +341,11 @@ function renderTable(data) {
     });
 }
 
-function transformJsonData(jsonData, weightJson) {
+async function transformJsonData(jsonData, weightJson, criteriaMod) {
+
+    console.log("here this data",jsonData)
+
+
     // Initialize the new headers with the first header unchanged ("Name")
     const transformedHeaders = [jsonData.headers[0]];
 
@@ -254,22 +368,44 @@ function transformJsonData(jsonData, weightJson) {
     }
 
     // Initialize the transformed data array
-    const transformedData = jsonData.data.map(row => {
-        // Start the transformed row with the first element unchanged ("Name")
-        const transformedRow = [row[0]];
+    const transformedData = [];
 
-        // Loop through the data values starting from the second element
-        for (let j = 1; j < row.length; j++) {
-            const moduleName = jsonData.headers[j];
-            const mark = row[j];
+for (const row of jsonData.data) {
+    // Start the transformed row with the first element unchanged ("Name")
+    const transformedRow = [row[0]];
 
-            // If the mark is empty, set weight to empty as well
-            const weight = mark ? ((mark / 50) * (weightMap[moduleName] || 0)).toFixed(2) : '';
+    // Loop through the data values starting from the second element
+    for (const [j, moduleName] of jsonData.headers.slice(1).entries()) {
+        const mark = row[j + 1]; // Adjust index because slice(1) starts from the second header
+
+        const evalCriteriaRef = ref(db, `Evaluation Criteria/${criteriaMod[moduleName]}`);
+
+        try {
+            // Fetch evaluation criteria asynchronously
+            const evalCriteriaSnapshot = await get(evalCriteriaRef);
+            let maxScore = 0;
+
+            // Sum up the points from the evaluation criteria
+            if (evalCriteriaSnapshot.exists()) {
+                evalCriteriaSnapshot.forEach((childSnapshot) => {
+                    const points = parseInt(childSnapshot.child('points').val()) || 0;
+                    maxScore += points;
+                });
+            }
+
+            // Calculate weight based on the mark
+            const weight = mark ? (((mark / maxScore) * (weightMap[moduleName] || 0))/100).toFixed(2) : '';
             transformedRow.push(mark, weight);
-        }
 
-        return transformedRow;
-    });
+        } catch (error) {
+            console.error(`Error fetching evaluation criteria for module ${moduleName}:`, error);
+            transformedRow.push(mark, ''); // Push empty weight in case of error
+        }
+    }
+
+    // Push the transformed row to the result array
+    transformedData.push(transformedRow);
+}
 
     return {
         headers: transformedHeaders,
@@ -301,14 +437,20 @@ function searchTable() {
     }
 }
 
-function calculateTotalMarks(student) {
+function calculateTotalMarks(student, checker) {
     const total = student.slice(2).reduce((sum, mark, index) => {
         const numericMark = parseFloat(mark);
 
-        // Check if the index within the sliced array is even (0, 2, 4, etc.)
-        if (index % 2 === 0 && !isNaN(numericMark)) {
+        // If checker is true, sum only the marks at even indices
+        if (checker && index % 2 === 0 && !isNaN(numericMark)) {
             return sum + numericMark;
         }
+
+        // If checker is false, sum all valid marks
+        if (!checker && !isNaN(numericMark)) {
+            return sum + numericMark;
+        }
+
         return sum;
     }, 0);
 
@@ -428,10 +570,13 @@ window.onload = async function () {
 
     try {
         document.body.style.zoom = "80%";
-        // Start loading the data
+
+        // Initially load with `fetchFirebaseTotal`
         json = await fetchFirebaseTotal(lastBatchYear, lastBatchKey, neededPhase);
         fetchData(json);
         initializeHeaders(extendedHeaders);
+        // Set the toggle flag
+        isTotalView = true;
     } catch (error) {
         console.error("Error loading data:", error);
     } finally {
@@ -439,3 +584,35 @@ window.onload = async function () {
         document.getElementById("loader").style.display = "none";
     }
 };
+
+// Initialize the toggle flag
+let isTotalView = true;
+const myButton = document.getElementById("show-project");
+
+// Attach a click event listener to the button
+myButton.addEventListener("click", async () => {
+    try {
+        // Show the loader
+        document.getElementById("loader").style.display = "block";
+
+        // Toggle between `fetchFirebaseTotal` and `fetchFirebaseOverall`
+        if (isTotalView) {
+            json = await fetchFirebaseOverall(lastBatchYear, lastBatchKey, neededPhase);
+            fetchProject(json);
+        } else {
+            json = await fetchFirebaseTotal(lastBatchYear, lastBatchKey, neededPhase);
+            fetchData(json);
+        }
+
+        // Reinitialize headers after data switch
+        initializeHeaders(extendedHeaders);
+
+        // Toggle the flag
+        isTotalView = !isTotalView;
+    } catch (error) {
+        console.error("Error loading data:", error);
+    } finally {
+        // Hide the loader
+        document.getElementById("loader").style.display = "none";
+    }
+});
