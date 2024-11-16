@@ -438,7 +438,10 @@ function searchTable() {
 }
 
 function calculateTotalMarks(student, checker) {
-    const total = student.slice(2).reduce((sum, mark, index) => {
+    // Choose slice based on the checker flag
+    const marksArray = checker ? student.slice(2) : student.slice(1);
+
+    const total = marksArray.reduce((sum, mark, index) => {
         const numericMark = parseFloat(mark);
 
         // If checker is true, sum only the marks at even indices
