@@ -314,10 +314,6 @@ function displayBatch(batch, studentCount) {
         }
     });
 
-    document.getElementById("add-batch-button").addEventListener("click", () => {
-        window.location.href = "Batch-Entry.html";
-    });
-
     eachBatchList.appendChild(graphContainer1);
 
     const activeBox = document.createElement('div')
@@ -358,6 +354,10 @@ function displayBatch(batch, studentCount) {
     batchLists.appendChild(eachBatchList);
 
 }
+
+document.getElementById("add-batch-button").addEventListener("click", () => {
+    window.location.href = "Batch-Entry.html";
+});
 
 async function displayModuleAverages(year, batchName,) {
 
