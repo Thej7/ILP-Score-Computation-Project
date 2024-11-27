@@ -315,7 +315,6 @@ function displayBatch(batch, studentCount) {
     });
 
     document.getElementById("add-batch-button").addEventListener("click", () => {
-        // Navigate to Add-Batch.html
         window.location.href = "Batch-Entry.html";
     });
 
