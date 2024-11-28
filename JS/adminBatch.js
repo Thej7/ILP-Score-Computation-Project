@@ -84,6 +84,7 @@ async function fetchApiStudent() {
             // Store batch data for the year in batchData object
             studentData[yearKey] = yearBatches;
             console.log("student Data", studentData);
+            fetchApiForBatches();
         }
     } else {
         console.log("No student data available");
@@ -92,7 +93,7 @@ async function fetchApiStudent() {
 
 
 fetchApiStudent();
-fetchApiForBatches();
+
 
 
 
@@ -231,7 +232,7 @@ async function deleteBatch(selectedYear, selectedBatchName) {
         console.log(`Batch ${selectedBatchName} for year ${selectedYear} deleted successfully.`);
 
         // Re-fetch batches to update the UI after deletion
-        fetchApiForBatches();
+        fetchApiStudent();
         showNotification(`${selectedBatchName} deleted successfully`, 'success');
     } catch (error) {
         console.error("Error deleting batch:", error);
