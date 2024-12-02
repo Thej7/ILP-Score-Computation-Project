@@ -469,7 +469,7 @@ function sortTop5() {
     });
 
     const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
-    renderTable(sortedData.slice(0, 5)); // Top 5 entries
+    renderTable(sortedData.slice(0, 5), checker); // Top 5 entries
 }
 
 // Sort and render the bottom 5 entries by total marks
@@ -480,14 +480,14 @@ function sortBottom5() {
     });
 
     const sortedData = filteredData.sort((a, b) => calculateTotalMarks(a) - calculateTotalMarks(b));
-    renderTable(sortedData.slice(0, 5)); // Bottom 5 entries
+    renderTable(sortedData.slice(0, 5), checker); // Bottom 5 entries
 }
 
 
 // Sort A-Z by Name
 function sortByName() {
     const sortedData = [...fullData].sort((a, b) => a[0].localeCompare(b[0])); // Sort by name (first column)
-    renderTable(sortedData);
+    renderTable(sortedData, checker);
 }
 
 
@@ -499,15 +499,43 @@ function showAll() {
     });
 
     const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
-    renderTable(sortedData); // Top 5 entries
+    renderTable(sortedData, checker); // Top 5 entries
 }
 
 // Download function for exporting the table as Excel
 function downloadExcel() {
     const table = document.getElementById('marklist-table');
-    const workbook = XLSX.utils.table_to_book(table);
-    XLSX.writeFile(workbook, 'marklist_batch5.xlsx');
+    
+    // Ensure the table exists
+    if (table) {
+        
+        // Create a new table element
+        const newTable = document.createElement('table');
+        
+        // Create a new row for the extendedHeaders
+        const newRow = document.createElement('tr');
+        extendedHeaders.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            newRow.appendChild(th);
+        });
+
+        // Append the new row to the new table
+        newTable.appendChild(newRow);
+        
+        // Copy the rows from the original table to the new table
+        for (let i = 0; i < table.rows.length; i++) {
+            newTable.appendChild(table.rows[i].cloneNode(true));
+        }
+        
+        // Generate the Excel file with the new table structure
+        const workbook = XLSX.utils.table_to_book(newTable);
+        XLSX.writeFile(workbook, 'marklist_batch5.xlsx');
+    } else {
+        console.error('Table is missing');
+    }
 }
+
 
 const INACTIVITY_TIMEOUT = 60 * 60 * 1000; // 1 hour
 
@@ -566,6 +594,7 @@ downloadBtn.addEventListener('click', downloadExcel);
 document.getElementById('Search_input').addEventListener('input', searchTable);
 
 
+
 // Fetch data and render the table on page load
 window.onload = async function () {
     // Show the loader
@@ -578,8 +607,12 @@ window.onload = async function () {
         json = await fetchFirebaseTotal(lastBatchYear, lastBatchKey, neededPhase);
         fetchData(json);
         initializeHeaders(extendedHeaders);
+
         // Set the toggle flag
         isTotalView = true;
+
+        // Set the button text initially
+        myButton.innerText = "Show Project Table"; // Change text for initial state
     } catch (error) {
         console.error("Error loading data:", error);
     } finally {
@@ -602,9 +635,15 @@ myButton.addEventListener("click", async () => {
         if (isTotalView) {
             json = await fetchFirebaseOverall(lastBatchYear, lastBatchKey, neededPhase);
             fetchProject(json);
+
+            // Change button text for Full Data View
+            myButton.innerText = "Show Full Table"; // Update button text
         } else {
             json = await fetchFirebaseTotal(lastBatchYear, lastBatchKey, neededPhase);
             fetchData(json);
+
+            // Change button text for Project View
+            myButton.innerText = "Show Project Marks"; // Update button text
         }
 
         // Reinitialize headers after data switch
