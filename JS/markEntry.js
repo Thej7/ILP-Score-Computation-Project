@@ -234,10 +234,10 @@ function showCard(index) {
 
     const validCards = cards.filter(card => Object.keys(card).length > 0); // Filter valid cards
 
-    if (validCards.length === 0) {
-        displayEmptyCard();
-        return;
-    }
+    // if (validCards.length === 0) {
+    //     displayEmptyCard();
+    //     return;
+    // }
 
     if (index >= 0 && index < validCards.length) {
         // Create current card
@@ -431,18 +431,37 @@ async function saveChanges() {
 }
 
 async function autoSaveExcelData(cards) {
-    console.log("Students List:", studentsList);
-    console.log(cards);
+    const savePath = `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students`;
+    const existingData = {};
 
-    for (let i = 0; i < cards.length - 1; i++) {
+    // Fetch existing data to determine starting id and handle conflicts
+    try {
+        const snapshot = await get(ref(db, savePath));
+        if (snapshot.exists()) {
+            Object.assign(existingData, snapshot.val());
+        }
+    } catch (error) {
+        console.error("Error fetching existing data:", error);
+    }
+
+    // Determine the next available ID
+    let nextId = Object.keys(existingData).length + 1;
+
+    for (let i = 0; i < cards.length; i++) {
         const card = cards[i];
-
-        // Generate studentId in the same format as saveChanges function
-        const studentId = `id${i + 1}`;
-        const savePath = `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students/${studentId}`;
-
-        // Separate the name and criteria
         const { name, ...criteria } = card;
+
+        // Check if a student with the same name exists
+        let existingId = null;
+        for (const [id, data] of Object.entries(existingData)) {
+            if (data.studentName.trim().toLowerCase() === name.trim().toLowerCase()) {
+                existingId = id;
+                break;
+            }
+        }
+
+        const studentId = existingId || `id${nextId}`;
+        if (!existingId) nextId++; // Increment nextId only if this is a new entry
 
         // Calculate the total of all criteria values
         let total = 0;
@@ -450,24 +469,31 @@ async function autoSaveExcelData(cards) {
             total += parseFloat(value) || 0; // Ensure value is numeric
         }
 
-        // Save each card data under the student's path with total
+        // Save or update the student's data
         try {
-            await set(ref(db, savePath), {
+            await set(ref(db, `${savePath}/${studentId}`), {
                 studentName: name,
                 criteria: criteria,
                 total: total
             });
-            console.log(`Auto-saved data for ${name} at ${savePath} with total: ${total}`);
+            console.log(`Saved data for ${name} at ${studentId} with total: ${total}`);
         } catch (error) {
-            console.error(`Error auto-saving data for ${name} at ${savePath}:`, error);
+            console.error(`Error saving data for ${name} at ${studentId}:`, error);
         }
+
+        // Update local reference for consistency
+        existingData[studentId] = { studentName: name, criteria, total };
     }
 }
 
 
+
 document.getElementById('saveButton').addEventListener('click', async () => {
     await autoSaveExcelData(cards);
+    await fetchCardsFromDatabase(); // Refresh cards from the database
+    updateDisplay(); // Re-render cards on the UI
 });
+
 
 
 
