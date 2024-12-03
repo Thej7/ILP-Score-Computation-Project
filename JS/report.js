@@ -285,29 +285,22 @@ function initializeHeaders(headers) {
 function sortColumnByHighestScore(columnIndex) {
     if (!fullData || fullData.length === 0) return;
 
-    // Check the current sorting direction for this column, default is descending
     let direction = sortDirection[columnIndex] || 'descending';
 
-    // Sort data based on the direction
     const sortedData = [...fullData].sort((a, b) => {
         const scoreA = parseFloat(a[columnIndex]) || 0;
         const scoreB = parseFloat(b[columnIndex]) || 0;
 
-        // Toggle between descending and ascending sorting
         if (direction === 'descending') {
-            return scoreB - scoreA; // Sort descending for highest score
+            return scoreB - scoreA;
         } else {
-            return scoreA - scoreB; // Sort ascending for lowest score
+            return scoreA - scoreB;
         }
     });
 
-    // Reinsert the first student at the top of the sorted data
-    renderTable(sortedData);
-
-    // Toggle the sorting direction for next click
+    renderTable(sortedData, checker);
     sortDirection[columnIndex] = direction === 'descending' ? 'ascending' : 'descending';
 }
-
 
 function renderHead(headings) {
     const tableHead = document.getElementById('table-head');
@@ -327,25 +320,24 @@ function renderHead(headings) {
 
 function renderTable(data, checker) {
     const tableBody = document.getElementById('table-body');
-    tableBody.innerHTML = ''; // Clear existing table data
+    tableBody.innerHTML = '';
 
     data.forEach(student => {
         const row = document.createElement('tr');
 
-        // Populate row cells with student data
+        // Add all columns except total
         student.forEach(value => {
             const cell = document.createElement('td');
             cell.textContent = value;
             row.appendChild(cell);
         });
 
-        // Calculate total marks and add the 'Total' cell
+        // Calculate and add total column
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         totalCell.textContent = totalMarks;
         row.appendChild(totalCell);
 
-        // Append the row to the table body
         tableBody.appendChild(row);
     });
 }
@@ -447,27 +439,25 @@ function searchTable() {
 }
 
 function calculateTotalMarks(student, checker) {
-    // Choose slice based on the checker flag
-    const marksArray = checker ? student.slice(2) : student.slice(1);
-
-    const total = marksArray.reduce((sum, mark, index) => {
-        const numericMark = parseFloat(mark);
-
-        // If checker is true, sum only the marks at even indices
-        if (checker && index % 2 === 0 && !isNaN(numericMark)) {
-            return sum + numericMark;
-        }
-
-        // If checker is false, sum all valid marks
-        if (!checker && !isNaN(numericMark)) {
-            return sum + numericMark;
-        }
-
-        return sum;
-    }, 0);
-
-    // Return the total rounded to 2 decimal places
-    return total.toFixed(2);
+    // If checker is true, we have alternating mark/weight columns
+    // We only want to sum the actual marks (even indices starting from 2)
+    if (checker) {
+        return student.slice(2).reduce((sum, mark, index) => {
+            // Only add marks from even-indexed columns (the raw marks)
+            if (index % 2 === 0) {
+                const numericMark = parseFloat(mark);
+                return !isNaN(numericMark) ? sum + numericMark : sum;
+            }
+            return sum;
+        }, 0).toFixed(2);
+    } 
+    // If checker is false, we have only mark columns
+    else {
+        return student.slice(1).reduce((sum, mark) => {
+            const numericMark = parseFloat(mark);
+            return !isNaN(numericMark) ? sum + numericMark : sum;
+        }, 0).toFixed(2);
+    }
 }
 
 // Sort and render the top 5 entries by total marks
