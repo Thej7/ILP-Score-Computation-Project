@@ -142,7 +142,7 @@ input {
 .Config-Page-Right-top-buttonpart {
     width: 20%;
     height: 10em;
-
+    font-size: 19px;
     margin-top: 1em;
     display: flex;
     flex-direction: column;
