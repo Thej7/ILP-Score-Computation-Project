@@ -178,21 +178,15 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
 }
 
 async function fetchFirebaseOverall(year, batchName, neededPhase) {
-    // Step 1: Fetch module headers and initialize criteriaHeaders
+    // Fetch module headers and initialize criteriaHeaders
     const modulesRef = ref(db, `Batches/${year}/${batchName}/modules`);
     const modulesSnapshot = await get(modulesRef);
     const modules = modulesSnapshot.exists() ? modulesSnapshot.val() : {};
 
     const matchingModules = await Promise.all(Object.keys(modules).map(async (moduleName) => {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
-        const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
-
-        const [phaseSnapshot, criteriaSnapshot] = await Promise.all([get(phaseRef), get(criteriaRef)]);
-
-        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
-            return moduleName;
-        }
-        return null;
+        const [phaseSnapshot] = await Promise.all([get(phaseRef)]);
+        return (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) ? moduleName : null;
     }));
 
     // Fetch criteria data for headers
@@ -208,19 +202,32 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
 
     const criteriaHeaders = ["Name", ...matchingHeaders.filter(header => header !== null)];
 
-    // Initialize jsonData and studentMap
+    // Initialize jsonData
     let jsonData = {
         criteriaHeaders,
         data: []
     };
-    const studentMap = {};
 
-    // Fetch all student names once
+    // Fetch student names and create normalized name map
     const studentNamesRef = ref(db, `studentList/${year}/${batchName}`);
     const studentNamesSnapshot = await get(studentNamesRef);
     const studentNames = studentNamesSnapshot.exists() ? studentNamesSnapshot.val() : {};
 
-    // Step 2: Loop through modules and fetch students' marks
+    // Create normalized name map
+    const normalizedNameMap = {};
+    const studentMap = {};
+    
+    for (const id in studentNames) {
+        const name = studentNames[id]?.Name;
+        if (name) {
+            const normalizedName = name.toLowerCase().trim();
+            normalizedNameMap[normalizedName] = { id, originalName: name };
+            // Initialize student data structure
+            studentMap[id] = [name, ...new Array(criteriaHeaders.length - 1).fill(null)];
+        }
+    }
+
+    // Process each matching module
     for (const moduleKey of matchingModules.filter(module => module !== null)) {
         const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
         const studentListSnapshot = await get(studentListRef);
@@ -228,36 +235,46 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
         if (studentListSnapshot.exists()) {
             const students = studentListSnapshot.val();
 
-            // For each student, retrieve "name" and their marks based on criteria
-            for (const id in students) {
-                const studentData = students[id];
-                const studentName = studentNames[id]?.Name || "Unknown";
-                const criteriaData = studentData.criteria || {};
-
-                // Initialize the student's row if not already present
-                if (!studentMap[id]) {
-                    studentMap[id] = [studentName, ...new Array(criteriaHeaders.length - 1).fill(null)];
+            for (const markId in students) {
+                const studentData = students[markId];
+                const marksName = studentData.studentName?.toLowerCase().trim();
+                
+                // Find matching student using normalized name
+                let matchedId = markId;
+                if (normalizedNameMap[marksName]) {
+                    matchedId = normalizedNameMap[marksName].id;
                 }
 
-                // Update the student's marks based on criteria
-                for (const criteriaKey in criteriaData) {
-                    const normalizedCriteriaKey = criteriaKey.trim().toLowerCase().replace(/\s+/g, '');
-                    const normalizedHeaders = criteriaHeaders.slice(1).map(header => header.trim().toLowerCase().replace(/\s+/g, ''));
+                if (studentMap[matchedId]) {
+                    const criteriaData = studentData.criteria || {};
+                    
+                    // Update criteria marks
+                    for (const criteriaKey in criteriaData) {
+                        const normalizedCriteriaKey = criteriaKey.trim().toLowerCase().replace(/\s+/g, '');
+                        const normalizedHeaders = criteriaHeaders.slice(1).map(header => 
+                            header.trim().toLowerCase().replace(/\s+/g, '')
+                        );
 
-                    // Find the index for the normalized criteriaKey in the normalizedHeaders
-                    const criteriaIndex = normalizedHeaders.indexOf(normalizedCriteriaKey);
-
-                    if (criteriaIndex >= 0) {
-                        studentMap[id][criteriaIndex + 1] = criteriaData[criteriaKey] || 0;
+                        const criteriaIndex = normalizedHeaders.indexOf(normalizedCriteriaKey);
+                        if (criteriaIndex >= 0) {
+                            // If there's an existing value, take the highest
+                            const currentValue = studentMap[matchedId][criteriaIndex + 1];
+                            const newValue = criteriaData[criteriaKey] || 0;
+                            studentMap[matchedId][criteriaIndex + 1] = Math.max(
+                                currentValue || 0,
+                                newValue
+                            );
+                        }
                     }
                 }
             }
         }
     }
 
-    // Step 3: Convert studentMap to jsonData.data
-    jsonData.data = Object.values(studentMap);
-    console.log("jsonData", jsonData);
+    // Convert studentMap to jsonData.data and sort by name
+    jsonData.data = Object.values(studentMap).sort((a, b) => a[0].localeCompare(b[0]));
+    
+    console.log("Project view jsonData", jsonData);
     return jsonData;
 }
 
