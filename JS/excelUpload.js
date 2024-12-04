@@ -44,6 +44,7 @@ async function handleFileUpload(event) {
         if (batchName) {
             console.log(`Current Batch Name: ${batchName}`);
             saveStudentsLocally(studentData, currentBatchYear, batchName);
+            alert('Students details uploaded successfully!');
         } else {
             console.error("No batch found for the current year.");
             alert("No batch found for the current year.");
@@ -51,6 +52,7 @@ async function handleFileUpload(event) {
     };
 
     reader.readAsBinaryString(file);
+   
 }
 
 // Function to validate the structure of student data

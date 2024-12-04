@@ -345,3 +345,38 @@ input {
     color: white;
     margin: 2em;
 }
+.module-Edit{
+    width: 10%;
+    height: 2em;
+    border: none;
+    background-color: #967ccf;
+    margin-left: 3px;
+    border-radius: 0.3em;
+
+}
+.delete-submitedModule{
+    width: 10%;
+    height: 2em;
+    border: none;
+    background-color: #967ccf;
+    margin-left: 10px;
+    border-radius: 0.3em;
+}
+.delete-modules{
+    width: 6%;
+    height: 2em;
+    border: none;
+    background-color: #967ccf;
+    margin-left: 10px;
+    border-radius: 0.3em;
+    
+}
+.module-submit{
+    width: 6%;
+    height: 2em;
+    border: none;
+    background-color: #967ccf;
+    margin-left: 10px;
+    border-radius: 0.3em;
+
+}
