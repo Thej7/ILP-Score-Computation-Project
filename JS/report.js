@@ -387,7 +387,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
         const moduleName = jsonData.headers[i];
-        transformedHeaders.push(`${moduleName} Mark`, `${moduleName} out of ${weightMap[moduleName]}`);
+        transformedHeaders.push(`${moduleName} Score`, `${moduleName} out of ${weightMap[moduleName]}`);
     }
 
     // Initialize the transformed data array
