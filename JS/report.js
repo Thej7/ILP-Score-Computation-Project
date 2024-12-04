@@ -31,7 +31,8 @@ async function fetchData(jsonData) {
             renderHead(extendedHeaders);
             fullData = json.data;
             checker = true;
-            renderTable(fullData, checker);
+            const sortedData = [...fullData].sort((a, b) => a[0].localeCompare(b[0])); // Sort by name (first column)
+            renderTable(sortedData, checker);
         } else {
             console.log("JSON structure is incorrect.");
         }
@@ -52,7 +53,8 @@ async function fetchProject(jsonData) {
             renderHead(extendedHeaders);
             fullData = json.data;
             checker = false;
-            renderTable(fullData);
+            const sortedData = [...fullData].sort((a, b) => a[0].localeCompare(b[0])); // Sort by name (first column)
+            renderTable(sortedData, checker);
         } else {
             console.log("JSON structure is incorrect.");
         }
@@ -293,7 +295,7 @@ function sortColumnByHighestScore(columnIndex) {
     });
 
     // Reinsert the first student at the top of the sorted data
-    renderTable(sortedData);
+    renderTable(sortedData, checker);
 
     // Toggle the sorting direction for next click
     sortDirection[columnIndex] = direction === 'descending' ? 'ascending' : 'descending';
@@ -364,7 +366,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
         const moduleName = jsonData.headers[i];
-        transformedHeaders.push(`${moduleName} Mark`, `${moduleName} out of ${weightMap[moduleName]}`);
+        transformedHeaders.push(`${moduleName} Score`, `${moduleName} out of ${weightMap[moduleName]}`);
     }
 
     // Initialize the transformed data array

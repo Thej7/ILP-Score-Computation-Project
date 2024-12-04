@@ -43,7 +43,7 @@ function prepareBatchData() {
         name: name,
         startDate: startDate,
         endDate: endDate,
-        active: 'yes',
+        active: 'no',
         modules: []
     };
 
