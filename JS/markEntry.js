@@ -433,6 +433,8 @@ async function saveChanges() {
 async function autoSaveExcelData(cards) {
     const savePath = `marks/${lastBatchYear}/${lastBatchKey}/${selectedModule}/students`;
     const existingData = {};
+    let successCount = 0;
+    let totalCards = cards.length;
 
     // Fetch existing data to determine starting id and handle conflicts
     try {
@@ -442,50 +444,65 @@ async function autoSaveExcelData(cards) {
         }
     } catch (error) {
         console.error("Error fetching existing data:", error);
+        alert("Error occurred while preparing to save data. Please try again.");
+        return;
     }
 
     // Determine the next available ID
     let nextId = Object.keys(existingData).length + 1;
 
-    for (let i = 0; i < cards.length; i++) {
-        const card = cards[i];
-        const { name, ...criteria } = card;
+    try {
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            const { name, ...criteria } = card;
 
-        // Check if a student with the same name exists
-        let existingId = null;
-        for (const [id, data] of Object.entries(existingData)) {
-            if (data.studentName.trim().toLowerCase() === name.trim().toLowerCase()) {
-                existingId = id;
-                break;
+            // Check if a student with the same name exists
+            let existingId = null;
+            for (const [id, data] of Object.entries(existingData)) {
+                if (data.studentName.trim().toLowerCase() === name.trim().toLowerCase()) {
+                    existingId = id;
+                    break;
+                }
+            }
+
+            const studentId = existingId || `id${nextId}`;
+            if (!existingId) nextId++; // Increment nextId only if this is a new entry
+
+            // Calculate the total of all criteria values
+            let total = 0;
+            for (const value of Object.values(criteria)) {
+                total += parseFloat(value) || 0; // Ensure value is numeric
+            }
+
+            // Save or update the student's data
+            try {
+                await set(ref(db, `${savePath}/${studentId}`), {
+                    studentName: name,
+                    criteria: criteria,
+                    total: total
+                });
+                console.log(`Saved data for ${name} at ${studentId} with total: ${total}`);
+                successCount++;
+
+                // Update local reference for consistency
+                existingData[studentId] = { studentName: name, criteria, total };
+            } catch (error) {
+                console.error(`Error saving data for ${name} at ${studentId}:`, error);
+                throw error; // Propagate error to outer catch block
             }
         }
 
-        const studentId = existingId || `id${nextId}`;
-        if (!existingId) nextId++; // Increment nextId only if this is a new entry
-
-        // Calculate the total of all criteria values
-        let total = 0;
-        for (const value of Object.values(criteria)) {
-            total += parseFloat(value) || 0; // Ensure value is numeric
+        // Show success message only if all cards were saved
+        if (successCount === totalCards) {
+            alert(`Successfully saved marks for all ${totalCards} students!`);
+        } else {
+            alert(`Saved marks for ${successCount} out of ${totalCards} students. Some saves may have failed.`);
         }
-
-        // Save or update the student's data
-        try {
-            await set(ref(db, `${savePath}/${studentId}`), {
-                studentName: name,
-                criteria: criteria,
-                total: total
-            });
-            console.log(`Saved data for ${name} at ${studentId} with total: ${total}`);
-        } catch (error) {
-            console.error(`Error saving data for ${name} at ${studentId}:`, error);
-        }
-
-        // Update local reference for consistency
-        existingData[studentId] = { studentName: name, criteria, total };
+    } catch (error) {
+        console.error("Error during save operation:", error);
+        alert("An error occurred while saving marks. Please try again.");
     }
 }
-
 
 
 document.getElementById('saveButton').addEventListener('click', async () => {

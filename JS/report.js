@@ -69,12 +69,11 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
     const modulesSnapshot = await get(modulesRef);
     const modules = modulesSnapshot.exists() ? modulesSnapshot.val() : {};
 
-    // Initialize an array to store the weightage data
+    // Initialize arrays for weightage data
     let weightJson = [];
-
     let criteriaMod = {};
 
-    // Fetch total weightage for each module if the phase matches `neededPhase` and criteria is "Module Assessment"
+    // Fetch total weightage for each module if the phase matches `neededPhase`
     for (const moduleName of Object.keys(modules)) {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
         const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
@@ -85,57 +84,59 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
         ]);
 
         if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
-
             criteriaMod[moduleName] = criteriaSnapshot.exists() ? criteriaSnapshot.val() : {};
             const weightageRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/totalWeightage`);
             const weightageSnapshot = await get(weightageRef);
 
             if (weightageSnapshot.exists()) {
-                const totalWeightage = weightageSnapshot.val();
                 weightJson.push({
                     modulename: moduleName,
-                    weightage: totalWeightage
+                    weightage: weightageSnapshot.val()
                 });
             }
         }
     }
 
-    console.log(weightJson);
-
-    // Asynchronously check which modules match the `neededPhase` and criteria
+    // Get matching modules
     const matchingModules = await Promise.all(Object.keys(modules).map(async (moduleName) => {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
-        const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
-
-        const [phaseSnapshot, criteriaSnapshot] = await Promise.all([
-            get(phaseRef),
-            get(criteriaRef)
-        ]);
-
-        // Check if the phase matches `neededPhase` and criteria is "Module Assessment"
-        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
-            return moduleName;
-        }
-
-        return null;
+        const phaseSnapshot = await get(phaseRef);
+        return (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) ? moduleName : null;
     }));
 
-    // Filter out null values and construct the headers array
     const headers = ["Name", ...matchingModules.filter(module => module !== null)];
+    let jsonData = { headers, data: [] };
 
-    // Step 2: Initialize jsonData with headers and prepare for student data
-    let jsonData = {
-        headers,
-        data: []
-    };
-    const studentMap = {};
-
-    // Fetch all student names once
+    // Fetch student list first
     const studentNamesRef = ref(db, `studentList/${year}/${batchName}`);
     const studentNamesSnapshot = await get(studentNamesRef);
     const studentNames = studentNamesSnapshot.exists() ? studentNamesSnapshot.val() : {};
 
-    // Step 3: Loop through each module key to fetch students' marks
+    // Create a map of normalized names to student IDs and original names
+    const normalizedNameMap = {};
+    for (const id in studentNames) {
+        const name = studentNames[id]?.Name;
+        if (name) {
+            const normalizedName = name.toLowerCase().trim();
+            normalizedNameMap[normalizedName] = { id, originalName: name };
+        }
+    }
+
+    // Create a map to store all student data
+    const studentDataMap = {};
+
+    // Initialize data structure for all students from studentList
+    for (const id in studentNames) {
+        const name = studentNames[id]?.Name;
+        if (name) {
+            studentDataMap[id] = {
+                name: name,
+                marks: {}
+            };
+        }
+    }
+
+    // Fetch and process marks for each module
     for (const moduleKey of headers.slice(1)) {
         const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
         const studentListSnapshot = await get(studentListRef);
@@ -143,49 +144,51 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
         if (studentListSnapshot.exists()) {
             const students = studentListSnapshot.val();
 
-            // For each student, retrieve "name" and "total"
-            for (const id in students) {
-                const studentData = students[id];
-                const studentName = studentNames[id]?.Name || "Unknown";
-
-                // Initialize the student's row if not already present
-                if (!studentMap[id]) {
-                    studentMap[id] = [studentName, ...headers.slice(1).map(() => null)];
+            for (const markId in students) {
+                const studentData = students[markId];
+                const marksName = studentData.studentName?.toLowerCase().trim();
+                
+                // Find matching student from studentList
+                let matchedId = markId;
+                if (normalizedNameMap[marksName]) {
+                    matchedId = normalizedNameMap[marksName].id;
                 }
 
-                // Update the student's mark for the current module
-                const moduleIndex = headers.indexOf(moduleKey);
-                if (moduleIndex >= 0) {
-                    studentMap[id][moduleIndex] = studentData.total || 0;
+                // If student exists in studentDataMap, update their marks
+                if (studentDataMap[matchedId]) {
+                    studentDataMap[matchedId].marks[moduleKey] = studentData.total || 0;
                 }
             }
         }
     }
 
-    // Convert studentMap to jsonData.data
-    jsonData.data = Object.values(studentMap);
-    jsonData = transformJsonData(jsonData, weightJson, criteriaMod);
+    // Convert studentDataMap to array format for jsonData
+    jsonData.data = Object.entries(studentDataMap).map(([id, data]) => {
+        const row = [data.name];
+        headers.slice(1).forEach(moduleKey => {
+            row.push(data.marks[moduleKey] || null);
+        });
+        return row;
+    });
 
-    console.log("jsonData", jsonData);
+    // Sort data by student name
+    jsonData.data.sort((a, b) => a[0].localeCompare(b[0]));
+
+    jsonData = transformJsonData(jsonData, weightJson, criteriaMod);
+    console.log("Final jsonData", jsonData);
     return jsonData;
 }
 
 async function fetchFirebaseOverall(year, batchName, neededPhase) {
-    // Step 1: Fetch module headers and initialize criteriaHeaders
+    // Fetch module headers and initialize criteriaHeaders
     const modulesRef = ref(db, `Batches/${year}/${batchName}/modules`);
     const modulesSnapshot = await get(modulesRef);
     const modules = modulesSnapshot.exists() ? modulesSnapshot.val() : {};
 
     const matchingModules = await Promise.all(Object.keys(modules).map(async (moduleName) => {
         const phaseRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/phase`);
-        const criteriaRef = ref(db, `Batches/${year}/${batchName}/modules/${moduleName}/criteria`);
-
-        const [phaseSnapshot, criteriaSnapshot] = await Promise.all([get(phaseRef), get(criteriaRef)]);
-
-        if (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) {
-            return moduleName;
-        }
-        return null;
+        const [phaseSnapshot] = await Promise.all([get(phaseRef)]);
+        return (phaseSnapshot.exists() && phaseSnapshot.val() === neededPhase) ? moduleName : null;
     }));
 
     // Fetch criteria data for headers
@@ -201,19 +204,32 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
 
     const criteriaHeaders = ["Name", ...matchingHeaders.filter(header => header !== null)];
 
-    // Initialize jsonData and studentMap
+    // Initialize jsonData
     let jsonData = {
         criteriaHeaders,
         data: []
     };
-    const studentMap = {};
 
-    // Fetch all student names once
+    // Fetch student names and create normalized name map
     const studentNamesRef = ref(db, `studentList/${year}/${batchName}`);
     const studentNamesSnapshot = await get(studentNamesRef);
     const studentNames = studentNamesSnapshot.exists() ? studentNamesSnapshot.val() : {};
 
-    // Step 2: Loop through modules and fetch students' marks
+    // Create normalized name map
+    const normalizedNameMap = {};
+    const studentMap = {};
+    
+    for (const id in studentNames) {
+        const name = studentNames[id]?.Name;
+        if (name) {
+            const normalizedName = name.toLowerCase().trim();
+            normalizedNameMap[normalizedName] = { id, originalName: name };
+            // Initialize student data structure
+            studentMap[id] = [name, ...new Array(criteriaHeaders.length - 1).fill(null)];
+        }
+    }
+
+    // Process each matching module
     for (const moduleKey of matchingModules.filter(module => module !== null)) {
         const studentListRef = ref(db, `marks/${year}/${batchName}/${moduleKey}/students`);
         const studentListSnapshot = await get(studentListRef);
@@ -221,36 +237,46 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
         if (studentListSnapshot.exists()) {
             const students = studentListSnapshot.val();
 
-            // For each student, retrieve "name" and their marks based on criteria
-            for (const id in students) {
-                const studentData = students[id];
-                const studentName = studentNames[id]?.Name || "Unknown";
-                const criteriaData = studentData.criteria || {};
-
-                // Initialize the student's row if not already present
-                if (!studentMap[id]) {
-                    studentMap[id] = [studentName, ...new Array(criteriaHeaders.length - 1).fill(null)];
+            for (const markId in students) {
+                const studentData = students[markId];
+                const marksName = studentData.studentName?.toLowerCase().trim();
+                
+                // Find matching student using normalized name
+                let matchedId = markId;
+                if (normalizedNameMap[marksName]) {
+                    matchedId = normalizedNameMap[marksName].id;
                 }
 
-                // Update the student's marks based on criteria
-                for (const criteriaKey in criteriaData) {
-                    const normalizedCriteriaKey = criteriaKey.trim().toLowerCase().replace(/\s+/g, '');
-                    const normalizedHeaders = criteriaHeaders.slice(1).map(header => header.trim().toLowerCase().replace(/\s+/g, ''));
+                if (studentMap[matchedId]) {
+                    const criteriaData = studentData.criteria || {};
+                    
+                    // Update criteria marks
+                    for (const criteriaKey in criteriaData) {
+                        const normalizedCriteriaKey = criteriaKey.trim().toLowerCase().replace(/\s+/g, '');
+                        const normalizedHeaders = criteriaHeaders.slice(1).map(header => 
+                            header.trim().toLowerCase().replace(/\s+/g, '')
+                        );
 
-                    // Find the index for the normalized criteriaKey in the normalizedHeaders
-                    const criteriaIndex = normalizedHeaders.indexOf(normalizedCriteriaKey);
-
-                    if (criteriaIndex >= 0) {
-                        studentMap[id][criteriaIndex + 1] = criteriaData[criteriaKey] || 0;
+                        const criteriaIndex = normalizedHeaders.indexOf(normalizedCriteriaKey);
+                        if (criteriaIndex >= 0) {
+                            // If there's an existing value, take the highest
+                            const currentValue = studentMap[matchedId][criteriaIndex + 1];
+                            const newValue = criteriaData[criteriaKey] || 0;
+                            studentMap[matchedId][criteriaIndex + 1] = Math.max(
+                                currentValue || 0,
+                                newValue
+                            );
+                        }
                     }
                 }
             }
         }
     }
 
-    // Step 3: Convert studentMap to jsonData.data
-    jsonData.data = Object.values(studentMap);
-    console.log("jsonData", jsonData);
+    // Convert studentMap to jsonData.data and sort by name
+    jsonData.data = Object.values(studentMap).sort((a, b) => a[0].localeCompare(b[0]));
+    
+    console.log("Project view jsonData", jsonData);
     return jsonData;
 }
 
@@ -278,19 +304,16 @@ function initializeHeaders(headers) {
 function sortColumnByHighestScore(columnIndex) {
     if (!fullData || fullData.length === 0) return;
 
-    // Check the current sorting direction for this column, default is descending
     let direction = sortDirection[columnIndex] || 'descending';
 
-    // Sort data based on the direction
     const sortedData = [...fullData].sort((a, b) => {
         const scoreA = parseFloat(a[columnIndex]) || 0;
         const scoreB = parseFloat(b[columnIndex]) || 0;
 
-        // Toggle between descending and ascending sorting
         if (direction === 'descending') {
-            return scoreB - scoreA; // Sort descending for highest score
+            return scoreB - scoreA;
         } else {
-            return scoreA - scoreB; // Sort ascending for lowest score
+            return scoreA - scoreB;
         }
     });
 
@@ -300,7 +323,6 @@ function sortColumnByHighestScore(columnIndex) {
     // Toggle the sorting direction for next click
     sortDirection[columnIndex] = direction === 'descending' ? 'ascending' : 'descending';
 }
-
 
 function renderHead(headings) {
     const tableHead = document.getElementById('table-head');
@@ -320,25 +342,24 @@ function renderHead(headings) {
 
 function renderTable(data, checker) {
     const tableBody = document.getElementById('table-body');
-    tableBody.innerHTML = ''; // Clear existing table data
+    tableBody.innerHTML = '';
 
     data.forEach(student => {
         const row = document.createElement('tr');
 
-        // Populate row cells with student data
+        // Add all columns except total
         student.forEach(value => {
             const cell = document.createElement('td');
             cell.textContent = value;
             row.appendChild(cell);
         });
 
-        // Calculate total marks and add the 'Total' cell
+        // Calculate and add total column
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         totalCell.textContent = totalMarks;
         row.appendChild(totalCell);
 
-        // Append the row to the table body
         tableBody.appendChild(row);
     });
 }
@@ -366,7 +387,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
         const moduleName = jsonData.headers[i];
-        transformedHeaders.push(`${moduleName} Score`, `${moduleName} out of ${weightMap[moduleName]}`);
+        transformedHeaders.push(`${moduleName} Mark`, `${moduleName} out of ${weightMap[moduleName]}`);
     }
 
     // Initialize the transformed data array
@@ -440,27 +461,25 @@ function searchTable() {
 }
 
 function calculateTotalMarks(student, checker) {
-    // Choose slice based on the checker flag
-    const marksArray = checker ? student.slice(2) : student.slice(1);
-
-    const total = marksArray.reduce((sum, mark, index) => {
-        const numericMark = parseFloat(mark);
-
-        // If checker is true, sum only the marks at even indices
-        if (checker && index % 2 === 0 && !isNaN(numericMark)) {
-            return sum + numericMark;
-        }
-
-        // If checker is false, sum all valid marks
-        if (!checker && !isNaN(numericMark)) {
-            return sum + numericMark;
-        }
-
-        return sum;
-    }, 0);
-
-    // Return the total rounded to 2 decimal places
-    return total.toFixed(2);
+    // If checker is true, we have alternating mark/weight columns
+    // We only want to sum the actual marks (even indices starting from 2)
+    if (checker) {
+        return student.slice(2).reduce((sum, mark, index) => {
+            // Only add marks from even-indexed columns (the raw marks)
+            if (index % 2 === 0) {
+                const numericMark = parseFloat(mark);
+                return !isNaN(numericMark) ? sum + numericMark : sum;
+            }
+            return sum;
+        }, 0).toFixed(2);
+    } 
+    // If checker is false, we have only mark columns
+    else {
+        return student.slice(1).reduce((sum, mark) => {
+            const numericMark = parseFloat(mark);
+            return !isNaN(numericMark) ? sum + numericMark : sum;
+        }, 0).toFixed(2);
+    }
 }
 
 // Sort and render the top 5 entries by total marks

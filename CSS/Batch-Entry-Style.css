@@ -57,7 +57,7 @@ body {
 }
 
 .nav-item:hover {
-    background-color: #5e89df; /* Darker shade on hover */
+    background-color: #6a5b92; /* Darker shade on hover */
 }
 
 .nav-icon {
@@ -142,7 +142,7 @@ input {
 .Config-Page-Right-top-buttonpart {
     width: 20%;
     height: 10em;
-
+    font-size: 19px;
     margin-top: 1em;
     display: flex;
     flex-direction: column;
@@ -309,7 +309,7 @@ input {
     border: none;
     background-color: #967ccf;
     border-radius: 0.3em;
-
+    color: white;
 }
 
 
@@ -342,6 +342,6 @@ input {
     border: none;
     background-color: #967ccf;
     border-radius: 0.3em;
-
+    color: white;
     margin: 2em;
 }
