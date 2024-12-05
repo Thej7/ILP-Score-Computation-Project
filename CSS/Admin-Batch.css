@@ -73,7 +73,7 @@ body {
 
 /******************************************    Right side    ******************************************/
 .Config-Page-Right {
-    margin-left: 300px; /* Adjusted to match sidebar width */
+    margin-left: 280px; /* Adjusted to match sidebar width */
     padding: 20px; /* Add padding for better spacing */
     flex-grow: 1; /* Allow it to take remaining space */
     background-color: #f0f0f0; /* Light background for contrast */
