@@ -197,3 +197,110 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+
+
+
+
+
+/* Confirmation Dialog Styles */
+body {
+    margin: 0; /* Ensure no margin on the body */
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.confirmation-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow: hidden; /* Ensure no scrollbars appear */
+}
+
+.confirmation-content {
+    background-color: rgba(0, 0, 0, 0.622);
+    padding: 24px;
+    border-radius: 12px;
+    width: 450px;
+    max-width: 90%; /* Ensure responsiveness */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: popIn 0.3s ease-out;
+    text-align: center; /* Ensure content looks centered */
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.confirmation-content h3 {
+    margin: 0 0 12px 0;
+    color: #fff9f9;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.confirmation-content p {
+    margin: 0 0 20px 0;
+    color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.confirmation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.cancel-btn {
+    padding: 8px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: white;
+    color: #000000;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.confirm-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #dc3545;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background-color: #f5f5f5;
+    border-color: #d0d0d0;
+}
+
+.confirm-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.cancel-btn:active,
+.confirm-btn:active {
+    transform: translateY(1px);
+}
