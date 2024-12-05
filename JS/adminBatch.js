@@ -221,24 +221,65 @@ async function setActiveBatch(selectedYear, selectedBatchName) {
 }
 
 async function deleteBatch(selectedYear, selectedBatchName) {
+    // Show confirmation dialog first
+    showDeleteConfirmation(selectedYear, selectedBatchName);
+}
 
-    try {
-        const batchRef = ref(db, `Batches/${selectedYear}/${selectedBatchName}`);
+function showDeleteConfirmation(selectedYear, selectedBatchName) {
+    // Create the confirmation dialog
+    const confirmationDialog = document.createElement('div');
+    confirmationDialog.className = 'confirmation-dialog';
+    confirmationDialog.setAttribute('role', 'dialog');
+    confirmationDialog.setAttribute('aria-labelledby', 'dialog-title');
+    confirmationDialog.innerHTML = `
+        <div class="confirmation-content">
+            <h3 id="dialog-title">Delete Batch</h3>
+            <p>Are you sure you want to delete Batch -" <strong>${selectedBatchName}</strong> "?</p>
+            <div class="confirmation-buttons">
+                <button class="cancel-btn">Cancel</button>
+                <button class="confirm-btn">Delete</button>
+            </div>
+        </div>
+    `;
 
-        // Remove the specific batch data
-        await remove(batchRef);
-        console.log("batch ref", batchRef)
+    // Append the dialog to the body
+    document.body.appendChild(confirmationDialog);
 
-        console.log(`Batch ${selectedBatchName} for year ${selectedYear} deleted successfully.`);
+    // Disable background interactions
+    document.body.style.pointerEvents = 'none';
 
-        // Re-fetch batches to update the UI after deletion
-        fetchApiStudent();
-        showNotification(`${selectedBatchName} deleted successfully`, 'success');
-    } catch (error) {
-        console.error("Error deleting batch:", error);
-        showNotification("Failed to delete batch", 'error');
+    // Enable dialog interactions
+    confirmationDialog.style.pointerEvents = 'auto';
+
+    // Close dialog on outside click
+    confirmationDialog.addEventListener('click', (event) => {
+        if (event.target === confirmationDialog) {
+            closeDialog();
+        }
+    });
+
+    // Add event listeners for the buttons
+    confirmationDialog.querySelector('.cancel-btn').addEventListener('click', closeDialog);
+
+    confirmationDialog.querySelector('.confirm-btn').addEventListener('click', async () => {
+        try {
+            const batchRef = ref(db, `Batches/${selectedYear}/${selectedBatchName}`);
+            await remove(batchRef);
+            fetchApiStudent(); // Refresh data
+            showNotification(`${selectedBatchName} deleted successfully`, 'success');
+        } catch (error) {
+            console.error("Error deleting batch:", error);
+            showNotification("Failed to delete batch", 'error');
+        } finally {
+            closeDialog();
+        }
+    });
+
+    // Function to close the dialog
+    function closeDialog() {
+        document.body.removeChild(confirmationDialog);
+        document.body.style.pointerEvents = '';
     }
-
 }
 
 function displayBatch(batch, studentCount) {
