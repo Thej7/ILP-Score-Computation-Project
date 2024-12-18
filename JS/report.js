@@ -340,6 +340,7 @@ function renderHead(headings) {
     console.log('Table headings are rendered:', headings);
 }
 
+
 function renderTable(data, checker) {
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
@@ -347,17 +348,23 @@ function renderTable(data, checker) {
     data.forEach(student => {
         const row = document.createElement('tr');
 
-        // Add all columns except total
-        student.forEach(value => {
+        // Add columns with appropriate decimal display
+        student.forEach((value, index) => {
             const cell = document.createElement('td');
-            cell.textContent = value;
+            // For numerical values, check if it needs formatting
+            if (!isNaN(value) && value !== null) {
+                // Format number to display 2 decimals
+                cell.textContent = Number(value).toFixed(2);
+            } else {
+                cell.textContent = value;
+            }
             row.appendChild(cell);
         });
 
-        // Calculate and add total column
+        // Calculate total with 3 decimals but display with 2
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
-        totalCell.textContent = totalMarks;
+        totalCell.textContent = Number(totalMarks).toFixed(2);
         row.appendChild(totalCell);
 
         tableBody.appendChild(row);
@@ -387,7 +394,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
         const moduleName = jsonData.headers[i];
-        transformedHeaders.push(`${moduleName} Score`, `${moduleName} out of ${weightMap[moduleName]}`);
+        transformedHeaders.push(`${moduleName} Mark`, `${moduleName} out of ${weightMap[moduleName]}`);
     }
 
     // Initialize the transformed data array
@@ -417,7 +424,7 @@ for (const row of jsonData.data) {
             }
 
             // Calculate weight based on the mark
-            const weight = mark ? (((mark / maxScore) * (weightMap[moduleName] || 0))/100).toFixed(2) : '';
+            const weight = mark ? (((mark / maxScore) * (weightMap[moduleName] || 0))/100).toFixed(5) : '';
             transformedRow.push(mark, weight);
 
         } catch (error) {
@@ -471,14 +478,14 @@ function calculateTotalMarks(student, checker) {
                 return !isNaN(numericMark) ? sum + numericMark : sum;
             }
             return sum;
-        }, 0).toFixed(2);
+        }, 0).toFixed(5);
     } 
     // If checker is false, we have only mark columns
     else {
         return student.slice(1).reduce((sum, mark) => {
             const numericMark = parseFloat(mark);
             return !isNaN(numericMark) ? sum + numericMark : sum;
-        }, 0).toFixed(2);
+        }, 0).toFixed(5);
     }
 }
 
