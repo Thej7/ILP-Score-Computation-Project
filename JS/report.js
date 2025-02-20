@@ -445,7 +445,7 @@ for (const row of jsonData.data) {
 
 
 // Function to search and filter the table
-function searchTable() {
+window.searchTable = function() {
     const searchInput = document.getElementById('Search_input').value.toLowerCase();
     const tableBody = document.getElementById('table-body');
     const rows = tableBody.getElementsByTagName('tr');
