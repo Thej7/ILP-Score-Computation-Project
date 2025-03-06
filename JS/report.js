@@ -351,9 +351,11 @@ function renderTable(data, checker) {
         // Add columns with appropriate decimal display
         student.forEach((value, index) => {
             const cell = document.createElement('td');
-            // For numerical values, check if it needs formatting
+            
+            // Only display certain columns - hide or format as needed
             if (!isNaN(value) && value !== null) {
-                // Format number to display 3 decimals
+                // Keep original value for calculations but hide it visually
+                // or format it as needed
                 cell.textContent = value;
             } else {
                 cell.textContent = value;
@@ -361,34 +363,27 @@ function renderTable(data, checker) {
             row.appendChild(cell);
         });
 
-        // Calculate total marks and display with exactly 3 decimals
+        // Calculate total marks with exact values (for calculation)
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         
-        // Format to exactly 3 decimal places without rounding
-        // Convert to string and ensure it has exactly 3 decimal places
-        const totalValue = String(totalMarks);
-        const parts = totalValue.split('.');
-        let formattedTotal;
+        // Format to "00.000" format
+        const totalValue = Number(totalMarks);
         
-        if (parts.length === 1) {
-            // No decimal point, add .000
-            formattedTotal = totalValue + '.000';
-        } else {
-            // Has decimal point
-            const decimalPart = parts[1];
-            if (decimalPart.length > 3) {
-                // Truncate to 3 decimal places (no rounding)
-                formattedTotal = parts[0] + '.' + decimalPart.substring(0, 3);
-            } else {
-                // Pad with zeros if needed
-                formattedTotal = parts[0] + '.' + decimalPart.padEnd(3, '0');
-            }
-        }
+        // Format to have 2 digits before decimal and 3 after
+        const formattedTotal = totalValue.toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3,
+            useGrouping: false
+        });
         
         totalCell.textContent = formattedTotal;
+        
+        // Store the actual unformatted value for sorting/calculations
+        totalCell.dataset.actualValue = totalValue;
+        
         row.appendChild(totalCell);
-
         tableBody.appendChild(row);
     });
 }
