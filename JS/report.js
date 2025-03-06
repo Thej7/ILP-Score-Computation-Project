@@ -353,18 +353,18 @@ function renderTable(data, checker) {
             const cell = document.createElement('td');
             // For numerical values, check if it needs formatting
             if (!isNaN(value) && value !== null) {
-                // Format number to display 2 decimals
-                cell.textContent = Number(value).toFixed(3);
+                // Format number to display without rounding
+                cell.textContent = value;
             } else {
                 cell.textContent = value;
             }
             row.appendChild(cell);
         });
 
-        // Calculate total with 3 decimals but display with 2
+        // Calculate total marks without rounding
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
-        totalCell.textContent = Number(totalMarks).toFixed(2);
+        totalCell.textContent = totalMarks; // Don't round the total
         row.appendChild(totalCell);
 
         tableBody.appendChild(row);
@@ -478,14 +478,14 @@ function calculateTotalMarks(student, checker) {
                 return !isNaN(numericMark) ? sum + numericMark : sum;
             }
             return sum;
-        }, 0).toFixed(5);
+        }, 0);
     } 
     // If checker is false, we have only mark columns
     else {
         return student.slice(1).reduce((sum, mark) => {
             const numericMark = parseFloat(mark);
             return !isNaN(numericMark) ? sum + numericMark : sum;
-        }, 0).toFixed(5);
+        }, 0);
     }
 }
 
