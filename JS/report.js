@@ -352,9 +352,14 @@ function renderTable(data, checker) {
         student.forEach((value, index) => {
             const cell = document.createElement('td');
             
-            // Only display certain columns - hide or format as needed
             if (!isNaN(value) && value !== null) {
-                cell.textContent = value;
+                // If this is a weight column (out of X) and is a number
+                if (index % 2 === 1 && index > 1 && checker) {
+                    // Format to exactly 3 decimal places
+                    cell.textContent = parseFloat(value).toFixed(3);
+                } else {
+                    cell.textContent = value;
+                }
             } else {
                 cell.textContent = value;
             }
@@ -377,9 +382,7 @@ function renderTable(data, checker) {
 }
 
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
-
-    console.log("here this data",jsonData)
-
+    console.log("here this data", jsonData);
 
     // Initialize the new headers with the first header unchanged ("Name")
     const transformedHeaders = [jsonData.headers[0]];
@@ -405,42 +408,48 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
     // Initialize the transformed data array
     const transformedData = [];
 
-for (const row of jsonData.data) {
-    // Start the transformed row with the first element unchanged ("Name")
-    const transformedRow = [row[0]];
+    for (const row of jsonData.data) {
+        // Start the transformed row with the first element unchanged ("Name")
+        const transformedRow = [row[0]];
 
-    // Loop through the data values starting from the second element
-    for (const [j, moduleName] of jsonData.headers.slice(1).entries()) {
-        const mark = row[j + 1]; // Adjust index because slice(1) starts from the second header
+        // Loop through the data values starting from the second element
+        for (const [j, moduleName] of jsonData.headers.slice(1).entries()) {
+            const mark = row[j + 1]; // Adjust index because slice(1) starts from the second header
 
-        const evalCriteriaRef = ref(db, `Evaluation Criteria/${criteriaMod[moduleName]}`);
+            const evalCriteriaRef = ref(db, `Evaluation Criteria/${criteriaMod[moduleName]}`);
 
-        try {
-            // Fetch evaluation criteria asynchronously
-            const evalCriteriaSnapshot = await get(evalCriteriaRef);
-            let maxScore = 0;
+            try {
+                // Fetch evaluation criteria asynchronously
+                const evalCriteriaSnapshot = await get(evalCriteriaRef);
+                let maxScore = 0;
 
-            // Sum up the points from the evaluation criteria
-            if (evalCriteriaSnapshot.exists()) {
-                evalCriteriaSnapshot.forEach((childSnapshot) => {
-                    const points = parseInt(childSnapshot.child('points').val()) || 0;
-                    maxScore += points;
-                });
+                // Sum up the points from the evaluation criteria
+                if (evalCriteriaSnapshot.exists()) {
+                    evalCriteriaSnapshot.forEach((childSnapshot) => {
+                        const points = parseInt(childSnapshot.child('points').val()) || 0;
+                        maxScore += points;
+                    });
+                }
+
+                // Calculate weight based on the mark and format to exactly 3 decimal places
+                let weight = '';
+                if (mark) {
+                    const calculatedWeight = ((mark / maxScore) * (weightMap[moduleName] || 0)) / 100;
+                    // Round to 3 decimal places to avoid floating point errors
+                    weight = (Math.round(calculatedWeight * 1000) / 1000).toFixed(3);
+                }
+                
+                transformedRow.push(mark, weight);
+
+            } catch (error) {
+                console.error(`Error fetching evaluation criteria for module ${moduleName}:`, error);
+                transformedRow.push(mark, ''); // Push empty weight in case of error
             }
-
-            // Calculate weight based on the mark
-            const weight = mark ? (((mark / maxScore) * (weightMap[moduleName] || 0))/100).toFixed(5) : '';
-            transformedRow.push(mark, weight);
-
-        } catch (error) {
-            console.error(`Error fetching evaluation criteria for module ${moduleName}:`, error);
-            transformedRow.push(mark, ''); // Push empty weight in case of error
         }
-    }
 
-    // Push the transformed row to the result array
-    transformedData.push(transformedRow);
-}
+        // Push the transformed row to the result array
+        transformedData.push(transformedRow);
+    }
 
     return {
         headers: transformedHeaders,
