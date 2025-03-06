@@ -354,8 +354,6 @@ function renderTable(data, checker) {
             
             // Only display certain columns - hide or format as needed
             if (!isNaN(value) && value !== null) {
-                // Keep original value for calculations but hide it visually
-                // or format it as needed
                 cell.textContent = value;
             } else {
                 cell.textContent = value;
@@ -367,19 +365,17 @@ function renderTable(data, checker) {
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         
-        // Format to display with 3 decimal places (0.000)
-        const totalValue = Number(totalMarks);
+        // Format to exactly 3 decimal places
+        totalCell.textContent = totalMarks.toFixed(3);
         
-        // Format to have exactly 3 decimal places, no extra zeros
-        totalCell.textContent = totalValue.toFixed(3);
-        
-        // Store the actual unformatted value for sorting/calculations
-        totalCell.dataset.actualValue = totalValue;
+        // Store the actual rounded value for sorting/calculations
+        totalCell.dataset.actualValue = totalMarks;
         
         row.appendChild(totalCell);
         tableBody.appendChild(row);
     });
 }
+
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
 
     console.log("here this data",jsonData)
@@ -477,25 +473,29 @@ window.searchTable = function() {
 }
 
 function calculateTotalMarks(student, checker) {
+    let total = 0;
+    
     // If checker is true, we have alternating mark/weight columns
-    // We only want to sum the actual marks (even indices starting from 2)
     if (checker) {
-        return student.slice(2).reduce((sum, mark, index) => {
-            // Only add marks from even-indexed columns (the raw marks)
-            if (index % 2 === 0) {
-                const numericMark = parseFloat(mark);
-                return !isNaN(numericMark) ? sum + numericMark : sum;
+        for (let i = 2; i < student.length; i += 2) {
+            const numericMark = parseFloat(student[i]);
+            if (!isNaN(numericMark)) {
+                total += numericMark;
             }
-            return sum;
-        }, 0);
+        }
     } 
     // If checker is false, we have only mark columns
     else {
-        return student.slice(1).reduce((sum, mark) => {
-            const numericMark = parseFloat(mark);
-            return !isNaN(numericMark) ? sum + numericMark : sum;
-        }, 0);
+        for (let i = 1; i < student.length; i++) {
+            const numericMark = parseFloat(student[i]);
+            if (!isNaN(numericMark)) {
+                total += numericMark;
+            }
+        }
     }
+    
+    // Return the number rounded to exactly 3 decimal places to avoid floating point issues
+    return Math.round(total * 1000) / 1000;
 }
 
 // Sort and render the top 5 entries by total marks
