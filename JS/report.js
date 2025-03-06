@@ -353,7 +353,7 @@ function renderTable(data, checker) {
             const cell = document.createElement('td');
             // For numerical values, check if it needs formatting
             if (!isNaN(value) && value !== null) {
-                // Format number to display without rounding
+                // Format number to display 3 decimals
                 cell.textContent = value;
             } else {
                 cell.textContent = value;
@@ -361,10 +361,32 @@ function renderTable(data, checker) {
             row.appendChild(cell);
         });
 
-        // Calculate total marks without rounding
+        // Calculate total marks and display with exactly 3 decimals
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
-        totalCell.textContent = totalMarks; // Don't round the total
+        
+        // Format to exactly 3 decimal places without rounding
+        // Convert to string and ensure it has exactly 3 decimal places
+        const totalValue = String(totalMarks);
+        const parts = totalValue.split('.');
+        let formattedTotal;
+        
+        if (parts.length === 1) {
+            // No decimal point, add .000
+            formattedTotal = totalValue + '.000';
+        } else {
+            // Has decimal point
+            const decimalPart = parts[1];
+            if (decimalPart.length > 3) {
+                // Truncate to 3 decimal places (no rounding)
+                formattedTotal = parts[0] + '.' + decimalPart.substring(0, 3);
+            } else {
+                // Pad with zeros if needed
+                formattedTotal = parts[0] + '.' + decimalPart.padEnd(3, '0');
+            }
+        }
+        
+        totalCell.textContent = formattedTotal;
         row.appendChild(totalCell);
 
         tableBody.appendChild(row);
