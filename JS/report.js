@@ -367,18 +367,11 @@ function renderTable(data, checker) {
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         
-        // Format to "00.000" format
+        // Format to display with 3 decimal places (0.000)
         const totalValue = Number(totalMarks);
         
-        // Format to have 2 digits before decimal and 3 after
-        const formattedTotal = totalValue.toLocaleString('en-US', {
-            minimumIntegerDigits: 2,
-            minimumFractionDigits: 3,
-            maximumFractionDigits: 3,
-            useGrouping: false
-        });
-        
-        totalCell.textContent = formattedTotal;
+        // Format to have exactly 3 decimal places, no extra zeros
+        totalCell.textContent = totalValue.toFixed(3);
         
         // Store the actual unformatted value for sorting/calculations
         totalCell.dataset.actualValue = totalValue;
@@ -387,7 +380,6 @@ function renderTable(data, checker) {
         tableBody.appendChild(row);
     });
 }
-
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
 
     console.log("here this data",jsonData)
