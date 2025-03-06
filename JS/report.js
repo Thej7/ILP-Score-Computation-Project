@@ -354,7 +354,7 @@ function renderTable(data, checker) {
             // For numerical values, check if it needs formatting
             if (!isNaN(value) && value !== null) {
                 // Format number to display 2 decimals
-                cell.textContent = Number(value).toFixed(2);
+                cell.textContent = Number(value).toFixed(3);
             } else {
                 cell.textContent = value;
             }
