@@ -29,6 +29,7 @@ async function fetchData(jsonData) {
         if (json.headers && json.data) {
             extendedHeaders = [...json.headers, 'Total'];
             renderHead(extendedHeaders);
+            console.log("extended", extendedHeaders);
             fullData = json.data;
             checker = true;
             const sortedData = [...fullData].sort((a, b) => a[0].localeCompare(b[0])); // Sort by name (first column)
@@ -50,6 +51,8 @@ async function fetchProject(jsonData) {
         // Check JSON structure and render if correct
         if (json.criteriaHeaders && json.data) {
             extendedHeaders = [...json.criteriaHeaders, 'Total'];
+            console.log("extended total headers", extendedHeaders);
+            
             renderHead(extendedHeaders);
             fullData = json.data;
             checker = false;
@@ -344,7 +347,7 @@ function renderHead(headings) {
 function renderTable(data, checker) {
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
-
+    
     data.forEach(student => {
         const row = document.createElement('tr');
 
@@ -357,6 +360,7 @@ function renderTable(data, checker) {
                 if (index % 2 === 1 && index > 1 && checker) {
                     // Format to exactly 3 decimal places
                     cell.textContent = parseFloat(value).toFixed(3);
+                    
                 } else {
                     cell.textContent = value;
                 }
@@ -381,6 +385,9 @@ function renderTable(data, checker) {
     });
 }
 
+const weightMap = {};
+let weightMapMain = {};
+
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
     console.log("here this data", jsonData);
 
@@ -388,7 +395,6 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
     const transformedHeaders = [jsonData.headers[0]];
 
     // Create a lookup map for weightage based on weightJson
-    const weightMap = {};
     if (Array.isArray(weightJson)) {
         for (let i = 0; i < weightJson.length; i++) {
             const { modulename, weightage } = weightJson[i];
@@ -398,6 +404,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
         }
     }
     console.log("weight map", weightMap);
+    weightMapMain = weightMap;
 
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
@@ -483,8 +490,14 @@ window.searchTable = function() {
 
 function calculateTotalMarks(student, checker) {
     let total = 0;
-    
-    // If checker is true, we have alternating mark/weight columns
+    console.log(weightMapMain);
+
+    let totalWeight = 0;
+
+    for (let key in weightMapMain) {
+        totalWeight += weightMapMain[key];
+    }
+
     if (checker) {
         for (let i = 2; i < student.length; i += 2) {
             const numericMark = parseFloat(student[i]);
@@ -492,6 +505,9 @@ function calculateTotalMarks(student, checker) {
                 total += numericMark;
             }
         }
+        total = total * 100;
+        total = total/totalWeight;
+        total = total * 100;
     } 
     // If checker is false, we have only mark columns
     else {
