@@ -303,35 +303,24 @@ function initializeHeaders(headers) {
     });
 }
 
-// Update the column sorting function to also consider percentage
+// Sort data by the selected module's score in descending or ascending order
 function sortColumnByHighestScore(columnIndex) {
     if (!fullData || fullData.length === 0) return;
 
     let direction = sortDirection[columnIndex] || 'descending';
 
     const sortedData = [...fullData].sort((a, b) => {
-        // If sorting the total column (last column)
-        if (columnIndex === fullData[0].length) {
-            const percentA = calculatePercentage(a, checker);
-            const percentB = calculatePercentage(b, checker);
-            
-            if (direction === 'descending') {
-                return percentB - percentA;
-            } else {
-                return percentA - percentB;
-            }
-        } else {
-            const scoreA = parseFloat(a[columnIndex]) || 0;
-            const scoreB = parseFloat(b[columnIndex]) || 0;
+        const scoreA = parseFloat(a[columnIndex]) || 0;
+        const scoreB = parseFloat(b[columnIndex]) || 0;
 
-            if (direction === 'descending') {
-                return scoreB - scoreA;
-            } else {
-                return scoreA - scoreB;
-            }
+        if (direction === 'descending') {
+            return scoreB - scoreA;
+        } else {
+            return scoreA - scoreB;
         }
     });
 
+    // Reinsert the first student at the top of the sorted data
     renderTable(sortedData, checker);
 
     // Toggle the sorting direction for next click
@@ -355,7 +344,6 @@ function renderHead(headings) {
 }
 
 
-// Modify the renderTable function to add percentage display
 function renderTable(data, checker) {
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
@@ -366,6 +354,7 @@ function renderTable(data, checker) {
         // Add columns with appropriate decimal display
         student.forEach((value, index) => {
             const cell = document.createElement('td');
+
 
             if (!isNaN(value) && value !== null) {
                 // If this is a weight column (out of X) and is a number
@@ -384,66 +373,23 @@ function renderTable(data, checker) {
 
         // Calculate total marks with exact values (for calculation)
         const totalMarks = calculateTotalMarks(student, checker);
-        
-        // Calculate percentage out of 100
-        const percentageTotal = calculatePercentage(student, checker);
-        
         const totalCell = document.createElement('td');
-        
-        // Show both exact mark and percentage
-        totalCell.textContent = `${totalMarks.toFixed(3)} (${percentageTotal.toFixed(2)}%)`;
+
+        // Format to exactly 3 decimal places
+        totalCell.textContent = totalMarks.toFixed(3);
 
         // Store the actual rounded value for sorting/calculations
         totalCell.dataset.actualValue = totalMarks;
-        totalCell.dataset.percentageValue = percentageTotal;
 
         row.appendChild(totalCell);
         tableBody.appendChild(row);
     });
 }
 
-function calculatePercentage(student, checker) {
-    let totalMark = 0;
-    let totalPossible = 0;
-
-    // If checker is true, we have alternating mark/weight columns
-    if (checker) {
-        for (let i = 1; i < student.length; i += 2) {
-            const rawMark = parseFloat(student[i]);
-            if (!isNaN(rawMark)) {
-                const weightageText = student[i+1] ? student[i+1].toString() : '';
-                const matches = weightageText.match(/out of ([\d.]+)/);
-                
-                if (matches && matches[1]) {
-                    const maxWeight = parseFloat(matches[1]);
-                    if (!isNaN(maxWeight) && maxWeight > 0) {
-                        totalMark += parseFloat(student[i+1]);
-                        totalPossible += maxWeight/100;
-                    }
-                }
-            }
-        }
-    } 
-    // If checker is false, we have only mark columns
-    else {
-        for (let i = 1; i < student.length; i++) {
-            const numericMark = parseFloat(student[i]);
-            if (!isNaN(numericMark)) {
-                // For project view, assume all criteria are out of the same value
-                // or modify this to use actual max values if available
-                totalMark += numericMark;
-                totalPossible += 1; // Assuming each criteria is out of 1, adjust as needed
-            }
-        }
-    }
-
-    // Calculate percentage (avoid division by zero)
-    return totalPossible > 0 ? (totalMark / totalPossible) * 100 : 0;
-}
-
-// Update the transformJsonData function to include the max possible score
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
     console.log("here this data", jsonData);
+
+
 
     // Initialize the new headers with the first header unchanged ("Name")
     const transformedHeaders = [jsonData.headers[0]];
@@ -508,6 +454,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
             }
         }
 
+
         // Push the transformed row to the result array
         transformedData.push(transformedRow);
     }
@@ -517,6 +464,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
         data: transformedData
     };
 }
+
 
 // Function to search and filter the table
 window.searchTable = function() {
@@ -576,36 +524,28 @@ function calculateTotalMarks(student, checker) {
     return Math.round(total * 1000) / 1000;
 }
 
-// Update the sortTop5 and sortBottom5 functions to use percentage for sorting
+// Sort and render the top 5 entries by total marks
 function sortTop5() {
     const filteredData = fullData.filter(entry => {
-        const totalMarks = calculateTotalMarks(entry, checker);
+        const totalMarks = calculateTotalMarks(entry);
         return totalMarks > 0; // Filter out entries with non-numeric or zero marks
     });
 
-    const sortedData = filteredData.sort((a, b) => {
-        const percentA = calculatePercentage(a, checker);
-        const percentB = calculatePercentage(b, checker);
-        return percentB - percentA;
-    });
-    
+    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
     renderTable(sortedData.slice(0, 5), checker); // Top 5 entries
 }
 
+// Sort and render the bottom 5 entries by total marks
 function sortBottom5() {
     const filteredData = fullData.filter(entry => {
-        const totalMarks = calculateTotalMarks(entry, checker);
+        const totalMarks = calculateTotalMarks(entry);
         return totalMarks > 0; // Filter out entries with non-numeric or zero marks
     });
 
-    const sortedData = filteredData.sort((a, b) => {
-        const percentA = calculatePercentage(a, checker);
-        const percentB = calculatePercentage(b, checker);
-        return percentA - percentB;
-    });
-    
+    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(a) - calculateTotalMarks(b));
     renderTable(sortedData.slice(0, 5), checker); // Bottom 5 entries
 }
+
 
 // Sort A-Z by Name
 function sortByName() {
@@ -614,22 +554,16 @@ function sortByName() {
 }
 
 
-// Update showAll to also use percentage sorting
+// Function to show all rows (re-render fullData)
 function showAll() {
     const filteredData = fullData.filter(entry => {
-        const totalMarks = calculateTotalMarks(entry, checker);
+        const totalMarks = calculateTotalMarks(entry);
         return totalMarks > 0; // Filter out entries with non-numeric or zero marks
     });
 
-    const sortedData = filteredData.sort((a, b) => {
-        const percentA = calculatePercentage(a, checker);
-        const percentB = calculatePercentage(b, checker);
-        return percentB - percentA;
-    });
-    
-    renderTable(sortedData, checker); // Show all entries sorted by percentage
+    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
+    renderTable(sortedData, checker); // Top 5 entries
 }
-
 
 // Download function for exporting the table as Excel
 function downloadExcel() {
