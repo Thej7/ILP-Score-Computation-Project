@@ -366,7 +366,7 @@ function renderTable(data, checker) {
             row.appendChild(cell);
         });
 
-        // Calculate total marks with exact values (for calculation)
+        // Calculate total marks out of 100
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
         
@@ -379,7 +379,29 @@ function renderTable(data, checker) {
         row.appendChild(totalCell);
         tableBody.appendChild(row);
     });
+    
+    // Add "Total" to the headers if not already present
+    const tableHead = document.getElementById('table-head');
+    const headerRow = tableHead.querySelector('tr');
+    
+    if (headerRow) {
+        let totalHeaderExists = false;
+        const headers = headerRow.querySelectorAll('th');
+        
+        headers.forEach(header => {
+            if (header.textContent === 'Total') {
+                totalHeaderExists = true;
+            }
+        });
+        
+        if (!totalHeaderExists) {
+            const totalHeader = document.createElement('th');
+            totalHeader.textContent = 'Total';
+            headerRow.appendChild(totalHeader);
+        }
+    }
 }
+
 
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
     console.log("here this data", jsonData);
@@ -481,68 +503,71 @@ window.searchTable = function() {
     }
 }
 
+// Updated calculateTotalMarks function to correctly scale to 100
 function calculateTotalMarks(student, checker) {
-    let totalObtained = 0;
-    let totalMaximum = 0;
-    
     // If checker is true, we have alternating mark/weight columns
     if (checker) {
-        for (let i = 2; i < student.length; i += 2) {
-            const obtainedMark = parseFloat(student[i]);
-            const maximumMark = parseFloat(student[i+1]);
+        let totalWeightage = 0;
+        
+        // In the transformed data structure, weights are at positions 3, 5, 7, etc.
+        // (index 2 would be the first module's mark, index 3 would be its weight)
+        for (let i = 3; i < student.length; i += 2) {
+            const weightValue = parseFloat(student[i]);
             
-            if (!isNaN(obtainedMark)) {
-                totalObtained += obtainedMark;
-            }
-            
-            if (!isNaN(maximumMark)) {
-                totalMaximum += maximumMark;
-            }
-        }
-    } 
-    // If checker is false, we need to determine maximum marks from elsewhere
-    else {
-        for (let i = 1; i < student.length; i++) {
-            const obtainedMark = parseFloat(student[i]);
-            if (!isNaN(obtainedMark)) {
-                totalObtained += obtainedMark;
+            if (!isNaN(weightValue)) {
+                totalWeightage += weightValue;
             }
         }
         
-        // This would need to be provided separately for the non-checker case
-        // For example, if each question is out of 10 and there are 6 questions
-        totalMaximum = 60; // This should be replaced with actual maximum
+        // The weights in transformJsonData are already scaled proportionally to each module's weightage
+        // We multiply by 100 to get the final percentage (0-100)
+        return Math.round(totalWeightage * 100 * 1000) / 1000;
+    } 
+    // If checker is false, handle simple mark calculation
+    else {
+        let totalMarks = 0;
+        let totalModules = 0;
+        
+        // Start from index 1 (skipping the name) and process all marks
+        for (let i = 1; i < student.length; i++) {
+            const mark = parseFloat(student[i]);
+            
+            if (!isNaN(mark)) {
+                totalMarks += mark;
+                totalModules++;
+            }
+        }
+        
+        // Calculate average if not using weights
+        const average = totalModules > 0 ? (totalMarks / totalModules) : 0;
+        
+        // Return properly rounded value
+        return Math.round(average * 1000) / 1000;
     }
-    
-    // Scale the total to be out of 100
-    let scaledTotal = 0;
-    if (totalMaximum > 0) {
-        scaledTotal = (totalObtained / totalMaximum) * 100;
-    }
-    
-    // Return the number rounded to exactly 3 decimal places to avoid floating point issues
-    return Math.round(scaledTotal * 1000) / 1000;
 }
 
-// Sort and render the top 5 entries by total marks
+// Updated sort functions to use the new total marks calculation
 function sortTop5() {
     const filteredData = fullData.filter(entry => {
-        const totalMarks = calculateTotalMarks(entry);
+        const totalMarks = calculateTotalMarks(entry, checker);
         return totalMarks > 0; // Filter out entries with non-numeric or zero marks
     });
 
-    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
+    const sortedData = filteredData.sort((a, b) => 
+        calculateTotalMarks(b, checker) - calculateTotalMarks(a, checker)
+    );
     renderTable(sortedData.slice(0, 5), checker); // Top 5 entries
 }
 
-// Sort and render the bottom 5 entries by total marks
 function sortBottom5() {
     const filteredData = fullData.filter(entry => {
-        const totalMarks = calculateTotalMarks(entry);
+        const totalMarks = calculateTotalMarks(entry, checker);
         return totalMarks > 0; // Filter out entries with non-numeric or zero marks
     });
 
-    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(a) - calculateTotalMarks(b));
+    const sortedData = filteredData.sort((a, b) => 
+        calculateTotalMarks(a, checker) - calculateTotalMarks(b, checker)
+    );
     renderTable(sortedData.slice(0, 5), checker); // Bottom 5 entries
 }
 
@@ -554,30 +579,38 @@ function sortByName() {
 }
 
 
-// Function to show all rows (re-render fullData)
 function showAll() {
     const filteredData = fullData.filter(entry => {
-        const totalMarks = calculateTotalMarks(entry);
+        const totalMarks = calculateTotalMarks(entry, checker);
         return totalMarks > 0; // Filter out entries with non-numeric or zero marks
     });
 
-    const sortedData = filteredData.sort((a, b) => calculateTotalMarks(b) - calculateTotalMarks(a));
-    renderTable(sortedData, checker); // Top 5 entries
+    const sortedData = filteredData.sort((a, b) => 
+        calculateTotalMarks(b, checker) - calculateTotalMarks(a, checker)
+    );
+    renderTable(sortedData, checker); // All entries sorted by total
 }
 
-// Download function for exporting the table as Excel
+// Updated downloadExcel function to include total marks
 function downloadExcel() {
     const table = document.getElementById('marklist-table');
     
     // Ensure the table exists
     if (table) {
-        
         // Create a new table element
         const newTable = document.createElement('table');
         
         // Create a new row for the extendedHeaders
         const newRow = document.createElement('tr');
-        extendedHeaders.forEach(header => {
+        
+        // Create an extended headers array that includes 'Total'
+        const completeHeaders = [...extendedHeaders];
+        if (!completeHeaders.includes('Total')) {
+            completeHeaders.push('Total');
+        }
+        
+        // Add all headers to the new row
+        completeHeaders.forEach(header => {
             const th = document.createElement('th');
             th.textContent = header;
             newRow.appendChild(th);
