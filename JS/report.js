@@ -482,46 +482,29 @@ window.searchTable = function() {
 }
 
 function calculateTotalMarks(student, checker) {
-    let totalObtained = 0;
-    let totalMaximum = 0;
-    
+    let total = 0;
+
     // If checker is true, we have alternating mark/weight columns
     if (checker) {
         for (let i = 2; i < student.length; i += 2) {
-            const obtainedMark = parseFloat(student[i]);
-            const maximumMark = parseFloat(student[i+1]);
-            
-            if (!isNaN(obtainedMark)) {
-                totalObtained += obtainedMark;
-            }
-            
-            if (!isNaN(maximumMark)) {
-                totalMaximum += maximumMark;
+            const numericMark = parseFloat(student[i]);
+            if (!isNaN(numericMark)) {
+                total += numericMark;
             }
         }
     } 
-    // If checker is false, we need to determine maximum marks from elsewhere
+    // If checker is false, we have only mark columns
     else {
         for (let i = 1; i < student.length; i++) {
-            const obtainedMark = parseFloat(student[i]);
-            if (!isNaN(obtainedMark)) {
-                totalObtained += obtainedMark;
+            const numericMark = parseFloat(student[i]);
+            if (!isNaN(numericMark)) {
+                total += numericMark;
             }
         }
-        
-        // This would need to be provided separately for the non-checker case
-        // For example, if each question is out of 10 and there are 6 questions
-        totalMaximum = 60; // This should be replaced with actual maximum
     }
-    
-    // Scale the total to be out of 100
-    let scaledTotal = 0;
-    if (totalMaximum > 0) {
-        scaledTotal = (totalObtained / totalMaximum) * 100;
-    }
-    
+
     // Return the number rounded to exactly 3 decimal places to avoid floating point issues
-    return Math.round(scaledTotal * 1000) / 1000;
+    return Math.round(total * 1000) / 1000;
 }
 
 // Sort and render the top 5 entries by total marks
