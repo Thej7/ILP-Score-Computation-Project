@@ -354,7 +354,7 @@ function renderTable(data, checker) {
             
             if (!isNaN(value) && value !== null) {
                 // If this is a weight column (out of X) and is a number
-                if (index % 2 === 1 && index > 1 && checker) {
+                if (index % 2 === 0 && index > 0 && checker) {
                     // Format to exactly 3 decimal places
                     cell.textContent = parseFloat(value).toFixed(3);
                 } else {
@@ -401,7 +401,6 @@ function renderTable(data, checker) {
         }
     }
 }
-
 
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
     console.log("here this data", jsonData);
@@ -509,9 +508,9 @@ function calculateTotalMarks(student, checker) {
     if (checker) {
         let totalWeightage = 0;
         
-        // In the transformed data structure, weights are at positions 3, 5, 7, etc.
-        // (index 2 would be the first module's mark, index 3 would be its weight)
-        for (let i = 3; i < student.length; i += 2) {
+        // In the transformed data structure, weights are at positions 2, 4, 6, etc.
+        // Based on the actual data format from the table
+        for (let i = 2; i < student.length; i += 2) {
             const weightValue = parseFloat(student[i]);
             
             if (!isNaN(weightValue)) {
