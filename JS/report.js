@@ -505,9 +505,9 @@ function calculateTotalMarks(student, checker) {
                 total += numericMark;
             }
         }
-        total = (total * 100 * 100) / totalWeight;
+        total = (total * 100) / totalWeight;
     } 
-    
+
     else {
         for (let i = 1; i < student.length; i++) {
             const numericMark = parseFloat(student[i]);
