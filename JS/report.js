@@ -382,6 +382,7 @@ function renderTable(data, checker) {
     });
 }
 
+let weightMapMain = {};
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
     console.log("here this data", jsonData);
 
@@ -401,6 +402,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
         }
     }
     console.log("weight map", weightMap);
+    weightMapMain = weightMap;
 
     // Loop through headers starting from the second element
     for (let i = 1; i < jsonData.headers.length; i++) {
@@ -488,7 +490,14 @@ window.searchTable = function() {
 function calculateTotalMarks(student, checker) {
     let total = 0;
 
-    // If checker is true, we have alternating mark/weight columns
+
+    let totalWeight = 0;
+
+    // Calculate the total weight
+    for (let key in weightMapMain) {
+        totalWeight += weightMapMain[key];
+    }
+
     if (checker) {
         for (let i = 2; i < student.length; i += 2) {
             const numericMark = parseFloat(student[i]);
@@ -496,8 +505,9 @@ function calculateTotalMarks(student, checker) {
                 total += numericMark;
             }
         }
+        total = (total * 100 * 100) / totalWeight;
     } 
-    // If checker is false, we have only mark columns
+    
     else {
         for (let i = 1; i < student.length; i++) {
             const numericMark = parseFloat(student[i]);
