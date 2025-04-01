@@ -147,7 +147,7 @@ async function fetchFirebaseTotal(year, batchName, neededPhase) {
             for (const markId in students) {
                 const studentData = students[markId];
                 const marksName = studentData.studentName?.toLowerCase().trim();
-                
+
                 // Find matching student from studentList
                 let matchedId = markId;
                 if (normalizedNameMap[marksName]) {
@@ -218,7 +218,7 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
     // Create normalized name map
     const normalizedNameMap = {};
     const studentMap = {};
-    
+
     for (const id in studentNames) {
         const name = studentNames[id]?.Name;
         if (name) {
@@ -240,7 +240,7 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
             for (const markId in students) {
                 const studentData = students[markId];
                 const marksName = studentData.studentName?.toLowerCase().trim();
-                
+
                 // Find matching student using normalized name
                 let matchedId = markId;
                 if (normalizedNameMap[marksName]) {
@@ -249,7 +249,7 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
 
                 if (studentMap[matchedId]) {
                     const criteriaData = studentData.criteria || {};
-                    
+
                     // Update criteria marks
                     for (const criteriaKey in criteriaData) {
                         const normalizedCriteriaKey = criteriaKey.trim().toLowerCase().replace(/\s+/g, '');
@@ -275,7 +275,7 @@ async function fetchFirebaseOverall(year, batchName, neededPhase) {
 
     // Convert studentMap to jsonData.data and sort by name
     jsonData.data = Object.values(studentMap).sort((a, b) => a[0].localeCompare(b[0]));
-    
+
     console.log("Project view jsonData", jsonData);
     return jsonData;
 }
@@ -351,7 +351,8 @@ function renderTable(data, checker) {
         // Add columns with appropriate decimal display
         student.forEach((value, index) => {
             const cell = document.createElement('td');
-            
+
+
             if (!isNaN(value) && value !== null) {
                 // If this is a weight column (out of X) and is a number
                 if (index % 2 === 1 && index > 1 && checker) {
@@ -369,13 +370,13 @@ function renderTable(data, checker) {
         // Calculate total marks with exact values (for calculation)
         const totalMarks = calculateTotalMarks(student, checker);
         const totalCell = document.createElement('td');
-        
+
         // Format to exactly 3 decimal places
         totalCell.textContent = totalMarks.toFixed(3);
-        
+
         // Store the actual rounded value for sorting/calculations
         totalCell.dataset.actualValue = totalMarks;
-        
+
         row.appendChild(totalCell);
         tableBody.appendChild(row);
     });
@@ -383,6 +384,8 @@ function renderTable(data, checker) {
 
 async function transformJsonData(jsonData, weightJson, criteriaMod) {
     console.log("here this data", jsonData);
+
+
 
     // Initialize the new headers with the first header unchanged ("Name")
     const transformedHeaders = [jsonData.headers[0]];
@@ -446,6 +449,7 @@ async function transformJsonData(jsonData, weightJson, criteriaMod) {
                 transformedRow.push(mark, ''); // Push empty weight in case of error
             }
         }
+
 
         // Push the transformed row to the result array
         transformedData.push(transformedRow);
@@ -551,13 +555,13 @@ function showAll() {
 // Download function for exporting the table as Excel
 function downloadExcel() {
     const table = document.getElementById('marklist-table');
-    
+
     // Ensure the table exists
     if (table) {
-        
+
         // Create a new table element
         const newTable = document.createElement('table');
-        
+
         // Create a new row for the extendedHeaders
         const newRow = document.createElement('tr');
         extendedHeaders.forEach(header => {
@@ -568,12 +572,12 @@ function downloadExcel() {
 
         // Append the new row to the new table
         newTable.appendChild(newRow);
-        
+
         // Copy the rows from the original table to the new table
         for (let i = 0; i < table.rows.length; i++) {
             newTable.appendChild(table.rows[i].cloneNode(true));
         }
-        
+
         // Generate the Excel file with the new table structure
         const workbook = XLSX.utils.table_to_book(newTable);
         XLSX.writeFile(workbook, 'marklist_batch5.xlsx');
